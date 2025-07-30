@@ -3,6 +3,11 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\SupplierPurchaseOrderController;
+
+
+
+Route::resource('suppliers/purchase-orders', SupplierPurchaseOrderController::class);
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [
