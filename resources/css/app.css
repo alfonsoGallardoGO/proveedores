@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+.p-datatable {
+    border-radius: 10px; 
+    overflow: hidden; 
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+.p-paginator {
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 10px;
+}
