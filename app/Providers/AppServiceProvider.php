@@ -26,8 +26,8 @@ class AppServiceProvider extends ServiceProvider
                     return [
                         'id' => auth()->id(),
                         'name' => auth()->user()->name,
-                        'roles' => auth()->user()->getRoleNames(),
-                        'permissions' => auth()->user()->getPermissionNames(),
+                        // 'roles' => auth()->user()->getRoleNames(),
+                        // 'permissions' => auth()->user()->getPermissionNames(),
                     ];
                 }
 

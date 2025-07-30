@@ -9,10 +9,9 @@ class SupplierUser extends Authenticatable
 {
     use Notifiable;
 
-    // 👇 nombre de la tablaaaaaa
+
     protected $table = 'supplier_users';
 
-    // columnas que puedes llenar
     protected $fillable = [
         'name',
         'username',
