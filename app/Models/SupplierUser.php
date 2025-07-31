@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class SupplierUser extends Authenticatable
 {
     use Notifiable;
+    use TwoFactorAuthenticatable;
+    use \Laravel\Jetstream\HasProfilePhoto;
 
 
     protected $table = 'supplier_users';
@@ -40,5 +43,9 @@ class SupplierUser extends Authenticatable
         'email_verified_at' => 'datetime',
         'two_factor_confirmed_at' => 'datetime',
         'recovery_token_expires' => 'datetime',
+    ];
+    
+    protected $appends = [
+        'profile_photo_url',
     ];
 }

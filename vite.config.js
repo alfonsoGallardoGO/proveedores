@@ -26,6 +26,10 @@ export default defineConfig({
     resolve: {
         alias: {
             "@assets": path.resolve(__dirname, "./public/assets"),
+            "@profile": path.resolve(
+                __dirname,
+                "./storage/app/public/profile-photos"
+            ),
         },
     },
 });
