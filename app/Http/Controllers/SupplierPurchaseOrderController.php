@@ -7,10 +7,11 @@ use App\Models\SupplierPurchaseOrder;
 
 class SupplierPurchaseOrderController extends Controller
 {
-    public function index()
-    {
-        $orders = SupplierPurchaseOrder::latest()->get();
-            $orders = $orders->map(function ($order) {
+    public function index(){
+        $orders = SupplierPurchaseOrder::with('items')
+            ->latest()
+            ->get();
+        $orders = $orders->map(function ($order) {
             $order->data = $order->data ? json_decode($order->data, true) : null;
             return $order;
         });
