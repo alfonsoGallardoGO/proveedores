@@ -56,7 +56,6 @@ export default {
                 <!--end::Symbol-->
                 <!--begin::Info-->
                 <div class="text-center mb-10">
-                    <p class="fs-4 fw-bolder mt-10 uppercase">proveedor</p>
                     <!--begin::Username-->
                     <Link
                         href="/user/profile"
