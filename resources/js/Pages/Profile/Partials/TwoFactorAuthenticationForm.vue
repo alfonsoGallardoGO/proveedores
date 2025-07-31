@@ -231,7 +231,7 @@ const disableTwoFactorAuthentication = () => {
                             :class="{ 'opacity-25': enabling }"
                             :disabled="enabling"
                         >
-                            Enable
+                            Habilitar
                         </PrimaryButton>
                     </ConfirmsPassword>
                 </div>
@@ -250,7 +250,7 @@ const disableTwoFactorAuthentication = () => {
                             }"
                             :disabled="enabling || confirmationForm.processing"
                         >
-                            Confirm
+                            CONFIRMAR
                         </PrimaryButton>
                     </ConfirmsPassword>
 

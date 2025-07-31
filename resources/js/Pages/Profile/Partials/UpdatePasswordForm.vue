@@ -49,7 +49,7 @@ const updatePassword = () => {
         <template #form>
             <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="current_password" value="Contraseña Actual" />
-                <TextInput
+                <InputText
                     id="current_password"
                     ref="currentPasswordInput"
                     v-model="form.current_password"
@@ -65,7 +65,7 @@ const updatePassword = () => {
 
             <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="password" value="Nueva Contraseña" />
-                <TextInput
+                <InputText
                     id="password"
                     ref="passwordInput"
                     v-model="form.password"
@@ -81,7 +81,7 @@ const updatePassword = () => {
                     for="password_confirmation"
                     value="Confirmar Contraseña"
                 />
-                <TextInput
+                <InputText
                     id="password_confirmation"
                     v-model="form.password_confirmation"
                     type="password"
