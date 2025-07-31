@@ -61,7 +61,7 @@ export default {
         <div class="aside-user mb-5 mb-lg-10" id="kt_aside_user">
             <!--begin::User-->
             <div class="d-flex align-items-center flex-column">
-                <!--begin::Symbol-->
+                <!--begin::Symbolll-->
                 <div class="symbol symbol-75px mb-4">
                     <img
                         :src="$page.props.auth.user.profile_photo_url"
