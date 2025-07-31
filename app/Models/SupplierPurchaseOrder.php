@@ -19,4 +19,11 @@ class SupplierPurchaseOrder extends Model
     ];
 
     protected $dates = ['deleted_at'];
+
+
+    public function items()
+    {
+        return $this->hasMany(SupplierPurchaseOrderItem::class, 'supplier_purchase_order_id', 'id');
+    }
+
 }
