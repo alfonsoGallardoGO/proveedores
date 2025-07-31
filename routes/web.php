@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\SupplierPurchaseOrderController;
+use App\Http\Controllers\SuplierUserController;
 
 
 
@@ -27,5 +28,7 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    
+    Route::get('/users', [SuplierUserController::class, 'index'])->name('users.index');
 });
+
+
