@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\SupplierPurchaseOrder;
+use App\Models\SupplierPurchaseOrderItem;
 
 class SupplierPurchaseOrderController extends Controller
 {
@@ -27,8 +28,7 @@ class SupplierPurchaseOrderController extends Controller
     }
 
     public function show($id){
-        $order = SupplierPurchaseOrder::findOrFail($id);
-        $order->data = $order->data ? json_decode($order->data, true) : null;
-        return response()->json($order);
+        $items = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $id)->get();
+        return response()->json($items);
     }
 }
