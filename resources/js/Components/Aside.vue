@@ -29,7 +29,7 @@ export default {
 <template>
     <div
         id="kt_aside"
-        class="aside pt-7 pb-4 pb-lg-7 pt-lg-17 bg-[#F8F8F8] border-2 shadow-lg aside-dark"
+        class="aside pt-7 pb-4 pb-lg-7 pt-lg-17 aside-dark shadow"
         data-kt-drawer="true"
         data-kt-drawer-name="aside"
         data-kt-drawer-activate="{default: true, lg: false}"
@@ -39,23 +39,7 @@ export default {
         data-kt-drawer-toggle="#kt_aside_toggle"
     >
         <!--begin::Brand-->
-        <div
-            class="aside-logo flex-column-auto mx-auto mb-14"
-            id="kt_aside_logo"
-        >
-            <Link :href="route('dashboard')">
-                <div class="flex flex-col items-center">
-                    <img
-                        alt="Logo"
-                        src="@assets/media/logos/Logo.png"
-                        class="h-[120px] logo theme-light-show"
-                    />
-                    <p class="text-gray-800 mt-8 font-bold text-2xl">
-                        Portal Proveedores
-                    </p>
-                </div>
-            </Link>
-        </div>
+
         <!--end::Brand-->
         <!--begin::Aside user-->
         <div class="aside-user mb-5 mb-lg-10" id="kt_aside_user">
@@ -66,24 +50,25 @@ export default {
                     <img
                         :src="$page.props.auth.user.profile_photo_url"
                         alt=""
+                        class="object-cover"
                     />
                 </div>
                 <!--end::Symbol-->
                 <!--begin::Info-->
-                <div class="text-center">
+                <div class="text-center mb-10">
+                    <p class="fs-4 fw-bolder mt-10 uppercase">proveedor</p>
                     <!--begin::Username-->
                     <Link
                         href="/user/profile"
-                        class="text-gray-800 text-hover-primary fs-4 fw-bolder"
+                        class="hover:text-[#ed6d24] fs-4 fw-bolder"
                         >{{ $page.props.auth.user.name }}</Link
                     >
 
                     <!--end::Username-->
-                    <!--begin::Description-->
-                    <span class="text-gray-600 fw-semibold d-block fs-7 mb-1"
-                        >Python Dev</span
-                    >
-                    <!--end::Description-->
+
+                    <div class="text-muted fw-bold">
+                        {{ $page.props.auth.user.email }}
+                    </div>
                 </div>
                 <!--end::Info-->
             </div>
@@ -134,43 +119,7 @@ export default {
                     <div
                         data-kt-menu-trigger="click"
                         class="menu-item menu-accordion"
-                    >
-                        <!--begin:Menu link-->
-                        <span class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-gift fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                    <span class="path3"></span>
-                                    <span class="path4"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">Catalogos</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <!--end:Menu link-->
-                        <!--begin:Menu sub-->
-                        <div class="menu-sub menu-sub-accordion">
-                            <!--begin:Menu item-->
-                            <div
-                                data-kt-menu-trigger="click"
-                                class="menu-item menu-accordion"
-                            >
-                                <!--begin:Menu link-->
-                                <Link
-                                    :href="route('catalogo.prestaciones.index')"
-                                    class="menu-link"
-                                >
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot"></span>
-                                    </span>
-                                    <span class="menu-title">Prestaciones</span>
-                                </Link>
-                                <!--end:Menu link-->
-                            </div>
-                        </div>
-                        <!--end:Menu sub-->
-                    </div>
+                    ></div>
                     <!--end:Menu item-->
                     <!--begin:Menu item-->
                     <div
@@ -401,48 +350,7 @@ export default {
                     </div>
                     <!--end:Menu item-->
                     <!--begin:Menu item-->
-                    <div
-                        data-kt-menu-trigger="click"
-                        class="menu-item menu-accordion"
-                    >
-                        <!--begin:Menu link-->
-                        <span class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-briefcase fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">Administracion</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <!--end:Menu link-->
-                        <!--begin:Menu sub-->
-                        <div class="menu-sub menu-sub-accordion">
-                            <div
-                                data-kt-menu-trigger="click"
-                                class="menu-item menu-accordion"
-                            >
-                                <div class="menu-item">
-                                    <!--begin:Menu link-->
-                                    <Link
-                                        :href="route('roles.index')"
-                                        class="menu-link active"
-                                        href="index.html"
-                                    >
-                                        <span class="menu-bullet">
-                                            <span
-                                                class="bullet bullet-dot"
-                                            ></span>
-                                        </span>
-                                        <span class="menu-title">Roles</span>
-                                    </Link>
-                                    <!--end:Menu link-->
-                                </div>
-                            </div>
-                        </div>
-                        <!--end:Menu sub-->
-                    </div>
+
                     <!--end:Menu item-->
                 </div>
                 <!--end::Menu-->
@@ -461,14 +369,16 @@ export default {
                 <a
                     @click.prevent="logout"
                     href="#"
-                    class="btn btn-sm btn-icon btn-active-color-primary btn-icon-gray-600 btn-text-gray-600"
+                    class="btn btn-sm btn-icon hover:text-[#ed6d24] btn-icon-gray-600 btn-active-color-primary"
                 >
                     <i class="ki-duotone ki-entrance-left fs-1 me-2">
                         <span class="path1"></span>
                         <span class="path2"></span>
                     </i>
                     <!--begin::Major-->
-                    <span class="d-flex flex-shrink-0 fw-bold">Log Out</span>
+                    <span class="d-flex flex-shrink-0 fw-bold fs-7"
+                        >Cerrar Sesión</span
+                    >
                     <!--end::Major-->
                 </a>
                 <!--end::Link-->
@@ -499,7 +409,10 @@ export default {
                                 <div class="symbol symbol-50px me-5">
                                     <img
                                         alt="Logo"
-                                        src="@assets/media/avatars/300-1.jpg"
+                                        :src="
+                                            $page.props.auth.user
+                                                .profile_photo_url
+                                        "
                                     />
                                 </div>
                                 <!--end::Avatar-->
@@ -508,16 +421,12 @@ export default {
                                     <div
                                         class="fw-bold d-flex align-items-center fs-5"
                                     >
-                                        Max Smith
-                                        <span
-                                            class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
-                                            >Pro</span
-                                        >
+                                        {{ $page.props.auth.user.name }}
                                     </div>
                                     <a
                                         href="#"
                                         class="fw-semibold text-muted text-hover-primary fs-7"
-                                        >max@kt.com</a
+                                        >{{ $page.props.auth.user.email }}</a
                                     >
                                 </div>
                                 <!--end::Username-->
