@@ -2,9 +2,6 @@
 import Header from "@/Components/Header.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { ref, onMounted, computed } from "vue";
-import { FilterMatchMode } from "@primevue/core/api";
-import { useToast } from "primevue/usetoast";
-import { useForm } from "@inertiajs/inertia-vue3";
 import axios from "axios";
 import Modal from "@/Components/Modal.vue";
 
@@ -14,20 +11,6 @@ const props = defineProps({
 
 const modalVisible = ref(false);
 const selectedOrder = ref(null);
-
-const form = useForm({
-    nombre: "",
-    descripcion: "",
-    tipo: null,
-    intervalo: null,
-    dia_corte: null,
-    condicionado_faltas: false,
-    condicionado_seniority: false,
-    condicionado_eficiencia: false,
-});
-
-const tipo = ref(null);
-const intervalo = ref(null);
 
 const show = async (id) => {
     try {
@@ -39,42 +22,12 @@ const show = async (id) => {
     }
 };
 
-const close = () => {
-    modalVisible.value = false;
-    selectedOrder.value = null;
-};  
 
-const deleteProduct = () => {
-    deleteBenefitDialog.value = true;
 
-    toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Beneficio Eliminado",
-        life: 3000,
-    });
-};
-
-const confirmDeleteSelected = () => {
-    deleteBenefitsDialog.value = true;
-};
-const deleteselectedBenefits = () => {
-    toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: "Beneficios Eliminados",
-        life: 3000,
-    });
-};
-
-const showSelect = () => {
-    if (!tipo.value || !tipo.value.value) {
-        intervalo.value = null;
-    }
-};
 </script>
 
 <template>
+    {{ orders }}
     <AppLayout title="Ordenes de compra">
         <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
             <Header :title="'Ordenes de compra'" />
@@ -86,7 +39,8 @@ const showSelect = () => {
                                 <template #header>
                                     <img alt="user header" src="https://cdn.worldvectorlogo.com/logos/netsuite.svg" />
                                 </template>
-                                <template #title> Orden de compra: {{ order.data?.tranid }}</template>
+                                
+                                <template #title>Orden de compra: {{ order.data?.tranid }}</template>
                                 <template #subtitle>Fecha: {{ order.data?.fecha }}</template>
                                 <template #footer>
                                     <div class="d-flex gap-2 mt-1">
@@ -123,8 +77,6 @@ const showSelect = () => {
                     {{ selectedOrder?.data?.estado }}
                 </span>
             </div>
-
-            <!-- Datos principales -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <p class="text-sm text-gray-500">Fecha</p>
@@ -199,8 +151,6 @@ const showSelect = () => {
                     </table>
                 </div>
             </div>
-
-            <!-- Footer -->
             <div class="flex justify-end space-x-3 border-t pt-4">
                 <Button label="Cerrar" severity="secondary" @click="close" />
                 <Button label="Guardar" icon="pi pi-save" />
