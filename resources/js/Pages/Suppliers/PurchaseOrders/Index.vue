@@ -210,7 +210,6 @@ const showSelect = () => {
                                             <div class="card">
                                                 <DataView v-if="selectedOrder.value && selectedOrder.value.length > 0"
                                                     :value="selectedOrder.value" paginator :rows="5">
-                                                    {{ item.id }}
                                                     <template #list="slotProps">
                                                         <div class="flex flex-col">
                                                             <div v-for="item in slotProps.items" :key="item.id">
@@ -260,7 +259,7 @@ const showSelect = () => {
                             </template>
                         </Dialog>
 
-                        <Dialog v-model:visible="deleteBenefitDialog" :style="{ width: '450px' }" header="Confirm"
+                        <!-- <Dialog v-model:visible="deleteBenefitDialog" :style="{ width: '450px' }" header="Confirm"
                             :modal="true">
                             <div class="flex items-center gap-4">
                                 <i class="pi pi-exclamation-triangle !text-3xl" />
@@ -288,7 +287,7 @@ const showSelect = () => {
                                 <Button label="Si" icon="pi pi-check" text @click="deleteselectedBenefits"
                                     severity="danger" />
                             </template>
-                        </Dialog>
+                        </Dialog> -->
                     </div>
                 </div>
             </div>
