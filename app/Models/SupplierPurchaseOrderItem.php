@@ -35,4 +35,15 @@ class SupplierPurchaseOrderItem extends Model
     {
         return $this->belongsTo(SupplierPurchaseOrder::class, 'supplier_purchase_order_id', 'id');
     }
+
+
+    public function deliveries()
+    {
+        return $this->hasMany(SupplierPurchaseOrdersItemsDelivery::class, 'supplier_purchase_orders_item_id');
+    }
+
+    public function getCantidadEntregadaAttribute()
+    {
+        return $this->deliveries()->sum('amount');
+    }
 }
