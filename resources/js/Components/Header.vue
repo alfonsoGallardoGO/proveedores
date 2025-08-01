@@ -33,13 +33,13 @@
                 </div>
                 <!--end::Aside mobile toggle-->
                 <!--begin::Logo-->
-                <a href="index.html" class="d-flex align-items-center">
+                <!-- <a href="index.html" class="d-flex align-items-center">
                     <img
                         alt="Logo"
                         src="@assets/media/logos/default-small.svg"
                         class="h-30px"
                     />
-                </a>
+                </a> -->
                 <!--end::Logo-->
             </div>
             <!--end::Wrapper-->

@@ -8,6 +8,18 @@ import { PrimeVue } from "@primevue/core";
 import Aura from "@primeuix/themes/aura";
 import { definePreset } from "@primeuix/themes";
 import { ToastService } from "primevue";
+import Toolbar from "primevue/toolbar";
+import Button from "primevue/button";
+import FileUpload from "primevue/fileupload";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import IconField from "primevue/iconfield";
+import InputIcon from "primevue/inputicon";
+import InputText from "primevue/inputtext";
+import Dialog from "primevue/dialog";
+import Tag from "primevue/tag";
+import InputMask from "primevue/inputmask";
+import Password from "primevue/password";
 import "primeicons/primeicons.css";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
@@ -72,7 +84,18 @@ createInertiaApp({
             },
         });
         app.use(ToastService);
-
+        app.component("Toolbar", Toolbar);
+        app.component("Button", Button);
+        app.component("FileUpload", FileUpload);
+        app.component("DataTable", DataTable);
+        app.component("Column", Column);
+        app.component("IconField", IconField);
+        app.component("InputIcon", InputIcon);
+        app.component("InputText", InputText);
+        app.component("Dialog", Dialog);
+        app.component("Tag", Tag);
+        app.component("InputMask", InputMask);
+        app.component("Password", Password);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {
