@@ -2,7 +2,7 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\User;
+use App\Models\SupplierUser as User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
@@ -22,7 +22,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
             'current_password' => ['required', 'string', 'current_password:web'],
             'password' => $this->passwordRules(),
         ], [
-            'current_password.current_password' => __('The provided password does not match your current password.'),
+            'current_password.current_password' => __('La contraseña proporcionada no coincide con su contraseña actual.'),
         ])->validateWithBag('updatePassword');
 
         $user->forceFill([

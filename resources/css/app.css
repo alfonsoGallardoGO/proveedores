@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --btn-active-color-primary: #ed6d24;
+}
+
 [x-cloak] {
     display: none;
 }
@@ -20,3 +24,5 @@
     padding: 12px 16px;
     margin-top: 10px;
 }
+
+
