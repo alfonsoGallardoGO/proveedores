@@ -4,10 +4,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\SupplierPurchaseOrderController;
+use App\Http\Controllers\SuplierUserController;
+use App\Http\Controllers\SupplierController;
 
 
 
 Route::resource('suppliers/purchase-orders', SupplierPurchaseOrderController::class);
+Route::resource('suppliers', SupplierController::class);
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [
@@ -27,5 +30,7 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    
+    Route::get('/users', [SuplierUserController::class, 'index'])->name('users.index');
 });
+
+
