@@ -222,6 +222,7 @@ const formatCurrency = (value) => {
                         >
                             <div class="card p-4">
                                 {{ selectedOrder }}
+                                {{ selectedOrder }}
                                 <DataView :value="selectedOrder" paginator :rows="5">
                                     <template #list="slotProps">
                                         <div class="flex flex-col">
