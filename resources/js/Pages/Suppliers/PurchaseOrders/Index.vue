@@ -14,34 +14,14 @@ const props = defineProps({
 
 
 const form = useForm({
-    nombre: "",
-    descripcion: "",
-    tipo: null,
-    intervalo: null,
-    dia_corte: null,
-    condicionado_faltas: false,
-    condicionado_seniority: false,
-    condicionado_eficiencia: false,
-});
-// console.log(benefits);
-// const orders = ref(null);
-// orders.value = benefits;
-const tipo = ref(null);
-const intervalo = ref(null);
-
-const intervaloSufijo = computed(() => {
-    return tipo.value?.value === "dia" ? " día(s)" : " mes(es)";
+    cantidades: {},
+    factura: null,
+    xml: null,
+    supplier_id: null,
+    supplier_purchase_order_id : null
 });
 
-const reglas = ref([]);
 
-function agregarRegla() {
-    reglas.value.push({ monto: null, otro: null, porcentaje: null });
-}
-
-function eliminarRegla(index) {
-    reglas.value.splice(index, 1);
-}
 
 const toast = useToast();
 const dt = ref();
@@ -49,8 +29,9 @@ const showOrder = ref(false);
 const benefitDialog = ref(false);
 const deleteBenefitDialog = ref(false);
 const deleteBenefitsDialog = ref(false);
-const product = ref({});
+
 const selectedBenefits = ref();
+const invoices = ref();
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -66,46 +47,64 @@ const hideDialog = () => {
     showOrder.value = false;
     selectedOrder.value = null;
 };
-const saveBenefit = () => {
-    form.post(route("catalogo.prestaciones.store"), {
-        onSuccess: () => {
-            hideDialog();
-            toast.add({
-                severity: "success",
-                summary: "Guardado",
-                detail: "Prestacion Guardada Correctamente",
-                life: 3000,
-            });
-        },
-        onError: (errors) => {
-            // Si el backend devuelve 422 con errores, Inertia los manejará automáticamente en form.errors
-            // Puedes mostrar un toast de error aquí o simplemente dejar que los mensajes de error de PrimeVue aparezcan
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: "Hubo un problema al guardar la prestación.",
-                life: 3000,
-            });
 
-            console.error("Errores al guardar la prestación:", errors);
-        },
+
+const store = () => {
+    const formData = new FormData();
+    for (const [itemId, amount] of Object.entries(form.cantidades)) {
+        formData.append(`cantidades[${itemId}]`, amount);
+    }
+    formData.append("supplier_id", form.supplier_id);
+    formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
+    if (form.factura) {
+        formData.append("pdf", form.factura);
+    }
+    if (form.xml) {
+        formData.append("xml", form.xml);
+    }
+    axios.post(route("purchase-orders.store"), formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    })
+    .then(() => {
+        toast.add({ severity: "success", summary: "Guardado", detail: "Datos guardados correctamente", life: 3000 });
+    })
+    .catch((err) => {
+        console.error(err);
+        toast.add({ severity: "error", summary: "Error", detail: "Hubo un problema al guardar", life: 3000 });
     });
 };
 
+
+
 const selectedOrder = ref(null);
 
-const showOrders = async (id) => {
-    showOrder.value = true;
-    const response = await axios.get(route("purchase-orders.show", id))
-
-        .then(response => {
-            selectedOrder.value = response.data;
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-
+const show = async (id, supplier) => {
+    form.supplier_purchase_order_id = id;
+    // form.supplier_id = supplier;
+    // console.log(supplier.data)
+    try {
+        showOrder.value = true;
+        const response = await axios.get(route("purchase-orders.show", id));
+        selectedOrder.value = response.data?.items;
+        invoices.value = response.data?.invoices;
+        
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
 };
+
+const onFacturaSelect = (event) => {
+    if (event.files && event.files.length > 0) {
+        form.factura = event.files[0];
+    }
+};
+
+const onXmlSelect = (event) => {
+    if (event.files && event.files.length > 0) {
+        form.xml = event.files[0];
+    }
+};
+
 const editProduct = (prod) => {
     benefitDialog.value = true;
 };
@@ -141,15 +140,23 @@ const showSelect = () => {
     }
 };
 
+const formatCurrency = (value) => {
+    if (!value) return "$0.00";
+    return new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+        minimumFractionDigits: 2,
+    }).format(Number(value));
+};
+
 
 
 </script>
 
 <template>
-    <AppLayout title="Prestaciones">
+    <AppLayout title="Ordenes de compra">
         <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
             <Header :title="'Prestaciones'" />
-            <!-- {{ orders }} -->
             <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
@@ -164,12 +171,13 @@ const showSelect = () => {
                             </template>
                         </Toolbar>
 
-                        <DataTable ref="dt" v-model:selection="selectedBenefits" :value="orders" dataKey="id" :rows="10"
+                        <DataTable ref="dt" v-model:selection="selectedBenefits" :value="orders" dataKey="id" paginator
+                            :rows="10"
                             :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
                             <template #header>
                                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                                    <h4 class="m-0">Prestaciones</h4>
+                                    <h4 class="m-0">Ordenes de compra</h4>
                                     <IconField>
                                         <InputIcon>
                                             <i class="pi pi-search" />
@@ -178,20 +186,27 @@ const showSelect = () => {
                                     </IconField>
                                 </div>
                             </template>
-
+                            
                             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
                             <Column field="id" header="Id" sortable style="min-width: 12rem"></Column>
-                            <Column field="data.tranid" header="ORDEN DE COMPRAS" sortable style="min-width: 16rem">
+                            <Column field="data.tranid" header="Orden de compra" sortable style="min-width: 16rem">
                             </Column>
 
-                            <Column field="data.estado" header="ESTATUS" sortable style="min-width: 16rem"
+                            <Column field="data.estado" header="Estatus" sortable style="min-width: 16rem"
                                 bodyClass="ml-2"></Column>
-                            <Column field="data.fecha" header="FECHA" sortable style="min-width: 10rem"
+                            <Column field="data.fecha" header="Fecha" sortable style="min-width: 10rem"
                                 bodyClass="ml-2"></Column>
-                            <Column :exportable="false" style="min-width: 12rem">
+                            <Column :exportable="false" header="Acciones" style="min-width: 12rem">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-eye" outlined rounded severity="secondary" class="mr-2"
-                                        @click="showOrders(slotProps.data.id)" />
+                                    <Button 
+                                        icon="pi pi-eye" 
+                                        outlined 
+                                        rounded 
+                                        severity="secondary" 
+                                        class="mr-2"
+                                        @click="show(slotProps.data.id, slotProps.data)" 
+                                    />
+
                                     <Button icon="pi pi-file-pdf" outlined rounded severity="danger" class="mr-2"
                                         @click="confirmDeleteProduct()" />
                                     <Button icon="pi pi-file-excel" outlined rounded @click="editProduct()" />
@@ -199,94 +214,159 @@ const showSelect = () => {
                             </Column>
                         </DataTable>
 
-                        <Dialog v-model:visible="showOrder" :style="{ width: '80%' }" header="ORDEN DE COMPRA"
-                            :modal="true">
-
-
-                            <template>
-                                <div class="card">
-                                    <DataView :value="selectedOrder" paginator :rows="5">
-                                        <template>
-                                            <div class="card">
-                                                <DataView v-if="selectedOrder.value && selectedOrder.value.length > 0"
-                                                    :value="selectedOrder.value" paginator :rows="5">
-                                                    {{ item.id }}
-                                                    <template #list="slotProps">
-                                                        <div class="flex flex-col">
-                                                            <div v-for="item in slotProps.items" :key="item.id">
-                                                                <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
-                                                                    :class="{ 'border-t border-surface-200 dark:border-surface-700': item.id !== selectedOrder.value[0].id }">
-                                                                    <div
-                                                                        class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
-                                                                        <div
-                                                                            class="flex flex-row md:flex-col justify-between items-start gap-2">
-                                                                            <div>
-                                                                                <span
-                                                                                    class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{
-                                                                                    item.class }}</span>
-                                                                                <div class="text-lg font-medium mt-2">{{
-                                                                                    item.description }}</div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="flex flex-col md:items-end gap-8">
-                                                                            <span class="text-xl font-semibold">{{
-                                                                                item.amount }}</span>
-                                                                            <div
-                                                                                class="flex flex-row-reverse md:flex-row gap-2">
-                                                                                <Button icon="pi pi-eye"
-                                                                                    label="Ver Detalles"
-                                                                                    class="flex-auto md:flex-initial whitespace-nowrap"></Button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+                        <Dialog 
+                            v-model:visible="showOrder" 
+                            :style="{ width: '80%' }" 
+                            header="ORDEN DE COMPRA"
+                            :modal="true"
+                        >
+                            <div class="card p-4">
+                                {{ invoices }}
+                                <DataView :value="selectedOrder" paginator :rows="5">
+                                    <template #list="slotProps">
+                                        <div class="flex flex-col">
+                                            <div v-for="(item, index) in slotProps.items" :key="index">
+                                                <div 
+                                                    class="flex flex-col sm:flex-row sm:items-center p-6 gap-4 bg-white rounded-lg shadow-sm mt-2"
+                                                    :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }"
+                                                >
+                                                    <div class="md:w-40 relative text-center">
+                                                        <i class="pi pi-box text-6xl text-gray-400"></i>
+                                                    </div>
+                                                    <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                                        <div class="flex flex-col gap-2">
+                                                            <span class="font-medium text-surface-500 text-sm">{{ item.class }}</span>
+                                                            <div class="text-lg font-semibold">{{ item.description ?? item.memo }}</div>
+                                                            <div class="flex items-center gap-3 mt-2">
+                                                                <label class="text-sm font-medium text-gray-600">
+                                                                    Cantidad Entregada
+                                                                </label>
+                                                                <InputNumber 
+                                                                    v-model="form.cantidades[item.id]"
+                                                                    :min="0"
+                                                                    :max="item.quantity - (item.deliveries_sum_amount ?? 0)" 
+                                                                    :step="1"
+                                                                    inputClass="w-28 text-center border rounded-lg shadow-sm"
+                                                                    showButtons
+                                                                    buttonLayout="horizontal"
+                                                                    decrementButtonClass="p-button-outlined p-button-secondary"
+                                                                    incrementButtonClass="p-button-outlined p-button-secondary"
+                                                                    incrementButtonIcon="pi pi-plus"
+                                                                    decrementButtonIcon="pi pi-minus"
+                                                                />
+                                                                
                                                             </div>
                                                         </div>
-                                                    </template>
-                                                </DataView>
-                                                <div v-else class="text-center p-6 text-surface-500">
-                                                    Cargando datos o no hay órdenes de compra.
+                                                        <div class="flex flex-col md:items-end gap-3">
+                                                            <span class="text-xl font-bold text-gray-700">
+                                                                {{ formatCurrency(item.amount) }}
+                                                            </span>
+
+                                                            <span class="text-sm text-gray-500">Cantidad Solicitada: {{ item.quantity }}</span>
+                                                            <span class="text-sm text-gray-500">Cantidad Entregada: {{ item.deliveries_sum_amount ?? 0 }}</span>
+                                                            <span class="text-sm text-gray-500">
+                                                                    Faltan {{ item.quantity - (item.deliveries_sum_amount ?? 0) }} por entregar
+                                                                </span>
+                                                            <Tag :value="item.type" severity="info" class="uppercase font-bold" />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </template>
-                                    </DataView>
+
+                                        </div>
+                                    </template>
+                                    
+                                </DataView>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+                                    <div v-for="(invoice, index) in invoices" 
+                                        :key="index"
+                                        class="bg-white border rounded-2xl shadow-md p-5 flex flex-col items-center justify-between hover:shadow-xl hover:-translate-y-1 transition transform">
+
+                                        
+                                        <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-lg font-bold shadow-lg">
+                                            #{{ invoice.id }}
+                                        </div>
+
+                                        
+                                        <div class="mt-3 text-center">
+                                            <p class="text-sm text-gray-600">Proveedor: {{ invoice.supplier_id }}</p>
+                                            <p class="text-xs text-gray-400">{{ new Date(invoice.created_at).toLocaleDateString() }}</p>
+                                        </div>
+
+                                        
+                                        <div class="flex gap-6 mt-5">
+                                            
+                                            <a v-if="invoice.pdf_route" 
+                                            :href="`/${invoice.pdf_route}`" 
+                                            target="_blank" 
+                                            class="flex flex-col items-center text-red-500 hover:text-red-700 transition"
+                                            title="Ver PDF">
+                                                <i class="pi pi-file-pdf text-4xl"></i>
+                                                <span class="text-sm mt-1 font-semibold">PDF</span>
+                                            </a>
+                                            <div v-else class="flex flex-col items-center text-gray-400">
+                                                <i class="pi pi-file text-4xl"></i>
+                                                <span class="text-sm mt-1">Sin PDF</span>
+                                            </div>
+
+                                        
+                                            <a v-if="invoice.xml_route" 
+                                            :href="`/${invoice.xml_route}`" 
+                                            target="_blank" 
+                                            class="flex flex-col items-center text-green-600 hover:text-green-800 transition"
+                                            title="Ver XML">
+                                                <i class="pi pi-code text-4xl"></i>
+                                                <span class="text-sm mt-1 font-semibold">XML</span>
+                                            </a>
+                                            <div v-else class="flex flex-col items-center text-gray-400">
+                                                <i class="pi pi-file text-4xl"></i>
+                                                <span class="text-sm mt-1">Sin XML</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </template>
-
-
-                            <template #footer>
-                                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                                <Button label="Guardar" icon="pi pi-check" @click="saveBenefit()" />
-                            </template>
-                        </Dialog>
-
-                        <Dialog v-model:visible="deleteBenefitDialog" :style="{ width: '450px' }" header="Confirm"
-                            :modal="true">
-                            <div class="flex items-center gap-4">
-                                <i class="pi pi-exclamation-triangle !text-3xl" />
-                                <span v-if="benefits.length">¿Estás seguro de que deseas eliminar?</span>
-
+                            </div>
+                            <div class="flex mt-2">
+                                <div class="col-md-6">
+                                    <div class="card p-4">
+                                        <h3 class="text-lg font-semibold mb-3">📄 Subir Factura</h3>
+                                        <FileUpload 
+                                            mode="basic"
+                                            name="pdf" 
+                                            :auto="false"
+                                            :multiple="false" 
+                                            accept=".pdf,image/*" 
+                                            :maxFileSize="2000000"
+                                            @select="onFacturaSelect"
+                                        >
+                                            <template #empty>
+                                                <span>Arrastra tu Factura aquí o haz clic para seleccionarla.</span>
+                                            </template>
+                                        </FileUpload>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card p-4">
+                                        <h3 class="text-lg font-semibold mb-3">📄 Subir XML</h3>
+                                        <FileUpload 
+                                            mode="basic"
+                                            name="xml" 
+                                            :auto="false"
+                                            :multiple="false" 
+                                            accept=".xml" 
+                                            :maxFileSize="1000000"
+                                            @select="onXmlSelect"
+                                        >
+                                            <template #empty>
+                                                <span>Arrastra tu archivo XML aquí o haz clic para seleccionarlo.</span>
+                                            </template>
+                                        </FileUpload>
+                                    </div>
+                                </div>
                             </div>
                             <template #footer>
-                                <Button label="No" icon="pi pi-times" text @click="deleteBenefitDialog = false"
-                                    severity="secondary" variant="text" />
-                                <Button label="Si" icon="pi pi-check" text @click="deleteselectedBenefits"
-                                    severity="danger" />
-                            </template>
-                        </Dialog>
-
-                        <Dialog v-model:visible="deleteBenefitsDialog" :style="{ width: '450px' }" header="Confirmar"
-                            :modal="true">
-                            <div class="flex items-center gap-4">
-                                <i class="pi pi-exclamation-triangle !text-3xl" />
-                                <span v-if="product">¿Estás seguro de que deseas eliminar los
-                                    registros seleccionados?</span>
-                            </div>
-                            <template #footer>
-                                <Button label="No" icon="pi pi-times" text @click="deleteBenefitsDialog = false"
-                                    severity="secondary" variant="text" />
-                                <Button label="Si" icon="pi pi-check" text @click="deleteselectedBenefits"
-                                    severity="danger" />
+                                <Button label="Cancelar" icon="pi pi-times" text @click="showOrder = false" />
+                                <Button label="Guardar" icon="pi pi-check" @click="store()" />
                             </template>
                         </Dialog>
                     </div>
