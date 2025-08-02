@@ -4,13 +4,17 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { ref } from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import { useForm, usePage } from "@inertiajs/vue3";
-import { Button } from "primevue";
+import { Button, useToast } from "primevue";
+import { router as Inertia } from "@inertiajs/vue3";
 
 const props = defineProps({
     users: Array,
 });
 
+const pageUrl = import.meta.env.VITE_APP_URL;
+
 const page = usePage();
+const toast = useToast();
 
 console.log("Page Props:", page.props);
 console.log("Users:", props.users);
@@ -42,36 +46,82 @@ const openNew = () => {
 };
 
 const confirmDeleteSelected = () => {
-    if (selectedUsers.value.length) {
-        console.log("Confirm delete selected users", selectedUsers.value);
-        deleteUserDialog.value = true;
-    } else {
-        console.log("No users selected for deletion");
-    }
+    deleteUserDialog.value = true;
+};
+
+const deleteSelectedUsers = () => {
+    submitted.value = true;
+    Inertia.delete(route("users.destroySelected"), {
+        data: {
+            users: selectedUsers.value.map((user) => user.id),
+        },
+        onSuccess: () => {
+            toast.add({
+                severity: "success",
+                summary: "Usuarios eliminados",
+                detail: "Los usuarios seleccionados han sido eliminados correctamente.",
+                life: 3000,
+            });
+            selectedUsers.value = [];
+            deleteUserDialog.value = false;
+        },
+    });
 };
 
 const sendUser = () => {
+    const formData = new FormData();
+    submitted.value = true;
+    if (user.profile_photo_path instanceof File) {
+        formData.append("profile_photo_path", user.profile_photo_path);
+    } else if (user.profile_photo_path === null) {
+        formData.append("profile_photo_path", "");
+    }
+    formData.append("name", user.name);
+    formData.append("email", user.email);
+    formData.append("username", user.username);
+    formData.append("rfc", user.rfc || "");
+    formData.append(
+        "phone_number",
+        user.phone_number?.replace(/\D/g, "") || ""
+    );
+
+    if (user.password) {
+        formData.append("password", user.password);
+    }
+
     if (user.id) {
-        delete user.password;
-        user.phone_number = user.phone_number
-            ? user.phone_number.replace(/\D/g, "")
-            : null;
-        user.put(route("users.update", user.id), {
+        formData.append("_method", "PUT");
+        Inertia.post(route("users.update", user.id), formData, {
+            forceFormData: true,
+            preserveScroll: true,
+            onError: () => {
+                submitted.value = true;
+            },
             onSuccess: () => {
                 userDialog.value = false;
                 user.reset();
                 previewImageUrl.value = null;
+                toast.add({
+                    severity: "success",
+                    summary: "Usuario actualizado",
+                    detail: "El usuario ha sido actualizado correctamente.",
+                    life: 3000,
+                });
             },
         });
     } else {
-        user.phone_number = user.phone_number
-            ? user.phone_number.replace(/\D/g, "")
-            : null;
-        user.post(route("users.store"), {
+        Inertia.post(route("users.store"), formData, {
+            forceFormData: true,
             onSuccess: () => {
                 userDialog.value = false;
                 user.reset();
                 previewImageUrl.value = null;
+                toast.add({
+                    severity: "success",
+                    summary: "Usuario creado",
+                    detail: "El usuario ha sido creado correctamente.",
+                    life: 3000,
+                });
             },
         });
     }
@@ -91,7 +141,7 @@ const editUser = (data) => {
     user.phone_number = data.phone_number;
     user.profile_photo_path = data.profile_photo_path || null;
     previewImageUrl.value = data.profile_photo_path
-        ? `http://localhost:8000/storage/${data.profile_photo_path}`
+        ? `${pageUrl}/storage/${data.profile_photo_path}`
         : null;
     submitted.value = false;
     userDialog.value = true;
@@ -167,6 +217,7 @@ const removeProfilePhoto = () => {
             >
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
+                        <Toast />
                         <Toolbar class="mb-6">
                             <template #start>
                                 <Button
@@ -184,28 +235,6 @@ const removeProfilePhoto = () => {
                                     :disabled="
                                         !selectedUsers || !selectedUsers.length
                                     "
-                                />
-                            </template>
-
-                            <template #end>
-                                <FileUpload
-                                    mode="basic"
-                                    accept="image/*"
-                                    :maxFileSize="1000000"
-                                    label="Import"
-                                    customUpload
-                                    chooseLabel="Import"
-                                    class="mr-2"
-                                    auto
-                                    :chooseButtonProps="{
-                                        severity: 'secondary',
-                                    }"
-                                />
-                                <Button
-                                    label="Export"
-                                    icon="pi pi-upload"
-                                    severity="secondary"
-                                    @click="exportCSV($event)"
                                 />
                             </template>
                         </Toolbar>
@@ -257,7 +286,7 @@ const removeProfilePhoto = () => {
                                         v-if="slotProps.data.profile_photo_path"
                                     >
                                         <img
-                                            :src="`http://localhost:8000/storage/${slotProps.data.profile_photo_path}`"
+                                            :src="`${pageUrl}/storage/${slotProps.data.profile_photo_path}`"
                                             :alt="slotProps.data.image"
                                             class="rounded-full object-cover"
                                             style="width: 40px; height: 40px"
@@ -561,11 +590,14 @@ const removeProfilePhoto = () => {
                                 label="Cancel"
                                 icon="pi pi-times"
                                 text
+                                :disabled="submitted"
                                 @click="hideDialog"
                             />
                             <Button
                                 label="Save"
                                 icon="pi pi-check"
+                                :loading="submitted"
+                                :disabled="submitted"
                                 @click="sendUser"
                             />
                         </template>
@@ -578,11 +610,15 @@ const removeProfilePhoto = () => {
                     >
                         <div class="flex items-center gap-4">
                             <i class="pi pi-exclamation-triangle !text-3xl" />
-                            <span v-if="user.name">
+                            <span v-if="user.name && !selectedUsers.length">
                                 Estás seguro de que deseas eliminar el usuario
                                 <b>{{ user.name }}</b
                                 >?</span
                             >
+                            <span v-else-if="selectedUsers.length">
+                                Estás seguro de que deseas eliminar estos
+                                usuarios ?
+                            </span>
                         </div>
                         <template #footer>
                             <Button
@@ -596,7 +632,13 @@ const removeProfilePhoto = () => {
                             <Button
                                 label="Si, eliminar"
                                 icon="pi pi-check"
-                                @click="deleteUser(user.id)"
+                                :loading="submitted"
+                                :disabled="submitted"
+                                @click="
+                                    selectedUsers.length === 0
+                                        ? deleteUser(user.id)
+                                        : deleteSelectedUsers()
+                                "
                                 severity="danger"
                             />
                         </template>
