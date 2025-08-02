@@ -92,6 +92,7 @@ const show = async (id, supplier) => {
     try {
         showOrder.value = true;
         const response = await axios.get(route("purchase-orders.show", id));
+        console.log(response)
         selectedOrder.value = response.data?.items;
         invoices.value = response.data?.invoices;
     } catch (error) {
@@ -295,8 +296,6 @@ const formatCurrency = (value) => {
                             :modal="true"
                         >
                             <div class="card p-4">
-                                {{ selectedOrder }}
-                                {{ selectedOrder }}
                                 <DataView :value="selectedOrder" paginator :rows="5">
                                     <template #list="slotProps">
                                         <div class="flex flex-col">
