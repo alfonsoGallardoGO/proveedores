@@ -4,7 +4,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { ref, onMounted, computed } from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import { useToast } from "primevue/usetoast";
-import { useForm } from "@inertiajs/inertia-vue3";
+import { useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     benefits: Array,

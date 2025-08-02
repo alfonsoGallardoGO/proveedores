@@ -31,6 +31,9 @@ Route::middleware([
     })->name('dashboard');
 
     Route::get('/users', [SuplierUserController::class, 'index'])->name('users.index');
+    Route::post('/users', [SuplierUserController::class, 'store'])->name('users.store');
+    Route::put('/users/{id}', [SuplierUserController::class, 'destroy'])->name('users.destroy');
+    Route::put('/users/{id}/update', [SuplierUserController::class, 'update'])->name('users.update');
 });
 
 

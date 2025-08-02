@@ -24,7 +24,7 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-console.log(page.props.auth.user.roles);
+// console.log(page.props.auth.user.roles);
 
 onMounted(() => {
     if (typeof KTApp !== 'undefined' && KTApp.init) {

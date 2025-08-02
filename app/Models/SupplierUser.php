@@ -12,6 +12,7 @@ class SupplierUser extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
     use \Laravel\Jetstream\HasProfilePhoto;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
 
     protected $table = 'supplier_users';
@@ -23,7 +24,7 @@ class SupplierUser extends Authenticatable
         'password',
         'rfc',
         'phone_number',
-        'url_photo_user',
+        'profile_photo_path',
         'default_locale',
         'signature',
         'request_change_password',

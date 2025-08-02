@@ -101,7 +101,10 @@ class SupplierController extends Controller
 
         $supplier->update($data);
 
-        return redirect()->route('suppliers.index')->with('success', 'Proveedor actualizado correctamente.');
+        // return redirect()->route('suppliers.index')->with('success', 'Proveedor actualizado correctamente.');
+
+        return response()->json(['message' => 'Proveedor actualizado correctamente.']);
+        // return response()->noContent();
     }
 
     // Eliminar supplier (soft delete)
