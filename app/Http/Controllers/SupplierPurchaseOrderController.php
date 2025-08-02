@@ -12,19 +12,16 @@ use Illuminate\Support\Facades\Auth;
 
 class SupplierPurchaseOrderController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $orders = SupplierPurchaseOrder::with('items')
-            ->latest()
-            ->get();
-        $orders = $orders->map(function ($order) {
-            $order->data = $order->data ? json_decode($order->data, true) : null;
-            return $order;
-        });
+        ->get();
 
         return Inertia::render('Suppliers/PurchaseOrders/Index', [
             'orders' => $orders
         ]);
     }
+
 
     public function create()
     {
