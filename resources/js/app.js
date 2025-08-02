@@ -24,6 +24,8 @@ import Password from "primevue/password";
 import "primeicons/primeicons.css";
 import DataView from 'primevue/dataview';
 import InputNumber from 'primevue/inputnumber';
+import { ref, onMounted } from "vue";
+import Chart from 'primevue/chart';
 
 
 
@@ -104,6 +106,7 @@ createInertiaApp({
         app.component("DataView", DataView);
         app.component("InputNumber", InputNumber);
         app.component("Toast", Toast);
+        app.component("Chart", Chart);
         app.mount(el);
 
 
