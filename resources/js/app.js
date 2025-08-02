@@ -8,6 +8,7 @@ import { PrimeVue } from "@primevue/core";
 import Aura from "@primeuix/themes/aura";
 import { definePreset } from "@primeuix/themes";
 import { ToastService } from "primevue";
+import Toast from 'primevue/toast';
 import Toolbar from "primevue/toolbar";
 import Button from "primevue/button";
 import FileUpload from "primevue/fileupload";
@@ -102,6 +103,7 @@ createInertiaApp({
         app.component("Password", Password);
         app.component("DataView", DataView);
         app.component("InputNumber", InputNumber);
+        app.component("Toast", Toast);
         app.mount(el);
 
 
