@@ -21,6 +21,10 @@ import Tag from "primevue/tag";
 import InputMask from "primevue/inputmask";
 import Password from "primevue/password";
 import "primeicons/primeicons.css";
+import DataView from 'primevue/dataview';
+import InputNumber from 'primevue/inputnumber';
+
+
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -96,7 +100,10 @@ createInertiaApp({
         app.component("Tag", Tag);
         app.component("InputMask", InputMask);
         app.component("Password", Password);
+        app.component("DataView", DataView);
+        app.component("InputNumber", InputNumber);
         app.mount(el);
+
 
         if (typeof KTApp !== "undefined" && KTApp.init) {
             KTApp.init();
