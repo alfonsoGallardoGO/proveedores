@@ -92,6 +92,7 @@ const show = async (id, supplier) => {
     try {
         showOrder.value = true;
         const response = await axios.get(route("purchase-orders.show", id));
+        console.log(response)
         selectedOrder.value = response.data?.items;
         invoices.value = response.data?.invoices;
     } catch (error) {
