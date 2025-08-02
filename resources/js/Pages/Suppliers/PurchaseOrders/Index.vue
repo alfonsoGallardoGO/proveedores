@@ -11,6 +11,7 @@ const props = defineProps({
     orders: Array,
 });
 
+
 const form = useForm({
     cantidades: {},
     factura: null,
@@ -189,7 +190,6 @@ const formatCurrency = (value) => {
                                 />
                             </template>
                         </Toolbar>
-
                         <DataTable
                             ref="dt"
                             v-model:selection="selectedBenefits"
@@ -229,23 +229,20 @@ const formatCurrency = (value) => {
                                 sortable
                                 style="min-width: 12rem"
                             ></Column>
-                            <Column
-                                field="data.tranid"
-                                header="Orden de compra"
-                                sortable
-                                style="min-width: 16rem"
-                            >
+                            <Column header="Orden de compra" sortable style="min-width: 16rem">
+                                <template #body="slotProps">
+                                    {{ slotProps.purchase_order || slotProps.data.tranid }}
+                                </template>
                             </Column>
-
                             <Column
-                                field="data.estado"
+                                field="status"
                                 header="Estatus"
                                 sortable
                                 style="min-width: 16rem"
                                 bodyClass="ml-2"
                             ></Column>
                             <Column
-                                field="data.fecha"
+                                field="date"
                                 header="Fecha"
                                 sortable
                                 style="min-width: 10rem"
@@ -578,7 +575,6 @@ const formatCurrency = (value) => {
                                 />
                             </template>
                         </Dialog>
-                        -->
                     </div>
                 </div>
             </div>

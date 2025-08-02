@@ -32,8 +32,10 @@ Route::middleware([
 
     Route::get('/users', [SuplierUserController::class, 'index'])->name('users.index');
     Route::post('/users', [SuplierUserController::class, 'store'])->name('users.store');
-    Route::put('/users/{id}', [SuplierUserController::class, 'destroy'])->name('users.destroy');
+    Route::delete('/users/{id}', [SuplierUserController::class, 'destroy'])->name('users.destroy');
     Route::put('/users/{id}/update', [SuplierUserController::class, 'update'])->name('users.update');
+    Route::delete('/users', [SuplierUserController::class, 'destroySelected'])->name('users.destroySelected');
+
 });
 
 
