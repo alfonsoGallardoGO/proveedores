@@ -179,6 +179,27 @@ class SupplierPurchaseOrderController extends Controller
                 SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete(); 
             }
 
+            $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
+            if($supplierPurchaseOrder->exists()){
+                $supplierPurchaseOrder->update([
+                    'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                    'rfc' => $data['proveedor']['rfc'] ?? null,
+                    'status' => $data['estado'] ?? null,
+                    'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                    'purchase_order_id' => $data['id'] ?? null,
+                    'purchase_order' => $data['tranid'] ?? null,
+                ]);
+            } else {
+                SupplierPurchaseOrder::create([
+                    'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                    'rfc' => $data['proveedor']['rfc'] ?? null,
+                    'status' => $data['estado'] ?? null,
+                    'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                    'purchase_order_id' => $data['id'] ?? null,
+                    'purchase_order' => $data['tranid'] ?? null,
+                ]);
+            }
+
             DB::commit(); 
             return response()->json([
                 'message' => 'Orden de compra y sus ítems sincronizados correctamente.',
