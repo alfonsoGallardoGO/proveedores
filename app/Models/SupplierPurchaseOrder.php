@@ -15,7 +15,8 @@ class SupplierPurchaseOrder extends Model
         'status',
         'date',
         'data' => 'array',
-        'purchase_order_id'
+        'purchase_order_id',
+        'purchase_order',
     ];
 
     protected $dates = ['deleted_at'];
