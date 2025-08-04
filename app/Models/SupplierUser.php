@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use App\Notifications\CustomResetPassword;
+use Laravel\Sanctum\HasApiTokens;
 
 class SupplierUser extends Authenticatable
 {
@@ -13,6 +14,8 @@ class SupplierUser extends Authenticatable
     use TwoFactorAuthenticatable;
     use \Laravel\Jetstream\HasProfilePhoto;
     use \Illuminate\Database\Eloquent\SoftDeletes;
+    use HasApiTokens;
+    
 
 
     protected $table = 'supplier_users';
