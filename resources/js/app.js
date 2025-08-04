@@ -22,8 +22,12 @@ import Tag from "primevue/tag";
 import InputMask from "primevue/inputmask";
 import Password from "primevue/password";
 import "primeicons/primeicons.css";
-import DataView from "primevue/dataview";
-import InputNumber from "primevue/inputnumber";
+import DataView from 'primevue/dataview';
+import InputNumber from 'primevue/inputnumber';
+import { ref, onMounted } from "vue";
+import Chart from 'primevue/chart';
+
+
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -102,6 +106,7 @@ createInertiaApp({
         app.component("DataView", DataView);
         app.component("InputNumber", InputNumber);
         app.component("Toast", Toast);
+        app.component("Chart", Chart);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {

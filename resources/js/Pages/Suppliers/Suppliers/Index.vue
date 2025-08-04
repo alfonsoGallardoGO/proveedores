@@ -80,13 +80,10 @@ const editSupplier = async (id) => {
     } catch (error) {
         console.log(error);
         hideDialog();
-        const errorMessage =
-            error.response?.data?.message ||
-            "Error al actualizar el proveedor.";
         toast.add({
             severity: "error",
             summary: "Error",
-            detail: errorMessage,
+            detail: error.response?.data?.message || "Error al actualizar el proveedor.",
             life: 3000,
         });
     }
