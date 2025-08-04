@@ -9,6 +9,7 @@ use App\Models\SupplierPurchaseOrderItem;
 use App\Models\SupplierPurchaseOrdersItemsDelivery;
 use App\Models\SupplierInvoice;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SupplierPurchaseOrderController extends Controller
 {
@@ -41,10 +42,13 @@ class SupplierPurchaseOrderController extends Controller
         ]);
 
     }
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $data = $request->validate([
             'cantidades' => 'required|array',
-            'cantidades.*' => 'nullable|integer|min:0'
+            'cantidades.*' => 'nullable|integer|min:0',
+            'factura' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'xml' => 'nullable|file|mimes:xml|max:1024',
         ]);
 
         foreach ($data['cantidades'] as $itemId => $amount) {
@@ -54,27 +58,30 @@ class SupplierPurchaseOrderController extends Controller
             ]);
         }
 
-        $supplierId = Auth::user()->supplier_id;
+        $supplierId = Auth::user()->supplier_id ?? 1; 
         $pdfPath = null;
         $xmlPath = null;
 
-        if ($request->hasFile('pdf')) {
-            $pdfPath = $request->file('pdf')->store('invoices/pdf', 'public');
+        if ($request->hasFile('factura')) {
+            Storage::disk('public')->makeDirectory('invoices/pdf');
+            $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
         }
 
         if ($request->hasFile('xml')) {
+            Storage::disk('public')->makeDirectory('invoices/xml');
             $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
         }
 
         SupplierInvoice::create([
-            'supplier_id' => 1,
-            'supplier_purchase_order_id' =>$data['supplier_purchase_order_id'],
+            'supplier_id' => $supplierId,
+            'supplier_purchase_order_id' => $request->supplier_purchase_order_id ?? 0,
             'pdf_route' => $pdfPath,
             'xml_route' => $xmlPath,
         ]);
 
         return redirect()->route('purchase-orders.index')
-            ->with('success', 'Cantidades entregadas registradas correctamente.');
+            ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
     }
+
 
 }
