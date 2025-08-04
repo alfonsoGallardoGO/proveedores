@@ -116,7 +116,7 @@ class SupplierPurchaseOrderController extends Controller
         // Procesar lineasGastos
         foreach (collect($data['lineasGastos'] ?? []) as $item) {
             $standardizedItem = [
-                'article_order_id' => $item['gastoId'],
+                'article_order_id' => $item['articuloId'],
                 'description'      => $item['memo'],
                 'quantity'         => $item['cantidad'],
                 'amount'           => $item['importe'],
