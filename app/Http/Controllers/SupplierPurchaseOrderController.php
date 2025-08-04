@@ -90,6 +90,18 @@ class SupplierPurchaseOrderController extends Controller
             ], 400);
         }
 
+        if(empty($data['estado'])){
+            return response()->json([
+                'error' => 'El campo estado se encuentra vacio.'
+            ], 400);
+        }
+
+        if (empty($data['tranid']) || strpos($data['tranid'], 'OC') !== 0) {
+            return response()->json([
+                'error' => 'El campo tranid no es válido.'
+            ], 400);
+        }
+
         $incomingItems = [];
 
         // Procesar lineasArticulos
