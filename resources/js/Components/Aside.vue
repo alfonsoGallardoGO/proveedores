@@ -93,7 +93,7 @@ export default {
                         </Link>
                     </div>
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <Link :href="route('dashboard')" class="menu-link">
+                        <Link :href="route('purchase-orders.index')" class="menu-link">
                         <span class="menu-icon">
                             <i class="ki-duotone ki-document fs-2">
                                 <span class="path1"></span>
@@ -104,7 +104,7 @@ export default {
                         </Link>
                     </div>
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <Link :href="route('dashboard')" class="menu-link">
+                        <Link :href="route('invoices.index')" class="menu-link">
                         <span class="menu-icon">
                             <i class="ki-duotone ki-questionnaire-tablet fs-2">
                                 <span class="path1"></span>

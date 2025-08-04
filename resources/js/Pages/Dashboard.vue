@@ -299,7 +299,7 @@ const setChartOptionsDoughnut = () => {
                                 <!--end::Header-->
                                 <!--begin::Body-->
                                 <div class="card flex justify-center">
-                                    <Chart type="doughnut" :data="chartDataDoughnut" :options="chartOptionsDoughnut" class="w-full md:w-[60rem]" />
+                                    <Chart type="doughnut" :data="chartDataDoughnut" :options="chartOptionsDoughnut" class="w-full md:w-[40rem]" />
                                 </div>
                                 <!--begin::Body-->
                             </div>

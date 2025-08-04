@@ -9,17 +9,21 @@ class SupplierInvoice extends Model
 {
     use HasFactory;
 
-    protected $table = 'suppliers_invoices';
+    protected $table = 'supplier_purchase_orders';
+    protected $primaryKey = 'id';
+
     protected $fillable = [
-        'supplier_id',
-        'supplier_purchase_order_id',
-        'pdf_route',
-        'xml_route',
+        'supplier_external_id',
+        'rfc',
+        'status',
+        'date',
+        'data' => 'array',
+        'purchase_order_id'
     ];
 
 
     public function invoices()
     {
-        return $this->hasMany(SupplierInvoice::class, 'supplier_purchase_order_id');
+        return $this->hasMany(SupplierInvoice::class, 'supplier_purchase_order_id', 'id');
     }
 }
