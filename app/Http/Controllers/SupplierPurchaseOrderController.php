@@ -10,6 +10,7 @@ use App\Models\SupplierPurchaseOrdersItemsDelivery;
 use App\Models\SupplierInvoice;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SupplierPurchaseOrderController extends Controller
 {
@@ -42,11 +43,13 @@ class SupplierPurchaseOrderController extends Controller
         ]);
 
     }
-
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $data = $request->validate([
             'cantidades' => 'required|array',
-            'cantidades.*' => 'nullable|integer|min:0'
+            'cantidades.*' => 'nullable|integer|min:0',
+            'factura' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'xml' => 'nullable|file|mimes:xml|max:1024',
         ]);
 
         foreach ($data['cantidades'] as $itemId => $amount) {
@@ -56,21 +59,23 @@ class SupplierPurchaseOrderController extends Controller
             ]);
         }
 
-        $supplierId = Auth::user()->supplier_id;
+        $supplierId = Auth::user()->supplier_id ?? 1; 
         $pdfPath = null;
         $xmlPath = null;
 
-        if ($request->hasFile('pdf')) {
-            $pdfPath = $request->file('pdf')->store('invoices/pdf', 'public');
+        if ($request->hasFile('factura')) {
+            Storage::disk('public')->makeDirectory('invoices/pdf');
+            $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
         }
 
         if ($request->hasFile('xml')) {
+            Storage::disk('public')->makeDirectory('invoices/xml');
             $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
         }
 
         SupplierInvoice::create([
-            'supplier_id' => 1,
-            'supplier_purchase_order_id' =>$data['supplier_purchase_order_id'],
+            'supplier_id' => $supplierId,
+            'supplier_purchase_order_id' => $request->supplier_purchase_order_id ?? 0,
             'pdf_route' => $pdfPath,
             'xml_route' => $xmlPath,
         ]);
@@ -87,6 +92,18 @@ class SupplierPurchaseOrderController extends Controller
         if (empty($supplier_purchase_order_id)) {
             return response()->json([
                 'error' => 'El campo id es requerido.'
+            ], 400);
+        }
+
+        if(empty($data['estado'])){
+            return response()->json([
+                'error' => 'El campo estado se encuentra vacio.'
+            ], 400);
+        }
+
+        if (empty($data['tranid']) || strpos($data['tranid'], 'OC') !== 0) {
+            return response()->json([
+                'error' => 'El campo tranid no es válido.'
             ], 400);
         }
 
@@ -116,7 +133,7 @@ class SupplierPurchaseOrderController extends Controller
         // Procesar lineasGastos
         foreach (collect($data['lineasGastos'] ?? []) as $item) {
             $standardizedItem = [
-                'article_order_id' => $item['gastoId'],
+                'article_order_id' => $item['articuloId'],
                 'description'      => $item['memo'],
                 'quantity'         => $item['cantidad'],
                 'amount'           => $item['importe'],
@@ -177,6 +194,27 @@ class SupplierPurchaseOrderController extends Controller
 
             if (!empty($idsToDelete)) {
                 SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete(); 
+            }
+
+            $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
+            if($supplierPurchaseOrder->exists()){
+                $supplierPurchaseOrder->update([
+                    'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                    'rfc' => $data['proveedor']['rfc'] ?? null,
+                    'status' => $data['estado'] ?? null,
+                    'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                    'purchase_order_id' => $data['id'] ?? null,
+                    'purchase_order' => $data['tranid'] ?? null,
+                ]);
+            } else {
+                SupplierPurchaseOrder::create([
+                    'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                    'rfc' => $data['proveedor']['rfc'] ?? null,
+                    'status' => $data['estado'] ?? null,
+                    'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                    'purchase_order_id' => $data['id'] ?? null,
+                    'purchase_order' => $data['tranid'] ?? null,
+                ]);
             }
 
             DB::commit(); 
