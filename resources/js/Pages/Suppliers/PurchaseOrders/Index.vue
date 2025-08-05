@@ -154,7 +154,7 @@ const getSeverity = (status) => {
 <template>
     <AppLayout title="Ordenes de compra">
         <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
-            <Header :title="'Prestaciones'" />
+            <Header :title="'ORDENES DE COMPRA PENDIENTES'" />
             <div
                 class="content d-flex flex-column flex-column-fluid"
                 id="kt_content"
@@ -198,7 +198,7 @@ const getSeverity = (status) => {
                                 <div
                                     class="flex flex-wrap gap-2 items-center justify-between"
                                 >
-                                    <h4 class="m-0">Ordenes de compra</h4>
+                                    <h4 class="m-0"></h4>
                                     <IconField>
                                         <InputIcon>
                                             <i class="pi pi-search" />
@@ -262,7 +262,7 @@ const getSeverity = (status) => {
                                         icon="pi pi-eye"
                                         outlined
                                         rounded
-                                        severity="secondary"
+                                        severity="warn"
                                         class="mr-2"
                                         @click="
                                             show(

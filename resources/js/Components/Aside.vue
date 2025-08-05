@@ -72,10 +72,7 @@ export default {
                     <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
                         <Link :href="route('dashboard')" class="menu-link">
                         <span class="menu-icon">
-                            <i class="ki-duotone ki-home-2 fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
+                            <i class="ki-solid ki-home-2 fs-2"></i>
                         </span>
                         <span class="menu-title">Inicio</span>
                         </Link>
@@ -84,34 +81,25 @@ export default {
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                         <Link :href="route('suppliers.index')" class="menu-link">
                         <span class="menu-icon">
-                            <i class="ki-duotone ki-delivery-3 fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
+                            <i class="ki-solid ki-note-2 fs-2"></i>
                         </span>
-                        <span class="menu-title">Catalogo</span>
+                        <span class="menu-title">Catálogo de Proveedores</span>
                         </Link>
                     </div>
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                         <Link :href="route('purchase-orders.index')" class="menu-link">
                         <span class="menu-icon">
-                            <i class="ki-duotone ki-document fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
+                            <i class="ki-solid ki-delivery-time fs-2"></i>
                         </span>
-                        <span class="menu-title">Facturas</span>
+                        <span class="menu-title">Ordenes de Compra Pendientes</span>
                         </Link>
                     </div>
                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                         <Link :href="route('invoices.index')" class="menu-link">
                         <span class="menu-icon">
-                            <i class="ki-duotone ki-questionnaire-tablet fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
+                            <i class="ki-solid ki-questionnaire-tablet fs-2"></i>
                         </span>
-                        <span class="menu-title">Facturas Completadas</span>
+                        <span class="menu-title">Ordenes de Compra Completas</span>
                         </Link>
                     </div>
                 </div>
