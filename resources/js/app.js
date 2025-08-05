@@ -109,7 +109,6 @@ createInertiaApp({
         app.component("InputNumber", InputNumber);
         app.component("Toast", Toast);
         app.component("Chart", Chart);
-        app.component("Popover", Popover);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {

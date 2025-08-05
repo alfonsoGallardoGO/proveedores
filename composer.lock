@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d1dca3df4c08ca8c2459936b47b5f32",
+    "content-hash": "87c4c0f3a0813cc76a5b97087d9f75be",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -613,6 +613,43 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "eher/oauth",
+            "version": "1.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/EHER/OAuth.git",
+                "reference": "935c1f7709d1c1457de9e250d0e5f29cac06e507"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/EHER/OAuth/zipball/935c1f7709d1c1457de9e250d0e5f29cac06e507",
+                "reference": "935c1f7709d1c1457de9e250d0e5f29cac06e507",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "eher/phpunit": "1.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Eher\\OAuth": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "OAuth 1 PHP Library",
+            "support": {
+                "issues": "https://github.com/EHER/OAuth/issues",
+                "source": "https://github.com/EHER/OAuth/tree/1.0.7"
+            },
+            "time": "2012-12-13T23:48:10+00:00"
         },
         {
             "name": "fruitcake/php-cors",
@@ -2202,6 +2239,82 @@
             "time": "2024-09-21T08:32:55+00:00"
         },
         {
+            "name": "league/oauth1-client",
+            "version": "v1.11.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/oauth1-client.git",
+                "reference": "f9c94b088837eb1aae1ad7c4f23eb65cc6993055"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/oauth1-client/zipball/f9c94b088837eb1aae1ad7c4f23eb65cc6993055",
+                "reference": "f9c94b088837eb1aae1ad7c4f23eb65cc6993055",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-openssl": "*",
+                "guzzlehttp/guzzle": "^6.0|^7.0",
+                "guzzlehttp/psr7": "^1.7|^2.0",
+                "php": ">=7.1||>=8.0"
+            },
+            "require-dev": {
+                "ext-simplexml": "*",
+                "friendsofphp/php-cs-fixer": "^2.17",
+                "mockery/mockery": "^1.3.3",
+                "phpstan/phpstan": "^0.12.42",
+                "phpunit/phpunit": "^7.5||9.5"
+            },
+            "suggest": {
+                "ext-simplexml": "For decoding XML-based responses."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev",
+                    "dev-develop": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\OAuth1\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Corlett",
+                    "email": "bencorlett@me.com",
+                    "homepage": "http://www.webcomm.com.au",
+                    "role": "Developer"
+                }
+            ],
+            "description": "OAuth 1.0 Client Library",
+            "keywords": [
+                "Authentication",
+                "SSO",
+                "authorization",
+                "bitbucket",
+                "identity",
+                "idp",
+                "oauth",
+                "oauth1",
+                "single sign on",
+                "trello",
+                "tumblr",
+                "twitter"
+            ],
+            "support": {
+                "issues": "https://github.com/thephpleague/oauth1-client/issues",
+                "source": "https://github.com/thephpleague/oauth1-client/tree/v1.11.0"
+            },
+            "time": "2024-12-10T19:59:05+00:00"
+        },
+        {
             "name": "league/uri",
             "version": "7.5.1",
             "source": {
@@ -2649,6 +2762,71 @@
             "time": "2025-06-21T15:19:35+00:00"
         },
         {
+            "name": "netsuitephp/netsuite-laravel",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/netsuitephp/netsuite-laravel.git",
+                "reference": "6b97bbcd7af8b34c0e2b513e36c05d485627bb9a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/netsuitephp/netsuite-laravel/zipball/6b97bbcd7af8b34c0e2b513e36c05d485627bb9a",
+                "reference": "6b97bbcd7af8b34c0e2b513e36c05d485627bb9a",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2.5|^8.0",
+                "ryanwinchester/netsuite-php": "*"
+            },
+            "require-dev": {
+                "illuminate/config": "^7|^8",
+                "illuminate/support": "^7|^8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "NetSuite": "NetSuite\\Facades\\NetSuite"
+                    },
+                    "providers": [
+                        "NetSuite\\Providers\\NetSuiteServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "NetSuite\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "James Gilliland (neclimdul)",
+                    "email": "neclimdul@gmail.com"
+                },
+                {
+                    "name": "Justin Rebelo (jrebs)",
+                    "homepage": "https://github.com/jrebs"
+                }
+            ],
+            "description": "NetSuite PHP laravel provider wrapper",
+            "keywords": [
+                "api",
+                "laravel",
+                "netsuite",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/netsuitephp/netsuite-laravel/issues",
+                "source": "https://github.com/netsuitephp/netsuite-laravel/tree/v1.0"
+            },
+            "time": "2021-04-21T19:47:02+00:00"
+        },
+        {
             "name": "nette/schema",
             "version": "v1.3.2",
             "source": {
@@ -3007,6 +3185,56 @@
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
             "time": "2024-05-08T12:36:18+00:00"
+        },
+        {
+            "name": "paragonie/random_compat",
+            "version": "v9.99.100",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/random_compat.git",
+                "reference": "996434e5492cb4c3edcb9168db6fbb1359ef965a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/996434e5492cb4c3edcb9168db6fbb1359ef965a",
+                "reference": "996434e5492cb4c3edcb9168db6fbb1359ef965a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*|5.*",
+                "vimeo/psalm": "^1"
+            },
+            "suggest": {
+                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com",
+                    "homepage": "https://paragonie.com"
+                }
+            ],
+            "description": "PHP 5.x polyfill for random_bytes() and random_int() from PHP 7",
+            "keywords": [
+                "csprng",
+                "polyfill",
+                "pseudorandom",
+                "random"
+            ],
+            "support": {
+                "email": "info@paragonie.com",
+                "issues": "https://github.com/paragonie/random_compat/issues",
+                "source": "https://github.com/paragonie/random_compat"
+            },
+            "time": "2020-10-15T08:29:30+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -3872,6 +4100,68 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.0"
             },
             "time": "2025-06-25T14:20:11+00:00"
+        },
+        {
+            "name": "ryanwinchester/netsuite-php",
+            "version": "v2024.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/netsuitephp/netsuite-php.git",
+                "reference": "07e6089de7f4c02ce2bd529a48bbd8e727965b56"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/netsuitephp/netsuite-php/zipball/07e6089de7f4c02ce2bd529a48bbd8e727965b56",
+                "reference": "07e6089de7f4c02ce2bd529a48bbd8e727965b56",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "ext-simplexml": "*",
+                "ext-soap": "*",
+                "paragonie/random_compat": ">=1",
+                "php": ">=8.1",
+                "psr/log": "^1|^2|^3"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.6",
+                "phpspec/phpspec": ">=5",
+                "phpunit/phpunit": "^9.5"
+            },
+            "suggest": {
+                "symfony/dotenv": "Provides loading a .env file for obtaining config variables",
+                "vlucas/phpdotenv": "Provides loading a .env file for obtaining config variables"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/includes/functions.php"
+                ],
+                "psr-4": {
+                    "NetSuite\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Ryan Winchester (fungku)",
+                    "email": "fungku@gmail.com"
+                }
+            ],
+            "description": "NetSuite PHP API wrapper",
+            "keywords": [
+                "api",
+                "netsuite",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/netsuitephp/netsuite-php/issues",
+                "source": "https://github.com/netsuitephp/netsuite-php/tree/v2024.2.0"
+            },
+            "time": "2025-01-24T17:51:40+00:00"
         },
         {
             "name": "spatie/laravel-permission",
