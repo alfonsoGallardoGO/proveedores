@@ -29,7 +29,7 @@ class SupplierController extends Controller
         $data = $request->validate([
             'external_id' => 'nullable|integer',
             'uid' => 'nullable|string',
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255', //required|string|max:255
             'company_name' => 'nullable|string|max:255',
             'legal_name_company' => 'nullable|string|max:255',
             'is_individual' => 'nullable|string|max:10',
@@ -77,7 +77,7 @@ class SupplierController extends Controller
         $data = $request->validate([
             'external_id' => 'nullable|integer',
             'uid' => 'nullable|string',
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255', //required|string|max:255
             'company_name' => 'nullable|string|max:255',
             'legal_name_company' => 'nullable|string|max:255',
             'is_individual' => 'nullable|string|max:10',
