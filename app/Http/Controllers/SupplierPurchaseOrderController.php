@@ -9,8 +9,8 @@ use App\Models\SupplierPurchaseOrderItem;
 use App\Models\SupplierPurchaseOrdersItemsDelivery;
 use App\Models\SupplierInvoice;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class SupplierPurchaseOrderController extends Controller
 {
@@ -43,7 +43,6 @@ class SupplierPurchaseOrderController extends Controller
         ]);
 
     }
-    
     public function store(Request $request)
     {
         $data = $request->validate([
