@@ -100,27 +100,43 @@ export default {
                         class="menu-item here show menu-accordion"
                     >
                         <Link :href="route('dashboard')" class="menu-link">
-                        <span class="menu-icon">
-                            <i class="ki-solid ki-home-2 fs-2"></i>
-                        </span>
-                        <span class="menu-title">Inicio</span>
+                            <span class="menu-icon">
+                                <i class="ki-solid ki-home-2 fs-2"></i>
+                            </span>
+                            <span class="menu-title">Inicio</span>
                         </Link>
                     </div>
                     <!-- <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion"></div> -->
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <Link :href="route('suppliers.index')" class="menu-link">
-                        <span class="menu-icon">
-                            <i class="ki-solid ki-note-2 fs-2"></i>
-                        </span>
-                        <span class="menu-title">Catálogo de Proveedores</span>
+                    <div
+                        data-kt-menu-trigger="click"
+                        class="menu-item menu-accordion"
+                    >
+                        <Link
+                            :href="route('suppliers.index')"
+                            class="menu-link"
+                        >
+                            <span class="menu-icon">
+                                <i class="ki-solid ki-note-2 fs-2"></i>
+                            </span>
+                            <span class="menu-title"
+                                >Catálogo de Proveedores</span
+                            >
                         </Link>
                     </div>
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <Link :href="route('purchase-orders.index')" class="menu-link">
-                        <span class="menu-icon">
-                            <i class="ki-solid ki-delivery-time fs-2"></i>
-                        </span>
-                        <span class="menu-title">Ordenes de Compra Pendientes</span>
+                    <div
+                        data-kt-menu-trigger="click"
+                        class="menu-item menu-accordion"
+                    >
+                        <Link
+                            :href="route('purchase-orders.index')"
+                            class="menu-link"
+                        >
+                            <span class="menu-icon">
+                                <i class="ki-solid ki-delivery-time fs-2"></i>
+                            </span>
+                            <span class="menu-title"
+                                >Ordenes de Compra Pendientes</span
+                            >
                         </Link>
                     </div>
                     <div
@@ -128,10 +144,14 @@ export default {
                         class="menu-item menu-accordion"
                     >
                         <Link :href="route('invoices.index')" class="menu-link">
-                        <span class="menu-icon">
-                            <i class="ki-solid ki-questionnaire-tablet fs-2"></i>
-                        </span>
-                        <span class="menu-title">Ordenes de Compra Completas</span>
+                            <span class="menu-icon">
+                                <i
+                                    class="ki-solid ki-questionnaire-tablet fs-2"
+                                ></i>
+                            </span>
+                            <span class="menu-title"
+                                >Ordenes de Compra Completas</span
+                            >
                         </Link>
                     </div>
                     <div
@@ -234,9 +254,7 @@ export default {
                         <!--end::Menu separator-->
                         <!--begin::Menu item-->
                         <div class="menu-item px-5">
-                            <Link
-                                class="menu-link px-5"
-                                :href="route('user.profile')"
+                            <Link class="menu-link px-5" href="/user/profile"
                                 >Perfil</Link
                             >
                         </div>
