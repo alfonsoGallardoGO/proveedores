@@ -114,4 +114,71 @@ class SupplierController extends Controller
 
         return redirect()->route('suppliers.index')->with('success', 'Proveedor eliminado correctamente.');
     }
+
+    public function storeSupliers(Request $request)
+    {
+        $data = $request->all(); 
+        $externalId = $data['id'] ?? null;
+        $uid = $data['nameorig'] ?? null;
+        $name = $data['firstname'] . " " . ($data['lastname'] ?? null);
+        $companyName = $data['companyname'] ?? null;
+        $legalNameCompany = $data['legalname'] ?? null;
+        $isIndividual = $data['tipoEntidad'] === 'individual' ? 'Si' : 'No';
+        $type = $data['type'] ?? null;
+        $phone = $data['phone'] ?? null;
+        $category = $data['inpt_category'] ?? null;
+        $tax = $data['taxitem'] ?? null;
+        $email = $data['email'] ?? null;
+        $currency = null;
+        $defaultAccountsPayable = $data['accountnumber'] ?? null;
+        $paymentTerms = null;
+        $balance = $data['balance'] ?? null;
+        $inactive = $data['isinactive'] ?? null;
+        $mainSubsidiary = $data['subsidiary'] ?? null;
+        $address = $data['shipaddressee'] ?? null;
+        $prepaidBalance = null;
+        $unbilledOrders = $data['unbilledorders'] ?? null;
+        $creditLimit = $data['creditlimit'] ?? null;
+        $filepath = null;
+
+        $newSupplier = [
+            'external_id' => $externalId,
+            'uid' => $uid,
+            'name' => $name,
+            'company_name' => $companyName,
+            'legal_name_company' => $legalNameCompany,
+            'is_individual' => $isIndividual,
+            'type' => $type,
+            'phone' => $phone,
+            'category' => $category,
+            'tax' => $tax,
+            'email' => $email,
+            'currency' => $currency,
+            'default_accounts_payable' => $defaultAccountsPayable,
+            'payment_terms' => $paymentTerms,
+            'balance' => $balance,
+            'inactive' => $inactive,
+            'main_subsidiary' => $mainSubsidiary,
+            'address' => $address,
+            'prepaid_balance' => $prepaidBalance,
+            'unbilled_orders' => $unbilledOrders,
+            'credit_limit' => $creditLimit,
+            'filepath' => $filepath
+        ];
+
+        $supplier = Supplier::where('external_id', $externalId)->first();
+
+        if(!empty($supplier)){
+            $supplier->update($newSupplier);
+        } else {
+            Supplier::create($newSupplier);
+        }
+
+
+        return response()->json([
+            'message' => 'Proveedor creado o actualizado correctamente.',
+            'supplier' => $newSupplier
+        ], 201);
+
+    }
 }
