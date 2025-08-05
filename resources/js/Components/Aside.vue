@@ -260,7 +260,9 @@ export default {
                         <!--end::Menu separator-->
                         <!--begin::Menu item-->
                         <div class="menu-item px-5">
-                            <Link class="menu-link px-5" href="user/profile"
+                            <Link
+                                class="menu-link px-5"
+                                :href="route('user.profile')"
                                 >Perfil</Link
                             >
                         </div>
@@ -269,7 +271,8 @@ export default {
                         <!--begin::Menu item-->
                         <div class="menu-item px-5">
                             <a
-                                href="authentication/layouts/corporate/sign-in.html"
+                                href="#"
+                                @click.prevent="logout"
                                 class="menu-link px-5"
                                 >Cerrar Sesión</a
                             >
