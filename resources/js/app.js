@@ -27,6 +27,10 @@ import InputNumber from 'primevue/inputnumber';
 import { ref, onMounted } from "vue";
 import Chart from 'primevue/chart';
 import Popover from 'primevue/popover';
+import Chip from 'primevue/chip';
+import ProgressSpinner from 'primevue/progressspinner';
+
+
 
 
 
@@ -110,6 +114,8 @@ createInertiaApp({
         app.component("Toast", Toast);
         app.component("Chart", Chart);
         app.component("Popover", Popover);
+        app.component("Chip", Chip);
+        app.component("ProgressSpinner", ProgressSpinner);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {

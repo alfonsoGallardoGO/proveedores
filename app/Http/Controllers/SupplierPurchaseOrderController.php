@@ -16,8 +16,9 @@ class SupplierPurchaseOrderController extends Controller
 {
     public function index()
     {
-        $orders = SupplierPurchaseOrder::with('items')
+        $orders = SupplierPurchaseOrder::where('supplier_external_id',$supplierId = Auth::user()->supplier_id ?? 65424) 
         ->get();
+        
 
         return Inertia::render('Suppliers/PurchaseOrders/Index', [
             'orders' => $orders
@@ -45,17 +46,12 @@ class SupplierPurchaseOrderController extends Controller
     }
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'cantidades' => 'required|array',
-            'cantidades.*' => 'nullable|integer|min:0',
-            'factura' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'xml' => 'nullable|file|mimes:xml|max:1024',
-        ]);
+        $data = $request;
 
         foreach ($data['cantidades'] as $itemId => $amount) {
             SupplierPurchaseOrdersItemsDelivery::create([
                 'supplier_purchase_orders_item_id' => $itemId,
-                'amount' => $amount,
+                'amount' => $amount ?? 0,
             ]);
         }
 
@@ -117,6 +113,9 @@ class SupplierPurchaseOrderController extends Controller
                 'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
                 'purchase_order_id' => $data['id'] ?? null,
                 'purchase_order' => $data['tranid'] ?? null,
+                'total' => $data['total'] ?? null,
+                'subtotal' => $data['subtotal'] ?? null,
+                'impuesto' => $data['impuesto'] ?? null,
             ]);
             $orderId = $supplierPurchaseOrder->first()->id;
         } else {
@@ -127,6 +126,10 @@ class SupplierPurchaseOrderController extends Controller
                 'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
                 'purchase_order_id' => $data['id'] ?? null,
                 'purchase_order' => $data['tranid'] ?? null,
+                'total' => $data['total'] ?? null,
+                'subtotal' => $data['subtotal'] ?? null,
+                'impuesto' => $data['impuesto'] ?? null,
+
             ]);
             $orderId = SupplierPurchaseOrder::latest()->first()->id;
         }
