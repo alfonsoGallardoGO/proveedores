@@ -62,14 +62,13 @@ const hideDialog = () => {
 
 const selectedOrder = ref(null);
 
-const show = async (id, supplier) => {
+const showCompletedInvoices = async (id, supplier) => {
     form.supplier_purchase_order_id = id;
-    // form.supplier_id = supplier;
-    // console.log(supplier.data)
+
     try {
         showInvoice.value = true;
         const response = await axios.get(route("purchase-orders.show", id));
-        console.log(response)
+        console.log(response);
         selectedOrder.value = response.data?.items;
         invoices.value = response.data?.invoices;
     } catch (error) {
@@ -88,49 +87,42 @@ const filtrer = (prod) => {
 };
 
 const statuses = ref([
-    { name: 'Cerrada', code: 'CLOSED' },
-    { name: 'Factura pendiente', code: 'INVOICE_PENDING' },
-    { name: 'Facturación pendiente/parcialmente recibido', code: 'PARTIALLY_RECEIVED_INVOICE_PENDING' },
-    { name: 'Parcialmente recibida', code: 'PARTIALLY_RECEIVED' },
-    { name: 'Recepción pendiente', code: 'RECEIVE_PENDING' },
-    { name: 'Totalmente facturada', code: 'FULLY_INVOICED' }
+    { name: 'Cerrada', code: 'Cerrada' },
+    { name: 'Factura pendiente', code: 'Factura pendiente' },
+    { name: 'Facturación pendiente/parcialmente recibido', code: 'Facturación pendiente/parcialmente recibido' },
+    { name: 'Parcialmente recibida', code: 'Parcialmente recibida' },
+    { name: 'Recepción pendiente', code: 'Recepción pendiente' },
+    { name: 'Totalmente facturada', code: 'Totalmente facturada' }
 ]);
 
-// Esta es la función que se ejecuta al dar clic en el botón "Buscar"
 const applyFilters = () => {
-    // Almacena los valores seleccionados en los inputs para usarlos en el computed
     appliedStatus.value = selectedStatus.value;
     appliedDate.value = selectedDate.value;
+    showFiltrer.value = false;
 };
 
 const closeFilters = () =>{
     showFiltrer.value = false;
 }
 
-// Esta es la función para limpiar todos los filtros
 const clearFilters = () => {
-    // Limpia los inputs del formulario
     selectedStatus.value = null;
     selectedDate.value = null;
     
-    // Limpia los filtros aplicados y fuerza la actualización de la tabla
     appliedStatus.value = null;
     appliedDate.value = null;
 
-    // También puedes limpiar el filtro global de búsqueda si es necesario
     filters.value.global.value = null;
+    showFiltrer.value = false;
 };
 
-// La propiedad computada que filtra los datos de la tabla
 const tableData = computed(() => {
     let result = props.orders;
 
-    // Aplica el filtro de estado si appliedStatus tiene un valor
     if (appliedStatus.value) {
         result = result.filter(order => order.status === appliedStatus.value.code);
     }
 
-    // Aplica el filtro de fecha si appliedDate tiene un valor
     if (appliedDate.value) {
         const selectedMonth = appliedDate.value.getMonth();
         const selectedYear = appliedDate.value.getFullYear();
@@ -139,9 +131,6 @@ const tableData = computed(() => {
             return (orderDate.getMonth() === selectedMonth) && (orderDate.getFullYear() === selectedYear);
         });
     }
-
-    // Nota: El filtro global de PrimeVue se aplicará automáticamente
-    // sobre los datos que este `computed` retorne.
 
     return result;
 });
@@ -152,7 +141,7 @@ const tableData = computed(() => {
 <template>
     <AppLayout title="Ordenes de compra">
         <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
-            <Header :title="'Prestaciones'" />
+            <Header :title="'ORDENES DE COMPRAS COMPLETAS'" />
             <div
                 class="content d-flex flex-column flex-column-fluid"
                 id="kt_content"
@@ -167,27 +156,14 @@ const tableData = computed(() => {
                                     icon="pi pi-filter-fill"
                                     severity="help" 
                                     outlined
-                                    @click="
-                                            filtrer()
-                                        "
+                                    @click="filtrer()"
                                 />
-                                <!-- <Button
-                                    label="Eliminar Seleccionados"
-                                    icon="pi pi-trash"
-                                    severity="danger"
-                                    outlined
-                                    @click="confirmDeleteSelected"
-                                    :disabled="
-                                        !selectedBenefits ||
-                                        !selectedBenefits.length
-                                    "
-                                /> -->
                             </template>
                         </Toolbar>
                         <DataTable
                             ref="dt"
                             v-model:selection="selectedBenefits"
-                            :value="orders"
+                            :value="tableData"
                             dataKey="id"
                             paginator
                             :rows="10"
@@ -199,7 +175,7 @@ const tableData = computed(() => {
                                 <div
                                     class="flex flex-wrap gap-2 items-center justify-between"
                                 >
-                                    <h4 class="m-0">Ordenes de compra</h4>
+                                    <h4 class="m-0"></h4>
                                     <IconField>
                                         <InputIcon>
                                             <i class="pi pi-search" />
@@ -249,12 +225,7 @@ const tableData = computed(() => {
                                         rounded
                                         severity="danger"
                                         class="mr-2"
-                                        @click="
-                                            show(
-                                                slotProps.data.id,
-                                                slotProps.data
-                                            )
-                                        "
+                                        @click="showCompletedInvoices(slotProps.data.id, slotProps.data)"
                                     />
                                 </template>
                             </Column>
@@ -266,23 +237,23 @@ const tableData = computed(() => {
                             header="FACTURA FINALIZADA"
                             :modal="true"
                         >
-                            <div class="card flex justify-center w-full h-full">
+                            <!-- <div class="card flex justify-center w-full h-full">
                                 <iframe 
                                 v-if="invoice.pdf_route"
                                 :href="`/${invoice.pdf_route}`"
                                 width="100%" 
                                 height="600px" 
                                 style="border: none;"></iframe>
-                            </div>
+                            </div> -->
                         </Dialog>
                         <Dialog 
                             v-model:visible="showFiltrer" 
                             :modal="true"
                             header="AÑADIR FILTROS DE BÚSQUEDA"
-                            :style="{ width: '25rem' }"
+                            :style="{ width: '35rem' }"
                         >
                             <div class="flex items-center gap-4 mb-4">
-                                <label for="estatus" class="font-semibold w-24">Estatus</label>
+                                <label for="estatus" class="font-semibold w-13">Estatus</label>
                                 <Dropdown 
                                     v-model="selectedStatus" 
                                     :options="statuses" 
@@ -291,14 +262,14 @@ const tableData = computed(() => {
                                     class="w-full md:w-14rem" 
                                 />
                             </div>
-                            <div class="flex items-center gap-4 mb-8">
-                                <label for="date" class="font-semibold w-24">Fecha</label>
+                            <div class="flex items-center gap-4 mb-4">
+                                <label for="date" class="font-semibold w-15">Fecha</label>
                                 <Calendar 
                                     v-model="selectedDate" 
                                     view="month" 
                                     dateFormat="mm/yy" 
                                     placeholder="Selecciona un mes" 
-                                    class="w-full"
+                                    class="w-50"
                                     :showIcon="true"
                                 />
                             </div>
