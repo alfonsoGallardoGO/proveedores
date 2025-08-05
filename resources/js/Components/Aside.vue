@@ -140,10 +140,7 @@ export default {
                     >
                         <Link :href="route('users.index')" class="menu-link">
                             <span class="menu-icon">
-                                <i class="ki-solid ki-profile-user fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
+                                <i class="ki-solid ki-profile-user fs-2"></i>
                             </span>
                             <span class="menu-title">Usuarios</span>
                         </Link>

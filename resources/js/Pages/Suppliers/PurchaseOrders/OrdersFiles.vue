@@ -1,0 +1,286 @@
+<script setup>
+import Header from "@/Components/Header.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import { ref, onMounted, computed } from "vue";
+import { FilterMatchMode } from "@primevue/core/api";
+import { useToast } from "primevue/usetoast";
+import { useForm } from "@inertiajs/vue3";
+import axios from "axios";
+import Card from 'primevue/card';
+
+const props = defineProps({
+    orders: Array,
+});
+
+
+const form = useForm({
+    cantidades: {},
+    factura: null,
+    xml: null,
+    supplier_id: null,
+    supplier_purchase_order_id: null,
+});
+
+const toast = useToast();
+const dt = ref();
+const dtItems = ref();
+const showOrder = ref(false);
+const invoices = ref();
+const isLooadingItems = ref(true);
+const progress = ref(0);
+
+onMounted(() => {
+    // props.orders.forEach(order => {
+    //     order.items.forEach(data => {
+    //         if (!form.cantidades[data.id]) {
+    //             form.cantidades[data.id] = 0;
+    //         }
+    //     });
+    // });
+});
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
+const filtersItems = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
+
+// const store = () => {
+//     const formData = new FormData();
+//     for (const [itemId, amount] of Object.entries(form.cantidades)) {
+//         formData.append(`cantidades[${itemId}]`, amount);
+//     }
+//     formData.append("supplier_id", form.supplier_id);
+//     formData.append(
+//         "supplier_purchase_order_id",
+//         form.supplier_purchase_order_id
+//     );
+//     if (form.factura) {
+//         formData.append("factura", form.factura);
+//     }
+//     if (form.xml) {
+//         formData.append("xml", form.xml);
+//     }
+
+//     console.log(formData)
+//     axios
+//         .post(route("purchase-orders.store"), formData, {
+//             headers: { "Content-Type": "multipart/form-data" },
+//         })
+//         .then(() => {
+//             toast.add({
+//                 severity: "success",
+//                 summary: "Guardado",
+//                 detail: "Datos guardados correctamente",
+//                 life: 3000,
+//             });
+//         })
+//         .catch((err) => {
+//             console.error(err);
+//             toast.add({
+//                 severity: "error",
+//                 summary: "Error",
+//                 detail: "Hubo un problema al guardar",
+//                 life: 3000,
+//             });
+//         });
+// };
+
+const store = async () => {
+    try {
+        progress.value = 0;
+        toast.add({
+            severity: 'info',
+            summary: 'Subiendo archivos...',
+            group: 'headless',
+            life: 999999,
+        });
+
+        const formData = new FormData();
+        for (const [itemId, amount] of Object.entries(form.cantidades)) {
+            formData.append(`cantidades[${itemId}]`, amount);
+        }
+        formData.append("supplier_id", form.supplier_id);
+        formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
+        if (form.factura) formData.append("factura", form.factura);
+        if (form.xml) formData.append("xml", form.xml);
+        await axios.post(route("purchase-orders.store"), formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (event) => {
+                if (event.total) {
+                    progress.value = Math.round((event.loaded * 100) / event.total);
+                }
+            },
+        });
+
+        toast.removeGroup("headless");
+
+        toast.add({
+            severity: "success",
+            summary: "Guardado",
+            detail: "Datos guardados correctamente",
+            life: 3000,
+        });
+    } catch (error) {
+        console.error(error);
+
+        toast.removeGroup("headless");
+
+        toast.add({
+            severity: "error",
+            summary: "Error",
+            detail: "Hubo un problema al guardar",
+            life: 3000,
+        });
+    } finally {
+        progress.value = 0; // Reinicia el progreso
+    }
+};
+
+const selectedOrder = ref(null);
+
+const show = async (id, supplier) => {
+    isLooadingItems.value = true;
+    form.supplier_purchase_order_id = id;
+    try {
+        showOrder.value = true;
+        const response = await axios.get(route("purchase-orders.show", id));
+        selectedOrder.value = response.data?.items;
+        invoices.value = response.data?.invoices;
+        isLooadingItems.value = false;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+};
+
+const onFacturaUpload = (event) => {
+    const file = event.files[0];
+    form.factura = file;
+};
+
+const onXmlUpload = (event) => {
+    const file = event.files[0];
+    form.xml = file;
+
+};
+
+
+const formatCurrency = (value) => {
+    if (!value) return "$0.00";
+    return new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+        minimumFractionDigits: 2,
+    }).format(Number(value));
+};
+
+
+const formatNumber = (rowData) => {
+    const value = rowData.total;
+    const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
+
+    return new Intl.NumberFormat('es-MX', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(safeValue);
+};
+
+const getSeverity = (status) => {
+    switch (status) {
+        case "Recepción pendiente":
+            return "warning";
+        case "Cerrada":
+            return "success";
+        case "Parcialmente recibida":
+            return "info";
+        case "Factura pendiente":
+            return "danger";
+        case "Totalmente facturada":
+            return "success";
+        case "Facturación pendiente/parcialmente recibido":
+            return "warning";
+        default:
+            return "secondary";
+    }
+};
+</script>
+
+<template>
+    <AppLayout title="Ordenes de compra">
+        <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
+            <Header :title="'ORDENES DE COMPRA PENDIENTES'" />
+            <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+                <DataTable ref="dtItems" :value="selectedOrder" dataKey="id" paginator :rows="10"
+                    :filters="filtersItems" :rowsPerPageOptions="[5, 10, 25]"
+                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
+                    <template #header>
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h4 class="m-0">Articulos de la orden de compra</h4>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
+                                <InputText v-model="filtersItems['global'].value"
+                                    placeholder="Buscar..." />
+                            </IconField>
+                        </div>
+                    </template>
+                    <Column field="id" header="Id" sortable style="min-width: 12rem"></Column>
+                    <Column header="Descripción" style="min-width: 16rem">
+                        <template #body="{ data }">
+                            <span class="font-medium text-gray-700">
+                                {{ data.description ?? data.memo }}
+                            </span>
+                        </template>
+                    </Column>
+                    <Column header="Cantidad Solicitada" style="min-width: 8rem">
+                        <template #body="{ data }">
+                            {{ data.quantity }}
+                        </template>
+                    </Column>
+                    <Column header="Cantidad Entregada" style="min-width: 8rem">
+                        <template #body="{ data }">
+                            {{ data.deliveries_sum_amount ?? 0 }}
+                        </template>
+                    </Column>
+                    <Column header="Faltan" style="min-width: 8rem">
+                        <template #body="{ data }">
+                            <span
+                                :class="(data.quantity - (data.deliveries_sum_amount ?? 0)) > 0 ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'">
+                                {{ data.quantity - (data.deliveries_sum_amount ?? 0) }}
+                            </span>
+                        </template>
+                    </Column>
+                    <Column header="Monto" style="min-width: 10rem">
+                        <template #body="{ data }">
+                            <span class="font-bold text-gray-800">{{ formatCurrency(data.amount)
+                                }}</span>
+                        </template>
+                    </Column>
+                    <Column header="Entrega" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            <InputNumber v-model="form.cantidades[data.id]" :min="0"
+                                :max="data.quantity - (data.deliveries_sum_amount ?? 0)" showButtons
+                                inputClass="w-20 text-center" class="w-full" />
+                        </template>
+                    </Column>
+                </DataTable>
+                <div class="container-fluid" id="kt_content_container">
+                    <div class="card">
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-3xl font-bold">Files</h1>
+                            <div class="relative">
+                                <InputText type="text" placeholder="Search" class="p-inputtext-sm pr-10" />
+                                <i class="pi pi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
