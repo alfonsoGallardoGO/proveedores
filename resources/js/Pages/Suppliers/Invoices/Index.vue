@@ -33,6 +33,15 @@ const deleteBenefitsDialog = ref(false);
 const selectedBenefits = ref();
 const invoices = ref();
 
+
+// Variables para los inputs (lo que el usuario selecciona)
+const selectedStatus = ref(null);
+const selectedDate = ref(null);
+
+// Variables para los filtros que se aplicarán (solo cuando se haga clic en "Buscar")
+const appliedStatus = ref(null);
+const appliedDate = ref(null);
+
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
@@ -78,9 +87,6 @@ const filtrer = (prod) => {
     showFiltrer.value = true;
 };
 
-const selectedStatus = ref(null);
-const selectedDate = ref(null);
-
 const statuses = ref([
     { name: 'Cerrada', code: 'CLOSED' },
     { name: 'Factura pendiente', code: 'INVOICE_PENDING' },
@@ -90,28 +96,54 @@ const statuses = ref([
     { name: 'Totalmente facturada', code: 'FULLY_INVOICED' }
 ]);
 
-const filteredOrders = computed(() => {
-    if (!selectedStatus.value && !selectedDate.value) {
-        return props.orders;
+// Esta es la función que se ejecuta al dar clic en el botón "Buscar"
+const applyFilters = () => {
+    // Almacena los valores seleccionados en los inputs para usarlos en el computed
+    appliedStatus.value = selectedStatus.value;
+    appliedDate.value = selectedDate.value;
+};
+
+const closeFilters = () =>{
+    showFiltrer.value = false;
+}
+
+// Esta es la función para limpiar todos los filtros
+const clearFilters = () => {
+    // Limpia los inputs del formulario
+    selectedStatus.value = null;
+    selectedDate.value = null;
+    
+    // Limpia los filtros aplicados y fuerza la actualización de la tabla
+    appliedStatus.value = null;
+    appliedDate.value = null;
+
+    // También puedes limpiar el filtro global de búsqueda si es necesario
+    filters.value.global.value = null;
+};
+
+// La propiedad computada que filtra los datos de la tabla
+const tableData = computed(() => {
+    let result = props.orders;
+
+    // Aplica el filtro de estado si appliedStatus tiene un valor
+    if (appliedStatus.value) {
+        result = result.filter(order => order.status === appliedStatus.value.code);
     }
 
-    return props.orders.filter(order => {
-        let statusMatch = true;
-        let dateMatch = true;
-
-        if (selectedStatus.value) {
-            statusMatch = order.status === selectedStatus.value.code;
-        }
-
-        if (selectedDate.value) {
+    // Aplica el filtro de fecha si appliedDate tiene un valor
+    if (appliedDate.value) {
+        const selectedMonth = appliedDate.value.getMonth();
+        const selectedYear = appliedDate.value.getFullYear();
+        result = result.filter(order => {
             const orderDate = new Date(order.date);
-            const selectedMonth = selectedDate.value.getMonth();
-            const selectedYear = selectedDate.value.getFullYear();
+            return (orderDate.getMonth() === selectedMonth) && (orderDate.getFullYear() === selectedYear);
+        });
+    }
 
-            dateMatch = (orderDate.getMonth() === selectedMonth) && (orderDate.getFullYear() === selectedYear);
-        }
-        return statusMatch && dateMatch;
-    });
+    // Nota: El filtro global de PrimeVue se aplicará automáticamente
+    // sobre los datos que este `computed` retorne.
+
+    return result;
 });
 
 
@@ -155,7 +187,7 @@ const filteredOrders = computed(() => {
                         <DataTable
                             ref="dt"
                             v-model:selection="selectedBenefits"
-                            :value="filteredOrders"
+                            :value="orders"
                             dataKey="id"
                             paginator
                             :rows="10"
@@ -271,9 +303,9 @@ const filteredOrders = computed(() => {
                                 />
                             </div>
                             <div class="flex justify-end gap-2">
-                                <Button type="button" severity="contrast" @click="visible = false"><i class="pi pi-times-circle"> Cerrar</i></Button>
-                                <Button type="button" severity="warn" @click="visible = false"><i class="pi pi-filter-slash"> Eliminar Filtros</i></Button>
-                                <Button type="button" label="Filtrar" @click="visible = false"><i class="pi pi-check-circle"> Filtrar</i></Button>
+                                <Button type="button" severity="contrast" @click="closeFilters"><i class="pi pi-times-circle"> Cerrar</i></Button>
+                                <Button type="button" severity="warn" @click="clearFilters"><i class="pi pi-filter-slash"> Eliminar Filtros</i></Button>
+                                <Button type="button" label="Filtrar" @click="applyFilters"><i class="pi pi-check-circle"> Filtrar</i></Button>
                             </div>
                         </Dialog>
                     </div>
