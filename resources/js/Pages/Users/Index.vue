@@ -9,6 +9,7 @@ import { router as Inertia } from "@inertiajs/vue3";
 
 const props = defineProps({
     users: Array,
+    suppliers: Array,
 });
 
 const pageUrl = import.meta.env.VITE_APP_URL;
@@ -18,6 +19,7 @@ const toast = useToast();
 
 console.log("Page Props:", page.props);
 console.log("Users:", props.users);
+console.log("Suppliers:", props.suppliers);
 
 const selectedUsers = ref([]);
 const filters = ref({
@@ -28,6 +30,8 @@ const userDialog = ref(false);
 const deleteUserDialog = ref(false);
 const previewImageUrl = ref(null);
 const passwordUser = ref("");
+const selectedSupplier = ref(null);
+
 const user = useForm({
     id: null,
     name: "",
@@ -37,6 +41,7 @@ const user = useForm({
     username: "",
     phone_number: "",
     profile_photo_path: "",
+    supplier_id: "",
 });
 
 const openNew = () => {
@@ -84,6 +89,7 @@ const sendUser = () => {
         "phone_number",
         user.phone_number?.replace(/\D/g, "") || ""
     );
+    formData.append("supplier_id", user.supplier_id || "");
 
     if (user.password) {
         formData.append("password", user.password);
@@ -96,6 +102,13 @@ const sendUser = () => {
             preserveScroll: true,
             onError: () => {
                 submitted.value = true;
+                console.log("Error creating/updating user");
+                toast.add({
+                    severity: "error",
+                    summary: "Error al actualizar el usuario",
+                    detail: "Por favor, corrige los errores y vuelve a intentarlo.",
+                    life: 3000,
+                });
             },
             onSuccess: () => {
                 userDialog.value = false;
@@ -107,9 +120,11 @@ const sendUser = () => {
                     detail: "El usuario ha sido actualizado correctamente.",
                     life: 3000,
                 });
+                submitted.value = false;
             },
         });
     } else {
+        console.log("Creating new user with formData:", formData);
         Inertia.post(route("users.store"), formData, {
             forceFormData: true,
             onSuccess: () => {
@@ -120,6 +135,17 @@ const sendUser = () => {
                     severity: "success",
                     summary: "Usuario creado",
                     detail: "El usuario ha sido creado correctamente.",
+                    life: 3000,
+                });
+                submitted.value = false;
+            },
+            onError: () => {
+                submitted.value = true;
+                console.log("Error creating user");
+                toast.add({
+                    severity: "error",
+                    summary: "Error al crear el usuario",
+                    detail: "Por favor, corrige los errores y vuelve a intentarlo.",
                     life: 3000,
                 });
             },
@@ -145,6 +171,7 @@ const editUser = (data) => {
         : null;
     submitted.value = false;
     userDialog.value = true;
+    user.supplier_id = data.supplier_id;
 };
 
 const getInitials = (username) => {
@@ -512,6 +539,7 @@ const removeProfilePhoto = () => {
                                     v-model.trim="user.rfc"
                                     required="true"
                                     :invalid="submitted && !user.rfc"
+                                    style="text-transform: uppercase"
                                     autocomplete="off"
                                     placeholder="RFC del usuario"
                                     fluid
@@ -580,18 +608,48 @@ const removeProfilePhoto = () => {
                                     >El número de teléfono es requerido.</small
                                 >
                             </div>
+                            <div>
+                                <label
+                                    for="supplier_id"
+                                    class="block font-bold mb-3"
+                                    >Proveedor</label
+                                >
+                                <Select
+                                    v-model="user.supplier_id"
+                                    :options="props.suppliers"
+                                    filter
+                                    optionLabel="company_name"
+                                    placeholder="Seleccione un Proveedor"
+                                    class="w-full"
+                                    :showClear="true"
+                                    id="supplier_id"
+                                    name="supplier_id"
+                                    optionValue="id"
+                                >
+                                    <template #option="slotProps">
+                                        <div class="flex items-center">
+                                            <div>
+                                                {{
+                                                    slotProps.option
+                                                        .company_name
+                                                }}
+                                            </div>
+                                        </div>
+                                    </template>
+                                </Select>
+                            </div>
                         </div>
 
                         <template #footer>
                             <Button
-                                label="Cancel"
+                                label="Cancelar"
                                 icon="pi pi-times"
                                 text
                                 :disabled="submitted"
                                 @click="hideDialog"
                             />
                             <Button
-                                label="Save"
+                                label="Guardar"
                                 icon="pi pi-check"
                                 :loading="submitted"
                                 :disabled="submitted"

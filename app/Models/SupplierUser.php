@@ -35,6 +35,7 @@ class SupplierUser extends Authenticatable
         'recovery_token_expires',
         'current_team_id',
         'current_branch_office_id',
+        'supplier_id',
     ];
 
     protected $hidden = [
@@ -57,5 +58,10 @@ class SupplierUser extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPassword($token));
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 }

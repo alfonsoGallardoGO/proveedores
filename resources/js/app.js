@@ -20,21 +20,33 @@ import InputText from "primevue/inputtext";
 import Dialog from "primevue/dialog";
 import Tag from "primevue/tag";
 import InputMask from "primevue/inputmask";
+import Select from "primevue/select";
 import Password from "primevue/password";
 import "primeicons/primeicons.css";
-import DataView from 'primevue/dataview';
-import InputNumber from 'primevue/inputnumber';
+import DataView from "primevue/dataview";
+import InputNumber from "primevue/inputnumber";
 import { ref, onMounted } from "vue";
-import Chart from 'primevue/chart';
-import Popover from 'primevue/popover';
-
-
-
+import Chart from "primevue/chart";
+import Popover from "primevue/popover";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
 const MyPreset = definePreset(Aura, {
     semantic: {
+        primary: {
+            0: "#ffffff",
+            50: "{blue.50}",
+            100: "{blue.100}",
+            200: "{blue.200}",
+            300: "{blue.300}",
+            400: "{blue.400}",
+            500: "{blue.500}",
+            600: "{blue.600}",
+            700: "{blue.700}",
+            800: "{blue.800}",
+            900: "{blue.900}",
+            950: "{blue.950}",
+        },
         colorScheme: {
             light: {
                 surface: {
@@ -110,6 +122,7 @@ createInertiaApp({
         app.component("Toast", Toast);
         app.component("Chart", Chart);
         app.component("Popover", Popover);
+        app.component("Select", Select);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {

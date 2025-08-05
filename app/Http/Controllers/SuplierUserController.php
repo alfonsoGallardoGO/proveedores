@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\SupplierUser;
@@ -18,7 +19,8 @@ class SuplierUserController extends Controller
     public function index()
     {
         $users = SupplierUser::withoutTrashed()->get();
-        return Inertia::render('Users/Index', ['users' => $users]);
+        $suppliers = Supplier::withoutTrashed()->get();
+        return Inertia::render('Users/Index', ['users' => $users, 'suppliers' => $suppliers]);
     }
 
     /**
@@ -38,6 +40,7 @@ class SuplierUserController extends Controller
      */
     public function store(Request $request)
     {
+        //dd($request->all());
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:supplier_users,email'],
@@ -45,7 +48,8 @@ class SuplierUserController extends Controller
             'rfc' => ['nullable', 'string', 'max:255', 'unique:supplier_users,rfc'],
             'username' => ['required', 'string', 'max:255', 'unique:supplier_users,username'],
             'phone_number' => ['nullable', 'string', 'max:20'],
-            'profile_photo_path' => ['nullable', 'image', 'max:2048']
+            'profile_photo_path' => ['nullable', 'image', 'max:2048'],
+            'supplier_id' => ['required', 'exists:suppliers,id'],
         ]);
 
         $validatedData['password'] = Hash::make($validatedData['password']);
@@ -97,7 +101,7 @@ class SuplierUserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+        //dd($request->all());
         $user = SupplierUser::findOrFail($id);
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -107,6 +111,7 @@ class SuplierUserController extends Controller
             'username' => ['required', 'string', 'max:255', 'unique:supplier_users,username,' . $id],
             'phone_number' => ['nullable', 'string', 'max:20'],
             'profile_photo_path' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'supplier_id' => ['required', 'exists:suppliers,id'],
         ]);
 
         if (!empty($validatedData['password'])) {
