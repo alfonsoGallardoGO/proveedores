@@ -107,6 +107,30 @@ class SupplierPurchaseOrderController extends Controller
             ], 400);
         }
 
+        $orderId = 0;
+        $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
+        if($supplierPurchaseOrder->exists()){
+            $supplierPurchaseOrder->update([
+                'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                'rfc' => $data['proveedor']['rfc'] ?? null,
+                'status' => $data['estado'] ?? null,
+                'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                'purchase_order_id' => $data['id'] ?? null,
+                'purchase_order' => $data['tranid'] ?? null,
+            ]);
+            $orderId = $supplierPurchaseOrder->first()->id;
+        } else {
+            SupplierPurchaseOrder::create([
+                'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                'rfc' => $data['proveedor']['rfc'] ?? null,
+                'status' => $data['estado'] ?? null,
+                'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                'purchase_order_id' => $data['id'] ?? null,
+                'purchase_order' => $data['tranid'] ?? null,
+            ]);
+            $orderId = SupplierPurchaseOrder::latest()->first()->id;
+        }
+
         $incomingItems = [];
 
         // Procesar lineasArticulos
@@ -124,7 +148,7 @@ class SupplierPurchaseOrderController extends Controller
                 'categoria'        => $item['categoria'],
                 'memo'             => $item['memo'] ?? null,
                 'type'             => 'ARTICULO',
-                'supplier_purchase_order_id' => $supplier_purchase_order_id,
+                'supplier_purchase_order_id' => $orderId,
             ];
             $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
             $incomingItems[$uniqueKey] = $standardizedItem;
@@ -145,7 +169,7 @@ class SupplierPurchaseOrderController extends Controller
                 'categoria'        => $item['categoria'],
                 'memo'             => $item['memo'] ?? null,
                 'type'             => 'GASTO', 
-                'supplier_purchase_order_id' => $supplier_purchase_order_id,
+                'supplier_purchase_order_id' => $orderId,
             ];
 
             $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
@@ -196,26 +220,7 @@ class SupplierPurchaseOrderController extends Controller
                 SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete(); 
             }
 
-            $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
-            if($supplierPurchaseOrder->exists()){
-                $supplierPurchaseOrder->update([
-                    'supplier_external_id' => $data['proveedor']['id'] ?? null,
-                    'rfc' => $data['proveedor']['rfc'] ?? null,
-                    'status' => $data['estado'] ?? null,
-                    'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
-                    'purchase_order_id' => $data['id'] ?? null,
-                    'purchase_order' => $data['tranid'] ?? null,
-                ]);
-            } else {
-                SupplierPurchaseOrder::create([
-                    'supplier_external_id' => $data['proveedor']['id'] ?? null,
-                    'rfc' => $data['proveedor']['rfc'] ?? null,
-                    'status' => $data['estado'] ?? null,
-                    'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
-                    'purchase_order_id' => $data['id'] ?? null,
-                    'purchase_order' => $data['tranid'] ?? null,
-                ]);
-            }
+            
 
             DB::commit(); 
             return response()->json([

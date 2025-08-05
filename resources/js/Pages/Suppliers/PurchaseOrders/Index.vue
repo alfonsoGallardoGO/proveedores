@@ -128,6 +128,27 @@ const formatCurrency = (value) => {
         minimumFractionDigits: 2,
     }).format(Number(value));
 };
+
+const getSeverity = (status) => {
+    switch (status) {
+        case "Recepción pendiente":
+            return "warning";
+        case "Cerrada":
+            return "success"; 
+        case "Parcialmente recibida":
+            return "info"; 
+        case "Factura pendiente":
+            return "danger";
+        case "Totalmente facturada":
+            return "success";
+        case "Facturación pendiente/parcialmente recibido":
+            return "warning";
+        default:
+            return "secondary";
+    }
+};
+
+
 </script>
 
 <template>
@@ -201,18 +222,29 @@ const formatCurrency = (value) => {
                                 sortable
                                 style="min-width: 12rem"
                             ></Column>
-                            <Column header="Orden de compra" sortable style="min-width: 16rem">
-                                <template #body="slotProps">
-                                    {{ slotProps.purchase_order || slotProps.data.tranid }}
-                                </template>
-                            </Column>
                             <Column
-                                field="status"
-                                header="Estatus"
+                                field="purchase_order"
+                                header="Orden de compra"
                                 sortable
                                 style="min-width: 16rem"
                                 bodyClass="ml-2"
                             ></Column>
+                            
+                            <Column 
+                                field="status"
+                                header="Estatus"
+                                sortable
+                                style="min-width: 16rem"
+                            >
+                                <template #body="slotProps">
+                                    <Tag 
+                                        :value="slotProps.data.status" 
+                                        :severity="getSeverity(slotProps.data.status)" 
+                                        rounded
+                                    />
+                                </template>
+                            </Column>
+
                             <Column
                                 field="date"
                                 header="Fecha"
@@ -240,20 +272,7 @@ const formatCurrency = (value) => {
                                         "
                                     />
 
-                                    <Button
-                                        icon="pi pi-file-pdf"
-                                        outlined
-                                        rounded
-                                        severity="danger"
-                                        class="mr-2"
-                                        @click="confirmDeleteProduct()"
-                                    />
-                                    <Button
-                                        icon="pi pi-file-excel"
-                                        outlined
-                                        rounded
-                                        @click="editProduct()"
-                                    />
+                                    
                                 </template>
                             </Column>
                         </DataTable>

@@ -292,8 +292,17 @@ const removeProfilePhoto = () => {
                                             style="width: 40px; height: 40px"
                                         />
                                     </div>
-                                    <div v-else class="initials-avatar">
-                                        {{ getInitials(slotProps.data.name) }}
+                                    <div v-else>
+                                        <img
+                                            :src="`https://ui-avatars.com/api/?name=${getInitials(
+                                                slotProps.data.name
+                                            )}&color=7F9CF5&background=EBF4FF`"
+                                            :alt="`${getInitials(
+                                                slotProps.data.name
+                                            )} Avatar`"
+                                            class="rounded-full object-cover"
+                                            style="width: 40px; height: 40px"
+                                        />
                                     </div>
                                 </template>
                             </Column>
@@ -346,16 +355,6 @@ const removeProfilePhoto = () => {
                                         rounded
                                         class="mr-2"
                                         @click="editUser(slotProps.data)"
-                                    />
-                                    <Button
-                                        icon="pi pi-eye"
-                                        variant="outlined"
-                                        rounded
-                                        severity="info"
-                                        class="mr-2"
-                                        @click="
-                                            confirmDeleteUser(slotProps.data)
-                                        "
                                     />
                                     <Button
                                         icon="pi pi-trash"
@@ -485,6 +484,7 @@ const removeProfilePhoto = () => {
                                     weakLabel="Demasiado simple"
                                     mediumLabel="Complejidad promedio"
                                     strongLabel="Contraseña compleja"
+                                    :disabled="user.id !== null"
                                 >
                                     <template #header>
                                         <div class="font-semibold text-xm mb-4">
@@ -493,10 +493,7 @@ const removeProfilePhoto = () => {
                                     </template>
                                 </Password>
                                 <small
-                                    v-if="
-                                        (submitted && !user.password) ||
-                                        page.props.errors.password
-                                    "
+                                    v-if="page.props.errors.password"
                                     class="text-red-500"
                                     >{{
                                         page.props.errors.password ===
