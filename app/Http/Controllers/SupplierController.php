@@ -127,7 +127,7 @@ class SupplierController extends Controller
         $type = $data['type'] ?? null;
         $phone = $data['phone'] ?? null;
         $category = $data['inpt_category'] ?? null;
-        $tax = $data['taxitem'] ?? null;
+        $tax = $data['custentity_mx_rfc'] ?? null;
         $email = $data['email'] ?? null;
         $currency = null;
         $defaultAccountsPayable = $data['accountnumber'] ?? null;
