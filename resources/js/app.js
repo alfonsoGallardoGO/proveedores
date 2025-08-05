@@ -28,6 +28,8 @@ import InputNumber from "primevue/inputnumber";
 import { ref, onMounted } from "vue";
 import Chart from "primevue/chart";
 import Popover from "primevue/popover";
+import Chip from "primevue/chip";
+import ProgressSpinner from "primevue/progressspinner";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -122,6 +124,8 @@ createInertiaApp({
         app.component("Toast", Toast);
         app.component("Chart", Chart);
         app.component("Popover", Popover);
+        app.component("Chip", Chip);
+        app.component("ProgressSpinner", ProgressSpinner);
         app.component("Select", Select);
         app.mount(el);
 
