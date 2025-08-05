@@ -11,7 +11,6 @@ use App\Models\SupplierInvoice;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Storage;
 
 class SupplierPurchaseOrderController extends Controller
 {
@@ -45,8 +44,6 @@ class SupplierPurchaseOrderController extends Controller
 
     }
     
-    public function store(Request $request)
-    {
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -88,8 +85,6 @@ class SupplierPurchaseOrderController extends Controller
             ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
     }
 
-<<<<<<< HEAD
-=======
     public function storePurchaseOrder(Request $request)
     {
         $data = $request->all();
@@ -225,6 +220,5 @@ class SupplierPurchaseOrderController extends Controller
             ], 500);
         }
     }
->>>>>>> parent of a78d4cb (feat:validaciones a las ordenes de compra)
 
 }
