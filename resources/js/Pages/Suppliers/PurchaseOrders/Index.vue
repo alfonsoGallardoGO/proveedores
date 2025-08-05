@@ -6,6 +6,8 @@ import { FilterMatchMode } from "@primevue/core/api";
 import { useToast } from "primevue/usetoast";
 import { useForm } from "@inertiajs/vue3";
 import axios from "axios";
+import Card from 'primevue/card';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     orders: Array,
@@ -178,14 +180,14 @@ const formatCurrency = (value) => {
 
 
 const formatNumber = (rowData) => {
-  const value = rowData.total;
-  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
+    const value = rowData.total;
+    const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
 
-  return new Intl.NumberFormat('es-MX', {
-    style: 'decimal',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(safeValue);
+    return new Intl.NumberFormat('es-MX', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(safeValue);
 };
 
 const getSeverity = (status) => {
@@ -193,9 +195,9 @@ const getSeverity = (status) => {
         case "Recepción pendiente":
             return "warning";
         case "Cerrada":
-            return "success"; 
+            return "success";
         case "Parcialmente recibida":
-            return "info"; 
+            return "info";
         case "Factura pendiente":
             return "danger";
         case "Totalmente facturada":
@@ -207,17 +209,13 @@ const getSeverity = (status) => {
     }
 };
 
-
 </script>
 
 <template>
     <AppLayout title="Ordenes de compra">
         <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
             <Header :title="'ORDENES DE COMPRA PENDIENTES'" />
-            <div
-                class="content d-flex flex-column flex-column-fluid"
-                id="kt_content"
-            >
+            <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
                         <Toast />
@@ -227,17 +225,15 @@ const getSeverity = (status) => {
                                 <section class="flex flex-col p-4 gap-4 w-full bg-primary/70 rounded-xl">
                                     <div class="flex items-center gap-5">
                                         <i class="pi pi-cloud-upload text-white dark:text-black text-2xl"></i>
-                                        <span class="font-bold text-base text-white dark:text-black">{{ message.summary }}</span>
+                                        <span class="font-bold text-base text-white dark:text-black">{{ message.summary
+                                            }}</span>
                                     </div>
                                     <div class="flex flex-col gap-2">
-                                        <ProgressBar
-                                            :value="progress"
-                                            :showValue="false"
-                                            :style="{ height: '4px' }"
-                                            pt:value:class="!bg-primary-50 dark:!bg-primary-900"
-                                            class="!bg-primary/80"
-                                        ></ProgressBar>
-                                        <label class="text-sm font-bold text-white dark:text-black">{{ progress }}% uploaded</label>
+                                        <ProgressBar :value="progress" :showValue="false" :style="{ height: '4px' }"
+                                            pt:value:class="!bg-primary-50 dark:!bg-primary-900" class="!bg-primary/80">
+                                        </ProgressBar>
+                                        <label class="text-sm font-bold text-white dark:text-black">{{ progress }}%
+                                            uploaded</label>
                                     </div>
                                     <div class="flex gap-4 mb-4 justify-end">
                                         <Button label="Another Upload?" size="small" @click="closeCallback"></Button>
@@ -247,165 +243,83 @@ const getSeverity = (status) => {
                             </template>
                         </Toast>
 
-                        <DataTable
-                            ref="dt"
-                            v-model:selection="selectedBenefits"
-                            :value="orders"
-                            dataKey="id"
-                            paginator
-                            :rows="10"
-                            :filters="filters"
-                            :rowsPerPageOptions="[5, 10, 25]"
-                            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones"
-                        >
+                        <DataTable ref="dt" v-model:selection="selectedBenefits" :value="orders" dataKey="id" paginator
+                            :rows="10" :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
+                            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
                             <template #header>
-                                <div
-                                    class="flex flex-wrap gap-2 items-center justify-between"
-                                >
+                                <div class="flex flex-wrap gap-2 items-center justify-between">
                                     <h4 class="m-0"></h4>
                                     <IconField>
                                         <InputIcon>
                                             <i class="pi pi-search" />
                                         </InputIcon>
-                                        <InputText
-                                            v-model="filters['global'].value"
-                                            placeholder="Buscar..."
-                                        />
+                                        <InputText v-model="filters['global'].value" placeholder="Buscar..." />
                                     </IconField>
                                 </div>
                             </template>
-                            <Column
-                                field="id"
-                                header="Id"
-                                sortable
-                                style="min-width: 12rem"
-                            ></Column>
-                            <Column
-                                field="purchase_order"
-                                header="Orden de compra"
-                                sortable
-                                style="min-width: 16rem"
-                                bodyClass="ml-2"
-                            ></Column>
-                            <Column
-                                field="impuesto"
-                                header="Impuesto"
-                                sortable
-                                style="min-width: 16rem"
-                                bodyClass="ml-2"
-                                :body="formatNumber"
-                            ></Column>
-                            <Column
-                                field="subtotal"
-                                header="Subtotal"
-                                sortable
-                                style="min-width: 16rem"
-                                bodyClass="ml-2"
-                                :body="formatNumber"
-                            ></Column>
-                            <Column
-                                field="total"
-                                header="Total"
-                                sortable
-                                style="min-width: 16rem"
-                                bodyClass="ml-2"
-                                :body="formatNumber"
-                            ></Column>
+                            <Column field="id" header="Id" sortable style="min-width: 12rem"></Column>
+                            <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 16rem"
+                                bodyClass="ml-2"></Column>
+                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 16rem"
+                                bodyClass="ml-2" :body="formatNumber">
+                            </Column>
+                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 16rem"
+                                bodyClass="ml-2" :body="formatNumber">
+                            </Column>
+                            <Column field="total" header="Total" sortable style="min-width: 16rem" bodyClass="ml-2"
+                                :body="formatNumber">
+                            </Column>
 
-                            
-                            <Column 
-                                field="status"
-                                header="Estatus"
-                                sortable
-                                style="min-width: 16rem"
-                            >
+
+                            <Column field="status" header="Estatus" sortable style="min-width: 16rem">
                                 <template #body="slotProps">
-                                    <Tag 
-                                        :value="slotProps.data.status" 
-                                        :severity="getSeverity(slotProps.data.status)" 
-                                        rounded
-                                    />
+                                    <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)"
+                                        rounded />
                                 </template>
                             </Column>
 
-                            <Column
-                                field="date"
-                                header="Fecha"
-                                sortable
-                                style="min-width: 10rem"
-                                bodyClass="ml-2"
-                            ></Column>
-                            <Column
-                                :exportable="false"
-                                header="Acciones"
-                                style="min-width: 12rem"
-                            >
+                            <Column field="date" header="Fecha" sortable style="min-width: 10rem" bodyClass="ml-2">
+                            </Column>
+                            <Column :exportable="false" header="Acciones" style="min-width: 12rem">
                                 <template #body="slotProps">
-                                    <Button
-                                        icon="pi pi-eye"
-                                        outlined
-                                        rounded
-                                        severity="warn"
-                                        class="mr-2"
-                                        @click="
-                                            show(
-                                                slotProps.data.id,
-                                                slotProps.data
-                                            )
-                                        "
-                                    />
+                                    <Link :href="`/orders/${slotProps.data.id}`">
+                                        <Button 
+                                            icon="pi pi-eye" 
+                                            outlined 
+                                            rounded 
+                                            severity="warn" 
+                                            class="mr-2"
+                                        />
+                                    </Link>
                                 </template>
                             </Column>
                         </DataTable>
 
-                        <Dialog
-                            v-model:visible="showOrder"
-                            :style="{ width: '80%' }"
-                            header="ORDEN DE COMPRA"
-                            :modal="true"
-                        >
-                            
+                        <!-- <Dialog v-model:visible="showOrder" :style="{ width: '80%' }" header="ORDEN DE COMPRA"
+                            :modal="true">
+
                             <div class="card flex justify-center" v-if="isLooadingItems">
                                 <ProgressSpinner :strokeWidth="6" :size="50" />
                             </div>
-                           
+
                             <div class="card flex justify-center" v-if="!isLooadingItems">
-                                <DataTable
-                                    ref="dtItems"
-                                    :value="selectedOrder"
-                                    dataKey="id"
-                                    paginator
-                                    :rows="10"
-                                    :filters="filtersItems"
-                                    :rowsPerPageOptions="[5, 10, 25]"
-                                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones"
-                                >
+                                <DataTable ref="dtItems" :value="selectedOrder" dataKey="id" paginator :rows="10"
+                                    :filters="filtersItems" :rowsPerPageOptions="[5, 10, 25]"
+                                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
                                     <template #header>
-                                        <div
-                                            class="flex flex-wrap gap-2 items-center justify-between"
-                                        >
+                                        <div class="flex flex-wrap gap-2 items-center justify-between">
                                             <h4 class="m-0">Articulos de la orden de compra</h4>
                                             <IconField>
                                                 <InputIcon>
                                                     <i class="pi pi-search" />
                                                 </InputIcon>
-                                                <InputText
-                                                    v-model="filtersItems['global'].value"
-                                                    placeholder="Buscar..."
-                                                />
+                                                <InputText v-model="filtersItems['global'].value"
+                                                    placeholder="Buscar..." />
                                             </IconField>
                                         </div>
                                     </template>
-                                    <Column
-                                        field="id"
-                                        header="Id"
-                                        sortable
-                                        style="min-width: 12rem"
-                                    ></Column>
-                                    <Column 
-                                        header="Descripción" 
-                                        style="min-width: 16rem"
-                                    >
+                                    <Column field="id" header="Id" sortable style="min-width: 12rem"></Column>
+                                    <Column header="Descripción" style="min-width: 16rem">
                                         <template #body="{ data }">
                                             <span class="font-medium text-gray-700">
                                                 {{ data.description ?? data.memo }}
@@ -424,26 +338,23 @@ const getSeverity = (status) => {
                                     </Column>
                                     <Column header="Faltan" style="min-width: 8rem">
                                         <template #body="{ data }">
-                                            <span :class="(data.quantity - (data.deliveries_sum_amount ?? 0)) > 0 ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'">
+                                            <span
+                                                :class="(data.quantity - (data.deliveries_sum_amount ?? 0)) > 0 ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'">
                                                 {{ data.quantity - (data.deliveries_sum_amount ?? 0) }}
                                             </span>
                                         </template>
                                     </Column>
                                     <Column header="Monto" style="min-width: 10rem">
                                         <template #body="{ data }">
-                                            <span class="font-bold text-gray-800">{{ formatCurrency(data.amount) }}</span>
+                                            <span class="font-bold text-gray-800">{{ formatCurrency(data.amount)
+                                                }}</span>
                                         </template>
                                     </Column>
                                     <Column header="Entrega" style="min-width: 12rem">
                                         <template #body="{ data }">
-                                            <InputNumber
-                                                v-model="form.cantidades[data.id]"
-                                                :min="0"
-                                                :max="data.quantity - (data.deliveries_sum_amount ?? 0)"
-                                                showButtons
-                                                inputClass="w-20 text-center"
-                                                class="w-full"
-                                            />
+                                            <InputNumber v-model="form.cantidades[data.id]" :min="0"
+                                                :max="data.quantity - (data.deliveries_sum_amount ?? 0)" showButtons
+                                                inputClass="w-20 text-center" class="w-full" />
                                         </template>
                                     </Column>
                                 </DataTable>
@@ -454,7 +365,6 @@ const getSeverity = (status) => {
                                     </h2>
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <!-- Subir Factura PDF -->
                                         <Card class="shadow-md rounded-xl">
                                             <template #title>
                                                 <div class="flex items-center gap-2">
@@ -463,18 +373,11 @@ const getSeverity = (status) => {
                                                 </div>
                                             </template>
                                             <template #content>
-                                                <FileUpload 
-                                                    mode="basic"
-                                                    name="factura"
-                                                    accept=".pdf"
-                                                    :auto="false"
-                                                    @select="onFacturaUpload"
-                                                    chooseLabel="Seleccionar Factura"
-                                                    uploadLabel="Subir" 
-                                                    cancelLabel="Cancelar"
-                                                    class="w-full"
-                                                />
-                                                <small class="block mt-2 text-gray-500">Solo archivos PDF. Máximo 2MB.</small>
+                                                <FileUpload mode="basic" name="factura" accept=".pdf" :auto="false"
+                                                    @select="onFacturaUpload" chooseLabel="Seleccionar Factura"
+                                                    uploadLabel="Subir" cancelLabel="Cancelar" class="w-full" />
+                                                <small class="block mt-2 text-gray-500">Solo archivos PDF. Máximo
+                                                    2MB.</small>
                                             </template>
                                         </Card>
                                         <Card class="shadow-md rounded-xl">
@@ -485,18 +388,11 @@ const getSeverity = (status) => {
                                                 </div>
                                             </template>
                                             <template #content>
-                                                <FileUpload 
-                                                    mode="basic"
-                                                    name="xml"
-                                                    accept=".xml"
-                                                    :auto="false"
-                                                    @select="onXmlUpload"
-                                                    chooseLabel="Seleccionar XML"
-                                                    uploadLabel="Subir" 
-                                                    cancelLabel="Cancelar"
-                                                    class="w-full"
-                                                />
-                                                <small class="block mt-2 text-gray-500">Solo archivos XML. Máximo 1MB.</small>
+                                                <FileUpload mode="basic" name="xml" accept=".xml" :auto="false"
+                                                    @select="onXmlUpload" chooseLabel="Seleccionar XML"
+                                                    uploadLabel="Subir" cancelLabel="Cancelar" class="w-full" />
+                                                <small class="block mt-2 text-gray-500">Solo archivos XML. Máximo
+                                                    1MB.</small>
                                             </template>
                                         </Card>
                                     </div>
@@ -508,31 +404,24 @@ const getSeverity = (status) => {
                                     </h2>
 
                                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                    
-                                        <Card 
-                                            v-for="(invoice, index) in invoices" 
-                                            :key="index"
-                                            class="shadow-md hover:shadow-xl transition-all duration-300 rounded-xl"
-                                        >
+
+                                        <Card v-for="(invoice, index) in invoices" :key="index"
+                                            class="shadow-md hover:shadow-xl transition-all duration-300 rounded-xl">
                                             <template #header>
-                                                <div class="flex items-center justify-between bg-gradient-to-r from-indigo-500 to-blue-600 px-4 py-3 rounded-t-xl">
+                                                <div
+                                                    class="flex items-center justify-between bg-gradient-to-r from-indigo-500 to-blue-600 px-4 py-3 rounded-t-xl">
                                                     <span class="font-semibold">Factura #{{ invoice.id }}</span>
-                                                    <Chip 
-                                                        :label="new Date(invoice.created_at).toLocaleDateString()" 
-                                                        class="text-xs text-indigo-600 px-2 py-1 rounded-md font-medium"
-                                                    />
+                                                    <Chip :label="new Date(invoice.created_at).toLocaleDateString()"
+                                                        class="text-xs text-indigo-600 px-2 py-1 rounded-md font-medium" />
                                                 </div>
                                             </template>
 
                                             <template #content>
                                                 <div class="flex flex-col items-center justify-center gap-4 py-6">
                                                     <div class="flex flex-col items-center">
-                                                        <a 
-                                                            v-if="invoice.pdf_route" 
-                                                            :href="`/storage/${invoice.pdf_route}`" 
-                                                            target="_blank"
-                                                            class="flex flex-col items-center text-red-500 hover:text-red-700 transition"
-                                                        >
+                                                        <a v-if="invoice.pdf_route"
+                                                            :href="`/storage/${invoice.pdf_route}`" target="_blank"
+                                                            class="flex flex-col items-center text-red-500 hover:text-red-700 transition">
                                                             <i class="pi pi-file-pdf text-6xl"></i>
                                                             <span class="mt-2 text-sm font-semibold">PDF</span>
                                                         </a>
@@ -542,12 +431,9 @@ const getSeverity = (status) => {
                                                         </div>
                                                     </div>
                                                     <div class="flex flex-col items-center">
-                                                        <a 
-                                                            v-if="invoice.xml_route" 
-                                                            :href="`/storage/${invoice.xml_route}`" 
-                                                            target="_blank"
-                                                            class="flex flex-col items-center text-green-600 hover:text-green-800 transition"
-                                                        >
+                                                        <a v-if="invoice.xml_route"
+                                                            :href="`/storage/${invoice.xml_route}`" target="_blank"
+                                                            class="flex flex-col items-center text-green-600 hover:text-green-800 transition">
                                                             <i class="pi pi-code text-6xl"></i>
                                                             <span class="mt-2 text-sm font-semibold">XML</span>
                                                         </a>
@@ -564,19 +450,10 @@ const getSeverity = (status) => {
                             </div>
 
                             <template #footer>
-                                <Button
-                                    label="Cancelar"
-                                    icon="pi pi-times"
-                                    text
-                                    @click="showOrder = false"
-                                />
-                                <Button
-                                    label="Guardar"
-                                    icon="pi pi-check"
-                                    @click="store()"
-                                />
+                                <Button label="Cancelar" icon="pi pi-times" text @click="showOrder = false" />
+                                <Button label="Guardar" icon="pi pi-check" @click="store()" />
                             </template>
-                        </Dialog>
+                        </Dialog> -->
                     </div>
                 </div>
             </div>

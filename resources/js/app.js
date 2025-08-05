@@ -30,6 +30,9 @@ import Chart from "primevue/chart";
 import Popover from "primevue/popover";
 import Chip from "primevue/chip";
 import ProgressSpinner from "primevue/progressspinner";
+import Card from 'primevue/card';
+import { Link } from '@inertiajs/vue3';
+
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -127,6 +130,8 @@ createInertiaApp({
         app.component("Chip", Chip);
         app.component("ProgressSpinner", ProgressSpinner);
         app.component("Select", Select);
+        app.component("Card", Card);
+        app.component("Link", Link);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {
