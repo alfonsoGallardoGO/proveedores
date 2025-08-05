@@ -269,7 +269,8 @@ export default {
                         <!--begin::Menu item-->
                         <div class="menu-item px-5">
                             <a
-                                href="authentication/layouts/corporate/sign-in.html"
+                                href="#"
+                                @click.prevent="logout"
                                 class="menu-link px-5"
                                 >Cerrar Sesión</a
                             >
