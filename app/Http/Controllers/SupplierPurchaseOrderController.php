@@ -38,10 +38,12 @@ class SupplierPurchaseOrderController extends Controller
 
         $invoices = SupplierInvoice::where('supplier_purchase_order_id', $id)->get();
 
-        return response()->json([
+
+         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,
             'invoices' => $invoices,
         ]);
+        
 
     }
     public function store(Request $request)
