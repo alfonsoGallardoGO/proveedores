@@ -224,6 +224,7 @@ const getSeverity = (status) => {
                                     </IconField>
                                 </div>
                             </template>
+                            
                             <Column field="id" header="Id" sortable style="min-width: 12rem"></Column>
                             <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 16rem"
                                 bodyClass="ml-2"></Column>
@@ -249,12 +250,13 @@ const getSeverity = (status) => {
                             </Column>
                             <Column :exportable="false" header="Acciones" style="min-width: 12rem">
                                 <template #body="slotProps">
-                                    <Button 
-                                        icon="pi pi-eye" 
-                                        outlined rounded severity="warn" 
-                                        class="mr-2"
-                                        @click="navigateToOrders(slotProps.data.id)" 
-                                    />
+                                    <Link :href="route('purchase-orders.show', slotProps.data.id)">
+                                        <Button 
+                                            icon="pi pi-eye" 
+                                            outlined rounded severity="warn" 
+                                            class="mr-2"
+                                        />
+                                    </Link>
                                 </template>
                             </Column>
                         </DataTable>

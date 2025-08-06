@@ -32,6 +32,10 @@ import Chip from "primevue/chip";
 import ProgressSpinner from "primevue/progressspinner";
 import Card from 'primevue/card';
 import { Link } from '@inertiajs/vue3';
+import { VueSpinnersPlugin } from 'vue3-spinners';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
 
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
@@ -132,6 +136,10 @@ createInertiaApp({
         app.component("Select", Select);
         app.component("Card", Card);
         app.component("Link", Link);
+        app.use(VueSpinnersPlugin);
+        app.component("Tabs", Tabs);
+        app.component("TabList", TabList);
+        app.component("Tab", Tab);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {
