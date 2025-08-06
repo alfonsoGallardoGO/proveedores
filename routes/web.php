@@ -43,3 +43,6 @@ Route::middleware([
 });
 
 Route::get('/netsuite/restlet/{scriptId}/{deployId}', [RestletController::class, 'getRestletResponse']);
+Route::post('/netsuite/restlet/{scriptId}/{deployId}', [RestletController::class, 'postRestletResponse']);
+
+// //Route::post('/purchase-orders', [SupplierPurchaseOrderController::class, 'storePurchaseOrder'])->name('purchase-orders.store');
