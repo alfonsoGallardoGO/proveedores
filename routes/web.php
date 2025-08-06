@@ -9,9 +9,11 @@ use App\Http\Controllers\SuplierUserController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierInvoicesController;
 
+
 Route::resource('suppliers/invoices', SupplierInvoicesController::class);
 Route::resource('suppliers/purchase-orders', SupplierPurchaseOrderController::class);
 Route::resource('suppliers', SupplierController::class);
+
 
 
 Route::get('/', function () {
@@ -41,4 +43,3 @@ Route::middleware([
 });
 
 Route::get('/netsuite/restlet/{scriptId}/{deployId}', [RestletController::class, 'getRestletResponse']);
-// //Route::post('/purchase-orders', [SupplierPurchaseOrderController::class, 'storePurchaseOrder'])->name('purchase-orders.store');

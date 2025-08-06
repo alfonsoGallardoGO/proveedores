@@ -8,10 +8,18 @@ import { useForm } from "@inertiajs/vue3";
 import axios from "axios";
 import Card from 'primevue/card';
 import { Link } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     orders: Array,
 });
+
+const navigateToOrders = (id) => {
+    router.visit(route('suppliers.orders-files'), {
+        method: 'post',
+        data: { purchaseOrderId: id },
+    });
+};
 
 
 const form = useForm({
@@ -49,134 +57,93 @@ const filtersItems = ref({
 });
 
 
-// const store = () => {
-//     const formData = new FormData();
-//     for (const [itemId, amount] of Object.entries(form.cantidades)) {
-//         formData.append(`cantidades[${itemId}]`, amount);
-//     }
-//     formData.append("supplier_id", form.supplier_id);
-//     formData.append(
-//         "supplier_purchase_order_id",
-//         form.supplier_purchase_order_id
-//     );
-//     if (form.factura) {
-//         formData.append("factura", form.factura);
-//     }
-//     if (form.xml) {
-//         formData.append("xml", form.xml);
-//     }
-
-//     console.log(formData)
-//     axios
-//         .post(route("purchase-orders.store"), formData, {
-//             headers: { "Content-Type": "multipart/form-data" },
-//         })
-//         .then(() => {
-//             toast.add({
-//                 severity: "success",
-//                 summary: "Guardado",
-//                 detail: "Datos guardados correctamente",
-//                 life: 3000,
-//             });
-//         })
-//         .catch((err) => {
-//             console.error(err);
-//             toast.add({
-//                 severity: "error",
-//                 summary: "Error",
-//                 detail: "Hubo un problema al guardar",
-//                 life: 3000,
-//             });
+// const store = async () => {
+//     try {
+//         progress.value = 0;
+//         toast.add({
+//             severity: 'info',
+//             summary: 'Subiendo archivos...',
+//             group: 'headless',
+//             life: 999999,
 //         });
+
+//         const formData = new FormData();
+//         for (const [itemId, amount] of Object.entries(form.cantidades)) {
+//             formData.append(`cantidades[${itemId}]`, amount);
+//         }
+//         formData.append("supplier_id", form.supplier_id);
+//         formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
+//         if (form.factura) formData.append("factura", form.factura);
+//         if (form.xml) formData.append("xml", form.xml);
+//         await axios.post(route("purchase-orders.store"), formData, {
+//             headers: { "Content-Type": "multipart/form-data" },
+//             onUploadProgress: (event) => {
+//                 if (event.total) {
+//                     progress.value = Math.round((event.loaded * 100) / event.total);
+//                 }
+//             },
+//         });
+
+//         toast.removeGroup("headless");
+
+//         toast.add({
+//             severity: "success",
+//             summary: "Guardado",
+//             detail: "Datos guardados correctamente",
+//             life: 3000,
+//         });
+//     } catch (error) {
+//         console.error(error);
+
+//         toast.removeGroup("headless");
+
+//         toast.add({
+//             severity: "error",
+//             summary: "Error",
+//             detail: "Hubo un problema al guardar",
+//             life: 3000,
+//         });
+//     } finally {
+//         progress.value = 0; // Reinicia el progreso
+//     }
 // };
 
-const store = async () => {
-    try {
-        progress.value = 0;
-        toast.add({
-            severity: 'info',
-            summary: 'Subiendo archivos...',
-            group: 'headless',
-            life: 999999,
-        });
+// const selectedOrder = ref(null);
 
-        const formData = new FormData();
-        for (const [itemId, amount] of Object.entries(form.cantidades)) {
-            formData.append(`cantidades[${itemId}]`, amount);
-        }
-        formData.append("supplier_id", form.supplier_id);
-        formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
-        if (form.factura) formData.append("factura", form.factura);
-        if (form.xml) formData.append("xml", form.xml);
-        await axios.post(route("purchase-orders.store"), formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-            onUploadProgress: (event) => {
-                if (event.total) {
-                    progress.value = Math.round((event.loaded * 100) / event.total);
-                }
-            },
-        });
+// const show = async (id, supplier) => {
+//     isLooadingItems.value = true;
+//     form.supplier_purchase_order_id = id;
+//     try {
+//         showOrder.value = true;
+//         const response = await axios.get(route("purchase-orders.show", id));
+//         selectedOrder.value = response.data?.items;
+//         invoices.value = response.data?.invoices;
+//         isLooadingItems.value = false;
+//     } catch (error) {
+//         console.error("Error fetching data:", error);
+//     }
+// };
 
-        toast.removeGroup("headless");
+// const onFacturaUpload = (event) => {
+//     const file = event.files[0];
+//     form.factura = file;
+// };
 
-        toast.add({
-            severity: "success",
-            summary: "Guardado",
-            detail: "Datos guardados correctamente",
-            life: 3000,
-        });
-    } catch (error) {
-        console.error(error);
+// const onXmlUpload = (event) => {
+//     const file = event.files[0];
+//     form.xml = file;
 
-        toast.removeGroup("headless");
-
-        toast.add({
-            severity: "error",
-            summary: "Error",
-            detail: "Hubo un problema al guardar",
-            life: 3000,
-        });
-    } finally {
-        progress.value = 0; // Reinicia el progreso
-    }
-};
-
-const selectedOrder = ref(null);
-
-const show = async (id, supplier) => {
-    isLooadingItems.value = true;
-    form.supplier_purchase_order_id = id;
-    try {
-        showOrder.value = true;
-        const response = await axios.get(route("purchase-orders.show", id));
-        selectedOrder.value = response.data?.items;
-        invoices.value = response.data?.invoices;
-        isLooadingItems.value = false;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
-};
-
-const onFacturaUpload = (event) => {
-    const file = event.files[0];
-    form.factura = file;
-};
-
-const onXmlUpload = (event) => {
-    const file = event.files[0];
-    form.xml = file;
-
-};
+// };
 
 
-const formatCurrency = (value) => {
-    if (!value) return "$0.00";
-    return new Intl.NumberFormat("es-MX", {
-        style: "currency",
-        currency: "MXN",
-        minimumFractionDigits: 2,
-    }).format(Number(value));
-};
+// const formatCurrency = (value) => {
+//     if (!value) return "$0.00";
+//     return new Intl.NumberFormat("es-MX", {
+//         style: "currency",
+//         currency: "MXN",
+//         minimumFractionDigits: 2,
+//     }).format(Number(value));
+// };
 
 
 const formatNumber = (rowData) => {
@@ -282,15 +249,12 @@ const getSeverity = (status) => {
                             </Column>
                             <Column :exportable="false" header="Acciones" style="min-width: 12rem">
                                 <template #body="slotProps">
-                                    <Link :href="`/orders/${slotProps.data.id}`">
-                                        <Button 
-                                            icon="pi pi-eye" 
-                                            outlined 
-                                            rounded 
-                                            severity="warn" 
-                                            class="mr-2"
-                                        />
-                                    </Link>
+                                    <Button 
+                                        icon="pi pi-eye" 
+                                        outlined rounded severity="warn" 
+                                        class="mr-2"
+                                        @click="navigateToOrders(slotProps.data.id)" 
+                                    />
                                 </template>
                             </Column>
                         </DataTable>

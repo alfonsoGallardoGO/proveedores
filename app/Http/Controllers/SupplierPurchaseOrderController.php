@@ -25,6 +25,15 @@ class SupplierPurchaseOrderController extends Controller
         ]);
     }
 
+    // public function indexOrders(Request $request)
+    // {
+    //     $purchaseOrderId = $request->input('purchaseOrderId');
+
+    //     return Inertia::render('Suppliers/PurchaseOrders/OrdersFiles', [
+    //         'purchaseOrderId' => $purchaseOrderId,
+    //     ]);
+    // }
+
 
     public function create()
     {
