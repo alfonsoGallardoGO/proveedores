@@ -21,9 +21,7 @@ class TwilioController extends Controller
         $token = env('TWILIO_AUTH_TOKEN');
         $from = env('TWILIO_WHATSAPP_FROM');
         $templateSid = env('TWILIO_TEMPLATE_SID');
-
-
-
+    
         $client = new Client($sid, $token);
 
         try {
