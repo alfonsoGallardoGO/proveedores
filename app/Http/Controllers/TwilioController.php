@@ -17,10 +17,10 @@ class TwilioController extends Controller
         $telefono = $request->telefono;
         $orderNumber = $request->order_number;
 
-        $sid = config('services.twilio.sid');
-        $token = config('services.twilio.token');
-        $from = config('services.twilio.from');
-        $templateSid = config('services.twilio.template_sid');
+        $sid = env('TWILIO_SID');
+        $token = env('TWILIO_AUTH_TOKEN');
+        $from = env('TWILIO_WHATSAPP_FROM');
+        $templateSid = env('TWILIO_TEMPLATE_SID');
 
 
 
