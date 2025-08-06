@@ -9,8 +9,6 @@ class TwilioController extends Controller
 {
     public function sendWhatsApp(Request $request)
     {
-
-        return $request;
         $request->validate([
             'telefono' => 'required|string',
             'order_number' => 'required|string',
