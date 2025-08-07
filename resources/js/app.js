@@ -36,6 +36,7 @@ import { VueSpinnersPlugin } from 'vue3-spinners';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
+import Message from 'primevue/message';
 
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
@@ -140,6 +141,7 @@ createInertiaApp({
         app.component("Tabs", Tabs);
         app.component("TabList", TabList);
         app.component("Tab", Tab);
+        app.component("Message", Message);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {
