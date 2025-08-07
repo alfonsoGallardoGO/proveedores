@@ -18,7 +18,7 @@ class TwilioController extends Controller
         $orderNumber = $request->order_number;
 
         $sid = env('TWILIO_SID');
-        $token = env('TWILIO_AUTH_TOKEN');
+        $token = env('TWILIO_TOKEN');
         $from = env('TWILIO_WHATSAPP_FROM');
         $templateSid = env('TWILIO_TEMPLATE_SID');
     
