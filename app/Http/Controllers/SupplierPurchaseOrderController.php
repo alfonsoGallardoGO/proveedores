@@ -16,9 +16,9 @@ class SupplierPurchaseOrderController extends Controller
 {
     public function index()
     {
-        $orders = SupplierPurchaseOrder::where('supplier_external_id',$supplierId = Auth::user()->supplier_id ?? 65424) 
-        ->get();
-        
+        $orders = SupplierPurchaseOrder::where('supplier_external_id', $supplierId = Auth::user()->supplier_id ?? 65424)
+            ->get();
+
 
         return Inertia::render('Suppliers/PurchaseOrders/Index', [
             'orders' => $orders
@@ -40,20 +40,19 @@ class SupplierPurchaseOrderController extends Controller
         return Inertia::render('Suppliers/PurchaseOrders/Create');
     }
 
-    public function show($id){
-       $items = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $id)
-        ->withSum('deliveries', 'amount')
-        ->get();
+    public function show($id)
+    {
+        $items = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $id)
+            ->withSum('deliveries', 'amount')
+            ->get();
 
         $invoices = SupplierInvoice::where('supplier_purchase_order_id', $id)->get();
 
 
-         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
+        return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,
             'invoices' => $invoices,
         ]);
-        
-
     }
     public function store(Request $request)
     {
@@ -66,7 +65,7 @@ class SupplierPurchaseOrderController extends Controller
             ]);
         }
 
-        $supplierId = Auth::user()->supplier_id ?? 1; 
+        $supplierId = Auth::user()->supplier_id ?? 1;
         $pdfPath = null;
         $xmlPath = null;
 
@@ -102,7 +101,7 @@ class SupplierPurchaseOrderController extends Controller
             ], 400);
         }
 
-        if(empty($data['estado'])){
+        if (empty($data['estado'])) {
             return response()->json([
                 'error' => 'El campo estado es requerido.'
             ], 400);
@@ -110,13 +109,13 @@ class SupplierPurchaseOrderController extends Controller
 
         if (empty($data['tranid']) || strpos($data['tranid'], 'OC') !== 0) {
             return response()->json([
-            'error' => 'El campo tranid no es valido.'
+                'error' => 'El campo tranid no es valido.'
             ], 400);
         }
 
         $orderId = 0;
         $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
-        if($supplierPurchaseOrder->exists()){
+        if ($supplierPurchaseOrder->exists()) {
             $supplierPurchaseOrder->update([
                 'supplier_external_id' => $data['proveedor']['id'] ?? null,
                 'rfc' => $data['proveedor']['rfc'] ?? null,
@@ -182,7 +181,7 @@ class SupplierPurchaseOrderController extends Controller
                 'account'          => $item['cuenta'],
                 'categoria'        => $item['categoria'],
                 'memo'             => $item['memo'] ?? null,
-                'type'             => 'GASTO', 
+                'type'             => 'GASTO',
                 'supplier_purchase_order_id' => $orderId,
             ];
 
@@ -191,23 +190,23 @@ class SupplierPurchaseOrderController extends Controller
         }
 
         //$existingItems = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-                                                // ->get()
-                                                // ->keyBy(function($item) {
-                                                //     // Creamos la misma clave única para comparar
-                                                //     return $item->article_order_id . '_' . $item->type;
-                                                // });
+        // ->get()
+        // ->keyBy(function($item) {
+        //     // Creamos la misma clave única para comparar
+        //     return $item->article_order_id . '_' . $item->type;
+        // });
 
-        
-        $itemsToKeepInDb = []; 
 
-        DB::beginTransaction(); 
+        $itemsToKeepInDb = [];
+
+        DB::beginTransaction();
         try {
             foreach ($incomingItems as $uniqueKey => $incomingItemData) {
                 $existingItem = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-                                                        ->where('article_order_id', $incomingItemData['article_order_id'])
-                                                        ->where('type', $incomingItemData['type'])
-                                                        ->withTrashed() 
-                                                        ->first();
+                    ->where('article_order_id', $incomingItemData['article_order_id'])
+                    ->where('type', $incomingItemData['type'])
+                    ->withTrashed()
+                    ->first();
 
                 if ($existingItem) {
                     if ($existingItem->trashed()) {
@@ -216,32 +215,30 @@ class SupplierPurchaseOrderController extends Controller
 
                     $existingItem->update($incomingItemData);
                     $itemsToKeepInDb[] = $existingItem->id;
-
                 } else {
-                    
+
                     $newItem = SupplierPurchaseOrderItem::create($incomingItemData);
                     $itemsToKeepInDb[] = $newItem->id;
                 }
             }
 
-           
+
             $idsToDelete = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-                                                    ->whereNotIn('id', $itemsToKeepInDb)
-                                                    ->pluck('id')
-                                                    ->all();
+                ->whereNotIn('id', $itemsToKeepInDb)
+                ->pluck('id')
+                ->all();
 
             if (!empty($idsToDelete)) {
-                SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete(); 
+                SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete();
             }
 
-            
 
-            DB::commit(); 
+
+            DB::commit();
             return response()->json([
                 'message' => 'Orden de compra y sus ítems sincronizados correctamente.',
                 'supplier_purchase_order_id' => $supplier_purchase_order_id
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -250,5 +247,4 @@ class SupplierPurchaseOrderController extends Controller
             ], 500);
         }
     }
-
 }
