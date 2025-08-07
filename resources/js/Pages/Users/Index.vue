@@ -148,6 +148,7 @@ const sendUser = () => {
                     detail: "Por favor, corrige los errores y vuelve a intentarlo.",
                     life: 3000,
                 });
+                submitted.value = false;
             },
         });
     }
@@ -192,7 +193,7 @@ const getInitials = (username) => {
 };
 
 const deleteUser = (userId) => {
-    user.put(route("users.destroy", userId), {
+    user.delete(route("users.destroy", userId), {
         onSuccess: () => {
             deleteUserDialog.value = false;
         },
@@ -624,7 +625,7 @@ const removeProfilePhoto = () => {
                                     :showClear="true"
                                     id="supplier_id"
                                     name="supplier_id"
-                                    optionValue="id"
+                                    optionValue="external_id"
                                 >
                                     <template #option="slotProps">
                                         <div class="flex items-center">

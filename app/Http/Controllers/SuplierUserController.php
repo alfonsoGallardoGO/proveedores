@@ -49,7 +49,7 @@ class SuplierUserController extends Controller
             'username' => ['required', 'string', 'max:255', 'unique:supplier_users,username'],
             'phone_number' => ['nullable', 'string', 'max:20'],
             'profile_photo_path' => ['nullable', 'image', 'max:2048'],
-            'supplier_id' => ['required', 'exists:suppliers,id'],
+            'supplier_id' => ['required', 'exists:suppliers,external_id'],
         ]);
 
         $validatedData['password'] = Hash::make($validatedData['password']);
@@ -111,7 +111,7 @@ class SuplierUserController extends Controller
             'username' => ['required', 'string', 'max:255', 'unique:supplier_users,username,' . $id],
             'phone_number' => ['nullable', 'string', 'max:20'],
             'profile_photo_path' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'supplier_id' => ['required', 'exists:suppliers,id'],
+            'supplier_id' => ['required', 'exists:suppliers,external_id'],
         ]);
 
         if (!empty($validatedData['password'])) {
