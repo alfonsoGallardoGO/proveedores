@@ -11,9 +11,17 @@ use App\Models\SupplierInvoice;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Services\NetSuiteRestService;
+use Illuminate\Support\Facades\Log;
 
 class SupplierPurchaseOrderController extends Controller
 {
+    private NetSuiteRestService $netSuiteRestService;
+    public function __construct(NetSuiteRestService $netSuiteRestService)
+    {
+        $this->netSuiteRestService = $netSuiteRestService;
+    }
+
     public function index()
     {
         $orders = SupplierPurchaseOrder::where('supplier_external_id', $supplierId = Auth::user()->supplier_id ?? 65424)
@@ -45,11 +53,8 @@ class SupplierPurchaseOrderController extends Controller
     }
     public function store(Request $request)
     {
-        // dd($request->supplier_purchase_order_id);
-
-
         $data = $request;
-        
+
         $gastos = [];
         $articulos = [];
         foreach ($data['cantidades'] as $itemId => $amount) {
@@ -57,6 +62,7 @@ class SupplierPurchaseOrderController extends Controller
                 'supplier_purchase_orders_item_id' => $itemId,
                 'amount' => $amount ?? 0,
             ]);
+
         }
 
         $supplierId = Auth::user()->supplier_id ?? 1;
@@ -69,6 +75,7 @@ class SupplierPurchaseOrderController extends Controller
 
             $pdfContent = Storage::disk('public')->get($pdfPath);
             $pdfBase64  = base64_encode($pdfContent);
+
         }
 
         if ($request->hasFile('xml')) {
@@ -77,8 +84,8 @@ class SupplierPurchaseOrderController extends Controller
 
             $xmlContent = Storage::disk('public')->get($xmlPath);
             $xmlBase64  = base64_encode($xmlContent);
-        }
 
+        }
 
         SupplierInvoice::create([
             'supplier_id' => $supplierId,
@@ -87,100 +94,6 @@ class SupplierPurchaseOrderController extends Controller
             'xml_route' => $xmlPath,
         ]);
 
-        // $order = SupplierPurchaseOrder::where('purchase_order_id', $request->supplier_purchase_order_id)
-        //     ->get();
-
-
-
-        // $path = storage_path('app/public/invoices/xml/vM7xw0qvKIXTyT8BV7ixNQAt0WQceSdC1fJUmbAZ.xml');
-        // $xmlContent = file_get_contents($path);
-        // $xml = simplexml_load_string($xmlContent);
-
-        // $ns = $xml->getNamespaces(true);
-        // $xml->registerXPathNamespace('cfdi', $ns['cfdi']);
-        // $xml->registerXPathNamespace('tfd',  $ns['tfd']);
-        // $xml->registerXPathNamespace('pago20', $ns['pago20']);
-
-
-
-        // $emisorNode   = $xml->xpath('//cfdi:Emisor')[0] ?? null;
-        // $receptorNode = $xml->xpath('//cfdi:Receptor')[0] ?? null;
-
-        // $rfcEmisor    = $emisorNode ? (string)$emisorNode['Rfc'] : '';
-        // $rfcReceptor  = $receptorNode ? (string)$receptorNode['Rfc'] : '';
-
-        // $pagoNode = $xml->xpath('//pago20:Pago')[0] ?? null;
-        // $monedaP  = $pagoNode ? (string)$pagoNode['MonedaP'] : 'MXN';
-        // $tipoCambioP = $pagoNode ? (string)$pagoNode['TipoCambioP'] : '1';
-        // $montoPago   = $pagoNode ? (string)$pagoNode['Monto'] : '0';
-
-        // $conceptoNode = $xml->xpath('//cfdi:Concepto')[0] ?? null;
-        // $claveProdServPago = $conceptoNode ? (string)$conceptoNode['ClaveProdServ'] : '0';
-
-
-        // $trasladosP = $xml->xpath('//pago20:TrasladoP') ?? [];
-
-        // $termino      = "4";
-        // $departamento = "106";
-        // $clase        = "490";
-        // $operacion    = "3";
-        // $ubicacion    = "533";
-        // $categoria    = "125";
-
-        // $gastos = [];
-        // foreach ($trasladosP as $item_traslado) {
-        //     $baseP      = (string)$item_traslado['BaseP'];   
-        //     $impuestoP  = (string)$item_traslado['ImpuestoP'];
-        //     $tipoFactor = (string)$item_traslado['TipoFactorP'];
-        //     $tasaOCuota = (string)$item_traslado['TasaOCuotaP'];
-        //     $importeP   = (string)$item_traslado['ImporteP'];
-
-        //     $gastos[] = [
-        //         "categoria"     => $categoria,
-        //         "costo"         => (string) (float) $baseP,
-        //         "ubicacion"     => $ubicacion,
-        //         "departamento"  => $departamento,
-        //         "clase"         => $clase,
-        //         "concepto"      => "Pago",
-        //         "claveprodser"  => $claveProdServPago,
-        //         "Impuestos"     => [
-        //             "Traslados" => [
-        //                 "Traslado" => [[
-        //                     "Base"       => (string) (float) $baseP,
-        //                     "Impuesto"   => $impuestoP,
-        //                     "TipoFactor" => $tipoFactor,
-        //                     "TasaOCuota" => $tasaOCuota,
-        //                     "Importe"    => (string) (float) $importeP,
-        //                 ]]
-        //             ]
-        //         ]
-        //     ];
-        // }
-
-
-        // $jsonPayload = [
-        //     "rfc"            => 0 ,
-        //     "nfactura"       => "27249",
-        //     "regimenfiscal"  => "626",
-        //     "moneda"         => "MXN",
-        //     "termino"        => "4",
-        //     "departamento"   => "106",
-        //     "clase"          => "490",
-        //     "operacion"      => "3",
-        //     "tipocambio"     => 0,
-        //     "fecha"          => "04/08/2025",
-        //     "ubicacion"      => "533",
-        //     "idnetsuite"     => "",
-        //     "uuid"           => "AB05BA85-C615-456C-8580-600D3C0EDDA8",
-        //     "gastos"         =>$gastos,
-        //     "articulos"      => 0,
-        //     "nota"           => "",
-        //     "generico"       => "",
-        //     "xml" => 0,
-        //     "pdf" => 0
-        // ];
-
-        // return 1;
 
         return redirect()->route('purchase-orders.index')
             ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
@@ -343,4 +256,269 @@ class SupplierPurchaseOrderController extends Controller
             ], 500);
         }
     }
+
+
+    public function xml(Request $request)
+    {
+        $path = storage_path('app/public/invoices/xml/prueba_xml.xml');
+
+        if (!file_exists($path)) {
+            abort(404, 'XML no encontrado');
+        }
+
+        $xp = function($xml, $query) { return $xml->xpath($query) ?: []; };
+        $first = function($arr) { return is_array($arr) && count($arr) ? $arr[0] : null; };
+        $attr = function($node, $name) { return $node ? (string)($node[$name] ?? '') : ''; };
+
+        libxml_use_internal_errors(true);
+        $xmlContent = file_get_contents($path);
+        $xml = simplexml_load_string($xmlContent);
+        if (!$xml) {
+            abort(422, 'XML inválido');
+        }
+
+        $ns = $xml->getNamespaces(true);
+        if (isset($ns['cfdi']))   $xml->registerXPathNamespace('cfdi',   $ns['cfdi']);
+        if (isset($ns['tfd']))    $xml->registerXPathNamespace('tfd',    $ns['tfd']);
+        if (isset($ns['pago20'])) $xml->registerXPathNamespace('pago20', $ns['pago20']);
+
+        $emisorNode   = $first($xp($xml, '//cfdi:Emisor'));
+        $receptorNode = $first($xp($xml, '//cfdi:Receptor'));
+        $tfdNode      = $first($xp($xml, '//tfd:TimbreFiscalDigital'));
+
+        $serie     = (string)($xml['Serie'] ?? '');
+        $folio     = (string)($xml['Folio'] ?? '');
+        $fechaCfd  = (string)($xml['Fecha'] ?? '');
+        $fechaJson = $fechaCfd ? \Carbon\Carbon::parse($fechaCfd)->format('d/m/Y') : '';
+
+        $rfcEmisor      = $attr($emisorNode, 'Rfc');
+        $regimenFiscal  = $attr($emisorNode, 'RegimenFiscal');
+        $rfcReceptor    = $attr($receptorNode, 'Rfc');
+        $uuid           = $attr($tfdNode, 'UUID');
+
+        $isPago = isset($ns['pago20']) && count($xp($xml, '//pago20:Pago')) > 0;
+
+        if ($isPago) {
+            $pagoNode   = $first($xp($xml, '//pago20:Pago'));
+            $moneda     = $attr($pagoNode, 'MonedaP') ?: 'MXN';
+            $tipoCambio = $attr($pagoNode, 'TipoCambioP') ?: '1';
+        } else {
+            $moneda     = (string)($xml['Moneda'] ?? 'MXN');
+            $tipoCambio = (string)($xml['TipoCambio'] ?? '1');
+        }
+
+        $conceptoNode   = $first($xp($xml, '//cfdi:Concepto'));
+        $claveProdServ  = $attr($conceptoNode, 'ClaveProdServ') ?: '84111506';
+        $descripcion    = $attr($conceptoNode, 'Descripcion') ?: 'Concepto';
+
+        $gastos = [];
+
+        if ($isPago) {
+            $trasladosP = $xp($xml, '//pago20:TrasladoP');
+            if (!empty($trasladosP)) {
+                $docRel = $first($xp($xml, '//pago20:DoctoRelacionado'));
+                $conceptoTxt = trim('Pago relacionado ' . $attr($docRel, 'Serie') . ' ' . $attr($docRel, 'Folio'));
+
+                foreach ($trasladosP as $t) {
+                    $base = (string)$t['BaseP'];
+                    $gastos[] = [
+                        "categoria"     => "125",
+                        "costo"         => (string)(float)$base,
+                        "ubicacion"     => "533",
+                        "departamento"  => "106",
+                        "clase"         => "490",
+                        "concepto"      => $conceptoTxt ?: 'Pago',
+                        "claveprodser"  => $claveProdServ,
+                        "Impuestos"     => [
+                            "Traslados" => [
+                                "Traslado" => [[
+                                    "Base"       => (string)(float)$base,
+                                    "Impuesto"   => (string)$t['ImpuestoP'],
+                                    "TipoFactor" => (string)$t['TipoFactorP'],
+                                    "TasaOCuota" => (string)$t['TasaOCuotaP'],
+                                    "Importe"    => (string)(float)$t['ImporteP'],
+                                ]]
+                            ]
+                        ]
+                    ];
+                }
+            }
+
+            if (empty($gastos)) {
+                $trasladosDR = $xp($xml, '//pago20:TrasladoDR');
+                foreach ($trasladosDR as $t) {
+                    $base = (string)$t['BaseDR'];
+                    $gastos[] = [
+                        "categoria"     => "125",
+                        "costo"         => (string)(float)$base,
+                        "ubicacion"     => "533",
+                        "departamento"  => "106",
+                        "clase"         => "490",
+                        "concepto"      => $descripcion ?: 'Pago',
+                        "claveprodser"  => $claveProdServ,
+                        "Impuestos"     => [
+                            "Traslados" => [
+                                "Traslado" => [[
+                                    "Base"       => (string)(float)$base,
+                                    "Impuesto"   => (string)$t['ImpuestoDR'],
+                                    "TipoFactor" => (string)$t['TipoFactorDR'],
+                                    "TasaOCuota" => (string)$t['TasaOCuotaDR'],
+                                    "Importe"    => (string)(float)$t['ImporteDR'],
+                                ]]
+                            ]
+                        ]
+                    ];
+                }
+            }
+        }
+
+        if (empty($gastos)) {
+            $trasGlobal = $xp($xml, '//cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
+            foreach ($trasGlobal as $t) {
+                $base = (string)($t['Base'] ?? $t['Importe'] ?? '0');
+                $gastos[] = [
+                    "categoria"     => "125",
+                    "costo"         => (string)(float)$base,
+                    "ubicacion"     => "533",
+                    "departamento"  => "106",
+                    "clase"         => "490",
+                    "concepto"      => $descripcion,
+                    "claveprodser"  => $claveProdServ,
+                    "Impuestos"     => [
+                        "Traslados" => [
+                            "Traslado" => [[
+                                "Base"       => (string)(float)$base,
+                                "Impuesto"   => (string)$t['Impuesto'],
+                                "TipoFactor" => (string)$t['TipoFactor'],
+                                "TasaOCuota" => (string)$t['TasaOCuota'],
+                                "Importe"    => (string)(float)$t['Importe'],
+                            ]]
+                        ]
+                    ]
+                ];
+            }
+        }
+
+        if (empty($gastos)) {
+            $conceptos = $xp($xml, '//cfdi:Concepto');
+            foreach ($conceptos as $c) {
+                $trasC = $xp($c, './cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
+                foreach ($trasC as $t) {
+                    $base = (string)($t['Base'] ?? $t['Importe'] ?? '0');
+                    $gastos[] = [
+                        "categoria"     => "125",
+                        "costo"         => (string)(float)$base,
+                        "ubicacion"     => "533",
+                        "departamento"  => "106",
+                        "clase"         => "490",
+                        "concepto"      => (string)($c['Descripcion'] ?? $descripcion),
+                        "claveprodser"  => (string)($c['ClaveProdServ'] ?? $claveProdServ),
+                        "Impuestos"     => [
+                            "Traslados" => [
+                                "Traslado" => [[
+                                    "Base"       => (string)(float)$base,
+                                    "Impuesto"   => (string)$t['Impuesto'],
+                                    "TipoFactor" => (string)$t['TipoFactor'],
+                                    "TasaOCuota" => (string)$t['TasaOCuota'],
+                                    "Importe"    => (string)(float)$t['Importe'],
+                                ]]
+                            ]
+                        ]
+                    ];
+                }
+            }
+        }
+
+        // $xmlBase64 = base64_encode($xmlContent);
+        // $pdfBase64 = "";
+
+        $pdfPath = storage_path('app/public/invoices/pdf/3k7iu4Ic9anZsJAThPjsBYbmH8FEad3mWriV6pwB.pdf');
+        $xmlPath = storage_path('app/public/invoices/xml/prueba_xml.xml');
+
+        $pdfBase64 = base64_encode(file_get_contents($pdfPath));
+        $xmlBase64 = base64_encode(file_get_contents($xmlPath));
+
+        $jsonPayload = [
+            "rfc"           => $rfcEmisor ?: $rfcReceptor,
+            "nfactura"      => $folio, 
+            "regimenfiscal" => $regimenFiscal,
+            "moneda"        => $moneda,
+            "termino"       => "4", 
+            "departamento"  => "106",
+            "clase"         => "490",
+            "operacion"     => "3",
+            "tipocambio"    => (float)$tipoCambio,
+            "fecha"         => $fechaJson,
+            "ubicacion"     => "533",
+            "idnetsuite"    => "",
+            "uuid"          => $uuid,
+            "gastos"        => $gastos,
+            "articulos"     => [],
+            "nota"          => "",
+            "generico"      => "",
+            "xml"           => $xmlBase64,
+            "pdf"           => $pdfBase64,
+        ];
+        
+        $data = [
+            [
+                "idproveedor" => "65424",
+                "iddoc" => "4414137",
+                "tipo_doc" => "PurchOrd",
+                "rfc" => "FIRA860812RX3",
+                "nfactura" => "15329",
+                "regimenfiscal" => "601",
+                "moneda" => "MXN",
+                "termino" => "4",
+                "departamento" => "106",
+                "clase" => "490",
+                "operacion" => "3",
+                "tipocambio" => 1,
+                "fecha" => "26/09/2024",
+                "ubicacion" => "533",
+                "idnetsuite" => "",
+                "uuid" => "9c5e171f-0561-46f1-8496-f7e8b644ddc7",
+                "gastos" => [
+                    [
+                        "categoria" => "125",
+                        "costo" => "8000",
+                        "ubicacion" => "533",
+                        "departamento" => "106",
+                        "clase" => "490",
+                        "concepto" => "Pago relacionado TCAM 23897",
+                        "claveprodser" => "84111506",
+                        "Impuestos" => [
+                            "Traslados" => [
+                                "Traslado" => [
+                                    [
+                                        "Base" => "8000",
+                                        "Impuesto" => "002",
+                                        "TipoFactor" => "Tasa",
+                                        "TasaOCuota" => "0.160000",
+                                        "Importe" => "1"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                "articulos" => [],
+                "nota" => "",
+                "generico" => "",
+                "xml" =>$xmlBase64,
+                "pdf" =>$pdfBase64
+            ]
+        ];
+
+        return $data;
+
+        // $restletPath = "/restlet.nl?script=5141&deploy=1";
+        // try {
+        //     $response = $this->netSuiteRestService->request($restletPath, 'POST', $data);
+        //     return response()->json(['ok' => true, 'response' => $response]);
+        // } catch (\Throwable $e) {
+        //     return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+        // }
+    }
+
 }

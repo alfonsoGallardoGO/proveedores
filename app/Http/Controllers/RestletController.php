@@ -54,7 +54,7 @@ class RestletController extends Controller
         // La ruta del RESTlet, incluyendo script y deploy IDs
         $restletPath = "/restlet.nl?script={$scriptId}&deploy={$deployId}";
         // Obtiene los datos del cuerpo de la solicitud
-        $data = $request->json()->all();
+        $data = [$request];
         try {
             // Llama al servicio para ejecutar el RESTlet
             // Para una solicitud POST, $data contendrá los datos del cuerpo
