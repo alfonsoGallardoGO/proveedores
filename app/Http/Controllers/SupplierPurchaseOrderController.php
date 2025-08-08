@@ -25,15 +25,6 @@ class SupplierPurchaseOrderController extends Controller
         ]);
     }
 
-    // public function indexOrders(Request $request)
-    // {
-    //     $purchaseOrderId = $request->input('purchaseOrderId');
-
-    //     return Inertia::render('Suppliers/PurchaseOrders/OrdersFiles', [
-    //         'purchaseOrderId' => $purchaseOrderId,
-    //     ]);
-    // }
-
 
     public function create()
     {
@@ -58,11 +49,41 @@ class SupplierPurchaseOrderController extends Controller
     {
         $data = $request;
 
+        $gastos = [];
+        $articulos = [];
         foreach ($data['cantidades'] as $itemId => $amount) {
             SupplierPurchaseOrdersItemsDelivery::create([
                 'supplier_purchase_orders_item_id' => $itemId,
                 'amount' => $amount ?? 0,
             ]);
+
+
+            $item = SupplierPurchaseOrderItem::find($itemId);
+
+            if ($item ->type ='GASTO') {
+                $gastos[] = [
+                    "categoria"     => $item->categoria,
+                    "costo"         => (string) $amount,
+                    "ubicacion"     => $item->location,
+                    "departamento"  => $item->department,
+                    "clase"         => $item->class,
+                    "concepto"      => $item->description,
+                    // "claveprodser"  => $item->claveprodser ?? "81112101",
+                    // "Impuestos"     => [
+                    //     "Traslados" => [
+                    //         "Traslado" => [[
+                    //             "Base"       => (string) $amount,
+                    //             "Impuesto"   => "002",
+                    //             "TipoFactor" => "Tasa",
+                    //             "TasaOCuota" => "0.160000",
+                    //             "Importe"    => (string) round($amount * 0.16, 2)
+                    //         ]]
+                    //     ]
+                    // ]
+                ];
+            }
+
+
         }
 
         $supplierId = Auth::user()->supplier_id ?? 1;
@@ -72,11 +93,19 @@ class SupplierPurchaseOrderController extends Controller
         if ($request->hasFile('factura')) {
             Storage::disk('public')->makeDirectory('invoices/pdf');
             $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
+
+            $pdfContent = Storage::disk('public')->get($pdfPath);
+            $pdfBase64  = base64_encode($pdfContent);
+
         }
 
         if ($request->hasFile('xml')) {
             Storage::disk('public')->makeDirectory('invoices/xml');
             $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
+
+            $xmlContent = Storage::disk('public')->get($xmlPath);
+            $xmlBase64  = base64_encode($xmlContent);
+
         }
 
         SupplierInvoice::create([
@@ -85,6 +114,31 @@ class SupplierPurchaseOrderController extends Controller
             'pdf_route' => $pdfPath,
             'xml_route' => $xmlPath,
         ]);
+
+        $order = SupplierPurchaseOrder::where('purchase_order_id', $request->supplier_purchase_order_id)
+            ->get();
+
+        $jsonPayload = [
+            "rfc"            =>  $order->rfc,
+            "nfactura"       => "27249",
+            "regimenfiscal"  => "626",
+            "moneda"         => "MXN",
+            "termino"        => "4",
+            "departamento"   => "106",
+            "clase"          => "490",
+            "operacion"      => "3",
+            "tipocambio"     => 0,
+            "fecha"          => "04/08/2025",
+            "ubicacion"      => "533",
+            "idnetsuite"     => "",
+            "uuid"           => "AB05BA85-C615-456C-8580-600D3C0EDDA8",
+            "gastos"         => $gastos,
+            "articulos"      => $articulos,
+            "nota"           => "",
+            "generico"       => "",
+            "xml" => $xmlBase64,
+            "pdf" => $pdfBase64
+        ];
 
         return redirect()->route('purchase-orders.index')
             ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
