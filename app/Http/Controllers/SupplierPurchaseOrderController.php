@@ -45,7 +45,7 @@ class SupplierPurchaseOrderController extends Controller
     }
     public function store(Request $request)
     {
-        return $request;
+        return "jotolon";
         // $data = $request;
 
         // $gastos = [];

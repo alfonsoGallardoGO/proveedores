@@ -19,177 +19,26 @@ const props = defineProps({
     items: Array,
 });
 
+// onMounted(() => {
+//     // Si tu intención es inicializar `form.cantidades` con un valor de 0
+//     // para cada item en `props.items`, solo necesitas un bucle.
+//     props.items.forEach(item => {
+//         // Accedes directamente a la propiedad `id` de cada item
+//         if (!form.cantidades[item.id]) {
+//             form.cantidades[item.id] = 0;
+//         }
+//         console.log(form.cantidades[item.id]);
+//     });
+// });
+
 const toast = useToast();
 const dtItems = ref();
-// const $primevue = usePrimeVue();
-
-// Variables y funciones para el input de PDF
-// const totalPdfSize = ref(0);
-// const totalPdfSizePercent = ref(0);
-const pdfFiles = ref([]);
-const xmlFiles = ref([]);
-const fileSizeError = ref(null);
-const maxFileSize = 1000000; // 1 MB en bytes
-const pdfUploader = ref(null); // Asegúrate de tener esta referencia
-
-// const onSelectedPdfFiles = (event) => {
-//     pdfFiles.value = event.files;
-//     if (pdfFiles.value.length > 0) {
-//         toast.add({ severity: 'success', summary: 'PDF Seleccionado', detail: `Se seleccionó el archivo: ${pdfFiles.value[0].name}`, life: 3000 });
-//     }
-// };
-
-// Propiedad computada para verificar si hay un PDF cargado
-const hasPdfFile = computed(() => pdfFiles.value.length > 0);
-
-// const uploadPdfEvent = (callback) => {
-//     totalPdfSizePercent.value = totalPdfSize.value / 10;
-//     callback();
-// };
-
-// const onPdfUpload = () => {
-//     toast.add({ severity: "info", summary: "Éxito", detail: "Archivos PDF subidos", life: 3000 });
-// };
-
-// Variables y funciones para el input de XML
-// const totalXmlSize = ref(0);
-// const totalXmlSizePercent = ref(0);
-
-
-
-// Variables reactivas para el mensaje de error y los archivos
-
-
-
-// const onSelectedXmlFiles = (event) => {
-//     xmlFiles.value = event.files;
-//     if (xmlFiles.value.length > 0) {
-//         toast.add({ severity: 'success', summary: 'XML Seleccionado', detail: `Se seleccionó el archivo: ${xmlFiles.value[0].name}`, life: 3000 });
-//     }
-// };
-
-
-// const onFileSelect = (event, type) => {
-//     const maxFileSize = 1000000; // 1 MB en bytes
-//     const file = event.files[0];
-
-//     // Esta parte de tu código ahora se ejecutará.
-//     if (file.size > maxFileSize) {
-//         console.log("El archivo excede el tamaño máximo.");
-//         console.log("Tamaño del archivo:", file.size);
-//         toast.add({
-//             severity: 'error',
-//             summary: 'Error de subida',
-//             detail: `El archivo '${file.name}' excede el tamaño máximo de 1 MB.`,
-//             life: 5000,
-//         });
-//         event.preventDefault(); // Esto es clave para que no se muestre el archivo en la interfaz
-//     } else {
-//         console.log("El archivo es válido.");
-//         // Tu lógica de éxito
-//         if (type === 'pdf') {
-//             toast.add({ severity: 'success', summary: 'PDF Seleccionado', detail: `Se seleccionó el archivo: ${file.name}`, life: 3000 });
-//         } else {
-//             toast.add({ severity: 'success', summary: 'XML Seleccionado', detail: `Se seleccionó el archivo: ${file.name}`, life: 3000 });
-//         }
-//     }
-// };
-
-const hasXmlFile = computed(() => xmlFiles.value.length > 0);
-
-// const uploadXmlEvent = (callback) => {
-//     totalXmlSizePercent.value = totalXmlSize.value / 10;
-//     callback();
-// };
-
-const onXmlUpload = () => {
-    toast.add({ severity: "info", summary: "Éxito", detail: "Archivos XML subidos", life: 3000 });
-};
-
-const formatSize = (bytes) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-
-
-const onFileSelect = (event) => {
-    fileSizeError.value = null; // Reinicia el error
-
-    const files = event.files;
-    for (const file of files) {
-        if (file.size > maxFileSize) {
-            fileSizeError.value = `Error: El archivo "${file.name}" es demasiado grande. El tamaño máximo permitido es 1 MB.`;
-
-            // Esta es la solución clave: llama al método 'clear()' del componente
-            if (pdfUploader.value) {
-                pdfUploader.value.clear();
-            }
-
-            console.log("Se ha evitado la carga del archivo:", file.name);
-            return;
-        }
-    }
-};
-
-const onPdfUpload = (event) => {
-    // Manejo de la carga exitosa
-    pdfFiles.value = event.files;
-    hasPdfFile.value = pdfFiles.value.length > 0;
-    fileSizeError.value = null; // Limpia el error si la carga es exitosa
-};
-
-const hasBothFiles = computed(() => hasPdfFile.value && hasXmlFile.value);
-
-const submitDocuments = () => {
-    if (hasBothFiles.value) {
-        form.factura = pdfFiles.value[0];
-        form.xml = xmlFiles.value[0];
-
-        router.post(route('ruta.enviar.documentos'), form, {
-            onSuccess: () => {
-                toast.add({
-                    severity: 'success',
-                    summary: 'Documentos subidos',
-                    detail: 'Los archivos se han subido correctamente.',
-                    life: 3000,
-                });
-                pdfFiles.value = [];
-                xmlFiles.value = [];
-            },
-            onError: (errors) => {
-                console.error(errors);
-                toast.add({
-                    severity: 'error',
-                    summary: 'Error al subir',
-                    detail: 'Hubo un problema al subir los archivos.',
-                    life: 3000,
-                });
-            },
-        });
-    } else {
-        toast.add({
-            severity: 'warn',
-            summary: 'Archivos faltantes',
-            detail: 'Por favor, selecciona un PDF y un XML.',
-            life: 3000,
-        });
-    }
-};
-
-// const onUploadError = (event) => {
-//     const error = event.xhr.statusText;
-//     toast.add({
-//         severity: 'error',
-//         summary: 'Error de subida',
-//         detail: `El archivo seleccionado excede el tamaño máximo de 1MB. Por favor, selecciona un archivo más pequeño.`,
-//         life: 5000,
-//     });
-// };
-
+// const pdfFiles = ref([]);
+// const xmlFiles = ref([]);
+// const fileSizeError = ref(null);
+// const maxFileSize = 1000000;
+// const pdfUploader = ref(null);
+const progress = ref(0);
 const form = useForm({
     cantidades: {},
     factura: null,
@@ -198,11 +47,172 @@ const form = useForm({
     supplier_purchase_order_id: null,
 });
 
-// onMounted(() => {
-//     setTimeout(() => {
-//         isLooadingItems.value = false;
-//     }, 3000);
-// });
+
+// const hasPdfFile = computed(() => pdfFiles.value.length > 0);
+// const hasXmlFile = computed(() => xmlFiles.value.length > 0);
+
+// const formatSize = (bytes) => {
+//     if (bytes === 0) return '0 B';
+//     const k = 1024;
+//     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+//     const i = Math.floor(Math.log(bytes) / Math.log(k));
+//     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+// };
+
+// const onFileSelect = (fileType, event) => {
+//     if (event.files && event.files.length > 0) {
+//         if (fileType === 'pdf') {
+//             pdfFiles.value = event.files;
+//         } else if (fileType === 'xml') {
+//             xmlFiles.value = event.files;
+//         }
+//     } else {
+//         if (fileType === 'pdf') {
+//             pdfFiles.value = [];
+//         } else if (fileType === 'xml') {
+//             xmlFiles.value = [];
+//         }
+//     }
+// };
+
+
+// Puedes inicializar el nombre del botón
+const buttonLabelPdf = ref('Seleccionar Factura');
+const buttonLabelXml = ref('Seleccionar XML');
+
+const onFacturaUpload = (event) => {
+    const file = event.files[0];
+    form.factura = file;
+
+    // Cambias el label del botón
+    if (file.value) {
+        buttonLabelPdf.value = `Archivo seleccionado: ${file.value.name}`;
+    } else {
+        buttonLabelPdf.value = 'Seleccionar Factura';
+    }
+};
+
+const onXmlUpload = (event) => {
+    const file = event.files[0];
+    form.xml = file;
+
+    // Cambias el label del botón
+    if (file.value) {
+        buttonLabelXml.value = `Archivo seleccionado: ${file.value.name}`;
+    } else {
+        buttonLabelXml.value = 'Seleccionar XML';
+    }
+};
+
+// const hasBothFiles = computed(() => hasPdfFile.value && hasXmlFile.value);
+
+
+// const submitDocuments = async () => {
+//     if (hasBothFiles.value) {
+//         const formData = new FormData();
+
+//         formData.append('factura', pdfFiles.value[0]);
+//         formData.append('xml', xmlFiles.value[0]);
+
+//         for (const [key, value] of formData.entries()) {
+//             console.log(`${key}:`, value);
+//         }
+
+//         try {
+//             const response = await axios.post(route('purchase-orders.store'), formData, {
+//                 headers: {
+//                     'Content-Type': 'multipart/form-data',
+//                 },
+//             });
+
+//             console.log('Respuesta del servidor:', response.data);
+
+//             toast.add({
+//                 severity: 'success',
+//                 summary: 'Documentos subidos',
+//                 detail: 'Los archivos se han subido correctamente.',
+//                 life: 3000,
+//             });
+//             pdfFiles.value = [];
+//             xmlFiles.value = [];
+
+//         } catch (error) {
+//             console.error("Error al subir los archivos:", error);
+//             toast.add({
+//                 severity: 'error',
+//                 summary: 'Error al subir',
+//                 detail: 'Hubo un problema al subir los archivos.',
+//                 life: 3000,
+//             });
+//         }
+//     } else {
+//         toast.add({
+//             severity: 'warn',
+//             summary: 'Archivos faltantes',
+//             detail: 'Por favor, selecciona un PDF y un XML.',
+//             life: 3000,
+//         });
+//     }
+// };
+
+const store = async () => {
+    try {
+        progress.value = 0;
+        toast.add({
+            severity: 'info',
+            summary: 'Subiendo archivos...',
+            group: 'headless',
+            life: 999999,
+        });
+        const formData = new FormData();
+        for (const [itemId, amount] of Object.entries(form.cantidades)) {
+            formData.append(`cantidades[${itemId}]`, amount);
+        }
+        formData.append("supplier_id", form.supplier_id);
+        formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
+
+        // for (const [key, value] of formData.entries()) {
+        //     console.log(`${key}: ${value}`);
+        // }
+        if (form.factura) formData.append("factura", form.factura);
+        if (form.xml) formData.append("xml", form.xml);
+        // console.log(form.factura);
+        // console.log(form.xml);
+        await axios.post(route("purchase-orders.store"), formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (event) => {
+                if (event.total) {
+                    progress.value = Math.round((event.loaded * 100) / event.total);
+                }
+            },
+        });
+
+        toast.removeGroup("headless");
+
+        toast.add({
+            severity: "success",
+            summary: "Guardado",
+            detail: "Datos guardados correctamente",
+            life: 3000,
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        toast.removeGroup("headless");
+
+        toast.add({
+            severity: "error",
+            summary: "Error",
+            detail: "Hubo un problema al guardar",
+            life: 3000,
+        });
+    } finally {
+        progress.value = 0; // Reinicia el progreso
+    }
+};
+
+
 
 const filtersItems = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -236,6 +246,8 @@ const showDocument = (url) => {
     dialogVisible.value = true;
 };
 
+
+
 </script>
 
 <template>
@@ -251,8 +263,14 @@ const showDocument = (url) => {
                                 <p class="loading-text">CARGANDO DATOS...</p>
                             </div>
                         </div> -->
-
                         <div class="card flex justify-center">
+                            <Toolbar class="p-5">
+                                <template #start>
+                                    <Link :href="route('purchase-orders.index')" class="menu-link" as="button">
+                                    <Button label="Regresar" icon="pi pi-arrow-circle-left" severity="help" outlined />
+                                    </Link>
+                                </template>
+                            </Toolbar>
                             <DataTable ref="dtItems" :value="items" dataKey="id" paginator :rows="10"
                                 :filters="filtersItems" :rowsPerPageOptions="[5, 10, 25]"
                                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
@@ -329,9 +347,34 @@ const showDocument = (url) => {
                                                 <i class="pi pi-file-pdf text-red-500"></i>
                                                 Subir Factura (PDF)
                                             </h4>
-                                            <Message v-if="fileSizeError" severity="error">{{ fileSizeError }}</Message>
-                                            <FileUpload ref="pdfUploader" v-model="pdfFiles" name="pdf[]"
-                                                accept="application/pdf" @select="onFileSelect"
+                                            <!-- <Message v-if="fileSizeError" severity="error">{{ fileSizeError }}</Message> -->
+
+                                            <!-- <FileUpload mode="basic" name="factura" accept=".pdf" :auto="false"
+                                                @select="onFacturaUpload" chooseLabel="Seleccionar Factura"
+                                                uploadLabel="Subir" cancelLabel="Cancelar" class="w-full" />
+                                            <small class="block mt-2 text-gray-500">Solo archivos PDF. Máximo
+                                                2MB.</small> -->
+
+                                            <FileUpload name="factura" accept=".pdf" :auto="false"
+                                                @select="onFacturaUpload" :customUpload="true">
+                                                <template #header="{ chooseCallback }">
+                                                    <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
+                                                        @click="chooseCallback()" severity="info"
+                                                        class="p-button-sm p-button-rounded" />
+                                                </template>
+                                                <template #content="{ files }">
+                                                    <div v-for="file of files" :key="file.name"
+                                                        class="p-4 flex items-center justify-between">
+                                                        <span class="flex items-center gap-2">
+                                                            <i class="pi pi-check-circle text-green-500" />
+                                                            {{ file.name }}
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            </FileUpload>
+
+                                            <!-- <FileUpload ref="pdfUploader" v-model="pdfFiles" name="factura"
+                                                accept="application/pdf" @select="onFileSelect('pdf', $event)"
                                                 :showUploadButton="false" :showCancelButton="false" :multiple="false"
                                                 :customUpload="true" url="/api/upload">
 
@@ -375,7 +418,7 @@ const showDocument = (url) => {
                                                                     class="pi pi-check-circle text-4xl text-green-500"></i>
                                                                 <div>
                                                                     <span class="font-bold block">{{ uploadedFile.name
-                                                                        }}</span>
+                                                                    }}</span>
                                                                     <span class="text-sm text-gray-500">{{
                                                                         formatSize(uploadedFile.size) }}</span>
                                                                 </div>
@@ -389,19 +432,43 @@ const showDocument = (url) => {
                                                         </div>
                                                     </div>
                                                 </template>
-                                            </FileUpload>
-                                        </div>
+                                            </FileUpload> -->
 
+                                        </div>
                                         <div class="card w-1/2 p-4 border rounded-lg shadow-sm">
                                             <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
                                                 <i class="pi pi-code text-green-600"></i>
                                                 Subir XML
                                             </h4>
-                                            <Message v-if="fileSizeError" severity="error">{{ fileSizeError }}</Message>
-                                            <FileUpload ref="xmlUploader" v-model="xmlFiles" name="xml[]"
-                                                url="/api/upload/xml" accept="text/xml" @select="onFileSelect"
-                                                :showUploadButton="false" :showCancelButton="false" :multiple="false"
-                                                :customUpload="true">
+                                            <!-- <FileUpload mode="basic" name="xml" accept=".xml" :auto="false"
+                                                @select="onXmlUpload" chooseLabel="Seleccionar XML" uploadLabel="Subir"
+                                                cancelLabel="Cancelar" class="w-full" />
+                                            <small class="block mt-2 text-gray-500">Solo archivos XML. Máximo
+                                                1MB.</small> -->
+
+                                            <FileUpload name="xml" accept=".xml" :auto="false"
+                                                @select="onXmlUpload" :customUpload="true">
+                                                <template #header="{ chooseCallback }">
+                                                    <Button :label="buttonLabelXML" icon="pi pi-file-excel"
+                                                        @click="chooseCallback()" severity="info"
+                                                        class="p-button-sm p-button-rounded" />
+                                                </template>
+                                                <template #content="{ files }">
+                                                    <div v-for="file of files" :key="file.name"
+                                                        class="p-4 flex items-center justify-between">
+                                                        <span class="flex items-center gap-2">
+                                                            <i class="pi pi-check-circle text-green-500" />
+                                                            {{ file.name }}
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            </FileUpload>
+
+                                            <!-- <Message v-if="fileSizeError" severity="error">{{ fileSizeError }}</Message>
+                                            <FileUpload ref="xmlUploader" v-model="xmlFiles" name="xml"
+                                                url="/api/upload/xml" accept="text/xml"
+                                                @select="onFileSelect('xml', $event)" :showUploadButton="false"
+                                                :showCancelButton="false" :multiple="false" :customUpload="true">
                                                 <template #header="{ chooseCallback, files }">
                                                     <div class="flex items-center gap-2">
                                                         <Button @click="chooseCallback()" icon="pi pi-code" rounded
@@ -429,7 +496,7 @@ const showDocument = (url) => {
                                                                     <span class="font-bold block">{{ file.name }}</span>
                                                                     <span class="text-sm text-gray-500">{{
                                                                         formatSize(file.size)
-                                                                        }}</span>
+                                                                    }}</span>
                                                                 </div>
                                                             </div>
                                                             <div class="flex items-center gap-2">
@@ -447,10 +514,10 @@ const showDocument = (url) => {
                                                                     class="pi pi-check-circle text-4xl text-green-500"></i>
                                                                 <div>
                                                                     <span class="font-bold block">{{ uploadedFile.name
-                                                                        }}</span>
+                                                                    }}</span>
                                                                     <span class="text-sm text-gray-500">{{
                                                                         formatSize(uploadedFile.size)
-                                                                        }}</span>
+                                                                    }}</span>
                                                                 </div>
                                                             </div>
                                                             <div class="flex items-center gap-2">
@@ -462,13 +529,14 @@ const showDocument = (url) => {
                                                         </div>
                                                     </div>
                                                 </template>
-                                            </FileUpload>
+                                            </FileUpload> -->
                                         </div>
                                     </div>
                                     <div v-if="activeTab === 'Subir Archivos'" class="mt-6 flex justify-end">
                                         <Button label="Subir Documentos" icon="pi pi-cloud-upload" severity="help"
-                                            :disabled="!hasBothFiles" @click="submitDocuments" />
+                                            @click="store()" />
                                     </div>
+                                    <div class="pb-12"></div>
                                     <div v-if="activeTab === 'Lista de Documentos'">
                                         <div class="card">
                                             <DataTable :value="invoices" stripedRows paginator :rows="10"
