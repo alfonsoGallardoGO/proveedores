@@ -4,18 +4,37 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
+use App\Models\SupplierWhatsapp;
 
 class TwilioController extends Controller
 {
     public function sendWhatsApp(Request $request)
     {
         $request->validate([
-            'telefono' => 'required|string',
-            'order_number' => 'required|string',
+            'receiptId'       => 'required|string',
+            'tranid'          => 'nullable|string',
+            'proveedorId'     => 'required|string',
+            'proveedor'       => 'required|string',
+            'fecha'           => 'required|string', // viene como dd/mm/YYYY
+            'numeroWhatsapp'  => 'required|string', // ejemplo: +5214434797316
+            
         ]);
 
-        $telefono = $request->telefono;
-        $orderNumber = $request->order_number;
+        
+
+        $orderNumber ="PRUE";
+        $telefono = $request->numeroWhatsapp;
+        $reception_id = $request->receiptId;
+        $external_supplier_id = $request->proveedorId;
+        $supplier_name = $request->proveedor;
+
+        SupplierWhatsapp::create([
+            'reception_id'         => $reception_id,
+            'external_supplier_id' => $external_supplier_id,
+            // 'supplier_name'        => $supplier_name,
+            // 'date'                 => $fechaDb,
+            'phone'                => $telefono,
+        ]);
 
         $sid = env('TWILIO_SID');
         $token = env('TWILIO_TOKEN');
@@ -51,4 +70,6 @@ class TwilioController extends Controller
         }
     }
 }
+
+
 
