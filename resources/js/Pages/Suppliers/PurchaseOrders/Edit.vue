@@ -5,8 +5,6 @@ import { ref, onMounted, computed } from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import { useToast } from "primevue/usetoast";
 import { useForm } from "@inertiajs/vue3";
-import Card from 'primevue/card';
-import { usePrimeVue } from 'primevue/config';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
@@ -19,74 +17,37 @@ const props = defineProps({
     items: Array,
 });
 
-// onMounted(() => {
-//     // Si tu intención es inicializar `form.cantidades` con un valor de 0
-//     // para cada item en `props.items`, solo necesitas un bucle.
-//     props.items.forEach(item => {
-//         // Accedes directamente a la propiedad `id` de cada item
-//         if (!form.cantidades[item.id]) {
-//             form.cantidades[item.id] = 0;
-//         }
-//         console.log(form.cantidades[item.id]);
-//     });
-// });
-
 const toast = useToast();
 const dtItems = ref();
-// const pdfFiles = ref([]);
-// const xmlFiles = ref([]);
-// const fileSizeError = ref(null);
-// const maxFileSize = 1000000;
-// const pdfUploader = ref(null);
 const progress = ref(0);
+
 const form = useForm({
     cantidades: {},
     factura: null,
     xml: null,
-    supplier_id: null,
     supplier_purchase_order_id: null,
 });
 
+onMounted(() => {
+    if (props.items && props.items.length > 0) {
+        form.supplier_purchase_order_id = props.items[0].supplier_purchase_order_id;
 
-// const hasPdfFile = computed(() => pdfFiles.value.length > 0);
-// const hasXmlFile = computed(() => xmlFiles.value.length > 0);
+        props.items.forEach(item => {
+            if (!form.cantidades[item.id]) {
+                form.cantidades[item.id] = 0;
+            }
+        });
+    }
+});
 
-// const formatSize = (bytes) => {
-//     if (bytes === 0) return '0 B';
-//     const k = 1024;
-//     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-//     const i = Math.floor(Math.log(bytes) / Math.log(k));
-//     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-// };
-
-// const onFileSelect = (fileType, event) => {
-//     if (event.files && event.files.length > 0) {
-//         if (fileType === 'pdf') {
-//             pdfFiles.value = event.files;
-//         } else if (fileType === 'xml') {
-//             xmlFiles.value = event.files;
-//         }
-//     } else {
-//         if (fileType === 'pdf') {
-//             pdfFiles.value = [];
-//         } else if (fileType === 'xml') {
-//             xmlFiles.value = [];
-//         }
-//     }
-// };
-
-
-// Puedes inicializar el nombre del botón
 const buttonLabelPdf = ref('Seleccionar Factura');
 const buttonLabelXml = ref('Seleccionar XML');
 
 const onFacturaUpload = (event) => {
     const file = event.files[0];
     form.factura = file;
-
-    // Cambias el label del botón
-    if (file.value) {
-        buttonLabelPdf.value = `Archivo seleccionado: ${file.value.name}`;
+    if (file) {
+        buttonLabelPdf.value = 'Factura seleccionada';
     } else {
         buttonLabelPdf.value = 'Seleccionar Factura';
     }
@@ -96,64 +57,13 @@ const onXmlUpload = (event) => {
     const file = event.files[0];
     form.xml = file;
 
-    // Cambias el label del botón
-    if (file.value) {
-        buttonLabelXml.value = `Archivo seleccionado: ${file.value.name}`;
+    if (file) {
+        buttonLabelXml.value = 'XML seleccionado';
     } else {
         buttonLabelXml.value = 'Seleccionar XML';
     }
 };
 
-// const hasBothFiles = computed(() => hasPdfFile.value && hasXmlFile.value);
-
-
-// const submitDocuments = async () => {
-//     if (hasBothFiles.value) {
-//         const formData = new FormData();
-
-//         formData.append('factura', pdfFiles.value[0]);
-//         formData.append('xml', xmlFiles.value[0]);
-
-//         for (const [key, value] of formData.entries()) {
-//             console.log(`${key}:`, value);
-//         }
-
-//         try {
-//             const response = await axios.post(route('purchase-orders.store'), formData, {
-//                 headers: {
-//                     'Content-Type': 'multipart/form-data',
-//                 },
-//             });
-
-//             console.log('Respuesta del servidor:', response.data);
-
-//             toast.add({
-//                 severity: 'success',
-//                 summary: 'Documentos subidos',
-//                 detail: 'Los archivos se han subido correctamente.',
-//                 life: 3000,
-//             });
-//             pdfFiles.value = [];
-//             xmlFiles.value = [];
-
-//         } catch (error) {
-//             console.error("Error al subir los archivos:", error);
-//             toast.add({
-//                 severity: 'error',
-//                 summary: 'Error al subir',
-//                 detail: 'Hubo un problema al subir los archivos.',
-//                 life: 3000,
-//             });
-//         }
-//     } else {
-//         toast.add({
-//             severity: 'warn',
-//             summary: 'Archivos faltantes',
-//             detail: 'Por favor, selecciona un PDF y un XML.',
-//             life: 3000,
-//         });
-//     }
-// };
 
 const store = async () => {
     try {
@@ -166,18 +76,16 @@ const store = async () => {
         });
         const formData = new FormData();
         for (const [itemId, amount] of Object.entries(form.cantidades)) {
+            // console.log(`El item con ID ${itemId} tiene una cantidad de ${amount}.`);
             formData.append(`cantidades[${itemId}]`, amount);
         }
-        formData.append("supplier_id", form.supplier_id);
+
+        // formData.append("supplier_id", form.supplier_id);
         formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
 
-        // for (const [key, value] of formData.entries()) {
-        //     console.log(`${key}: ${value}`);
-        // }
         if (form.factura) formData.append("factura", form.factura);
         if (form.xml) formData.append("xml", form.xml);
-        // console.log(form.factura);
-        // console.log(form.xml);
+
         await axios.post(route("purchase-orders.store"), formData, {
             headers: { "Content-Type": "multipart/form-data" },
             onUploadProgress: (event) => {
@@ -208,11 +116,9 @@ const store = async () => {
             life: 3000,
         });
     } finally {
-        progress.value = 0; // Reinicia el progreso
+        progress.value = 0;
     }
 };
-
-
 
 const filtersItems = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -245,9 +151,6 @@ const showDocument = (url) => {
     currentDocumentUrl.value = url;
     dialogVisible.value = true;
 };
-
-
-
 </script>
 
 <template>
@@ -257,12 +160,6 @@ const showDocument = (url) => {
             <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
-                        <!-- <div v-if="isLooadingItems" class="overlay">
-                            <div class="spinner-container">
-                                <VueSpinnerPuff size="120" color="violet" />
-                                <p class="loading-text">CARGANDO DATOS...</p>
-                            </div>
-                        </div> -->
                         <div class="card flex justify-center">
                             <Toolbar class="p-5">
                                 <template #start>
@@ -314,7 +211,7 @@ const showDocument = (url) => {
                                 <Column header="Monto" style="min-width: 10rem">
                                     <template #body="{ data }">
                                         <span class="font-bold text-gray-800">{{ formatCurrency(data.amount)
-                                        }}</span>
+                                            }}</span>
                                     </template>
                                 </Column>
                                 <Column header="Entrega" style="min-width: 12rem">
@@ -347,8 +244,6 @@ const showDocument = (url) => {
                                                 <i class="pi pi-file-pdf text-red-500"></i>
                                                 Subir Factura (PDF)
                                             </h4>
-                                            <!-- <Message v-if="fileSizeError" severity="error">{{ fileSizeError }}</Message> -->
-
                                             <!-- <FileUpload mode="basic" name="factura" accept=".pdf" :auto="false"
                                                 @select="onFacturaUpload" chooseLabel="Seleccionar Factura"
                                                 uploadLabel="Subir" cancelLabel="Cancelar" class="w-full" />
@@ -359,7 +254,7 @@ const showDocument = (url) => {
                                                 @select="onFacturaUpload" :customUpload="true">
                                                 <template #header="{ chooseCallback }">
                                                     <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
-                                                        @click="chooseCallback()" severity="info"
+                                                        @click="chooseCallback()" severity="error"
                                                         class="p-button-sm p-button-rounded" />
                                                 </template>
                                                 <template #content="{ files }">
@@ -372,68 +267,6 @@ const showDocument = (url) => {
                                                     </div>
                                                 </template>
                                             </FileUpload>
-
-                                            <!-- <FileUpload ref="pdfUploader" v-model="pdfFiles" name="factura"
-                                                accept="application/pdf" @select="onFileSelect('pdf', $event)"
-                                                :showUploadButton="false" :showCancelButton="false" :multiple="false"
-                                                :customUpload="true" url="/api/upload">
-
-                                                <template #header="{ chooseCallback, files }">
-                                                    <div class="flex items-center gap-2">
-                                                        <Button @click="chooseCallback()" icon="pi pi-file-pdf" rounded
-                                                            variant="outlined" severity="secondary" />
-                                                        <span v-if="!hasPdfFile"
-                                                            class="text-sm text-gray-500">Seleccionar PDF</span>
-                                                        <span v-else class="text-sm font-semibold text-green-600">
-                                                            <i class="pi pi-check-circle mr-2" />
-                                                            Archivo cargado: {{ pdfFiles[0]?.name }}
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                                <template
-                                                    #content="{ files, uploadedFiles, removeUploadedFileCallback, removeFileCallback }">
-                                                    <div class="flex flex-col gap-8 pt-4">
-                                                        <div v-for="file of files" :key="file.name"
-                                                            class="p-4 border rounded-lg flex items-center justify-between shadow-sm">
-                                                            <div class="flex items-center gap-4">
-                                                                <i class="pi pi-file-pdf text-4xl text-red-500"></i>
-                                                                <div>
-                                                                    <span class="font-bold block">{{ file.name }}</span>
-                                                                    <span class="text-sm text-gray-500">{{
-                                                                        formatSize(file.size) }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex items-center gap-2">
-                                                                <Chip label="Pending"
-                                                                    class="bg-orange-400 text-white font-bold" />
-                                                                <Button icon="pi pi-times" severity="danger" text
-                                                                    @click="removeFileCallback(file)" />
-                                                            </div>
-                                                        </div>
-                                                        <div v-for="uploadedFile of uploadedFiles"
-                                                            :key="uploadedFile.name"
-                                                            class="p-4 border rounded-lg flex items-center justify-between shadow-sm">
-                                                            <div class="flex items-center gap-4">
-                                                                <i
-                                                                    class="pi pi-check-circle text-4xl text-green-500"></i>
-                                                                <div>
-                                                                    <span class="font-bold block">{{ uploadedFile.name
-                                                                    }}</span>
-                                                                    <span class="text-sm text-gray-500">{{
-                                                                        formatSize(uploadedFile.size) }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex items-center gap-2">
-                                                                <Chip label="Uploaded"
-                                                                    class="bg-green-500 text-white font-bold" />
-                                                                <Button icon="pi pi-times" severity="danger" text
-                                                                    @click="removeUploadedFileCallback(uploadedFile)" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                            </FileUpload> -->
-
                                         </div>
                                         <div class="card w-1/2 p-4 border rounded-lg shadow-sm">
                                             <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
@@ -446,11 +279,11 @@ const showDocument = (url) => {
                                             <small class="block mt-2 text-gray-500">Solo archivos XML. Máximo
                                                 1MB.</small> -->
 
-                                            <FileUpload name="xml" accept=".xml" :auto="false"
-                                                @select="onXmlUpload" :customUpload="true">
+                                            <FileUpload name="xml" accept=".xml" :auto="false" @select="onXmlUpload"
+                                                :customUpload="true">
                                                 <template #header="{ chooseCallback }">
-                                                    <Button :label="buttonLabelXML" icon="pi pi-file-excel"
-                                                        @click="chooseCallback()" severity="info"
+                                                    <Button :label="buttonLabelXml" icon="pi pi-file-excel"
+                                                        @click="chooseCallback()" severity="success"
                                                         class="p-button-sm p-button-rounded" />
                                                 </template>
                                                 <template #content="{ files }">
@@ -463,73 +296,6 @@ const showDocument = (url) => {
                                                     </div>
                                                 </template>
                                             </FileUpload>
-
-                                            <!-- <Message v-if="fileSizeError" severity="error">{{ fileSizeError }}</Message>
-                                            <FileUpload ref="xmlUploader" v-model="xmlFiles" name="xml"
-                                                url="/api/upload/xml" accept="text/xml"
-                                                @select="onFileSelect('xml', $event)" :showUploadButton="false"
-                                                :showCancelButton="false" :multiple="false" :customUpload="true">
-                                                <template #header="{ chooseCallback, files }">
-                                                    <div class="flex items-center gap-2">
-                                                        <Button @click="chooseCallback()" icon="pi pi-code" rounded
-                                                            variant="outlined" severity="secondary" />
-                                                        <span v-if="!hasXmlFile"
-                                                            class="text-sm text-gray-500">Seleccionar XML</span>
-                                                        <span v-else class="text-sm font-semibold text-green-600">
-                                                            <i class="pi pi-check-circle mr-2" />
-                                                            Archivo cargado: {{ xmlFiles[0]?.name }}
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                                <template #content="{
-                                                    files,
-                                                    uploadedFiles,
-                                                    removeUploadedFileCallback,
-                                                    removeFileCallback,
-                                                }">
-                                                    <div class="flex flex-col gap-8 pt-4">
-                                                        <div v-for="file of files" :key="file.name"
-                                                            class="p-4 border rounded-lg flex items-center justify-between shadow-sm">
-                                                            <div class="flex items-center gap-4">
-                                                                <i class="pi pi-code text-4xl text-green-600"></i>
-                                                                <div>
-                                                                    <span class="font-bold block">{{ file.name }}</span>
-                                                                    <span class="text-sm text-gray-500">{{
-                                                                        formatSize(file.size)
-                                                                    }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex items-center gap-2">
-                                                                <Chip label="Pending"
-                                                                    class="bg-orange-400 text-white font-bold" />
-                                                                <Button icon="pi pi-times" severity="danger" text
-                                                                    @click="removeFileCallback(file)" />
-                                                            </div>
-                                                        </div>
-                                                        <div v-for="uploadedFile of uploadedFiles"
-                                                            :key="uploadedFile.name"
-                                                            class="p-4 border rounded-lg flex items-center justify-between shadow-sm">
-                                                            <div class="flex items-center gap-4">
-                                                                <i
-                                                                    class="pi pi-check-circle text-4xl text-green-500"></i>
-                                                                <div>
-                                                                    <span class="font-bold block">{{ uploadedFile.name
-                                                                    }}</span>
-                                                                    <span class="text-sm text-gray-500">{{
-                                                                        formatSize(uploadedFile.size)
-                                                                    }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex items-center gap-2">
-                                                                <Chip label="Uploaded"
-                                                                    class="bg-green-500 text-white font-bold" />
-                                                                <Button icon="pi pi-times" severity="danger" text
-                                                                    @click="removeUploadedFileCallback(uploadedFile)" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                            </FileUpload> -->
                                         </div>
                                     </div>
                                     <div v-if="activeTab === 'Subir Archivos'" class="mt-6 flex justify-end">
@@ -579,20 +345,6 @@ const showDocument = (url) => {
                                                                 <i class="pi pi-file text-xl"></i>
                                                                 <span class="ml-2 hidden sm:inline">Sin PDF</span>
                                                             </span>
-
-                                                            <!-- <a v-if="slotProps.data.xml_route"
-                                                                :href="`/storage/${slotProps.data.xml_route}`"
-                                                                target="_blank"
-                                                                class="flex items-center text-green-600 hover:text-green-800 transition"
-                                                                aria-label="Descargar XML">
-                                                                <i class="pi pi-code text-xl"></i>
-                                                                <span
-                                                                    class="ml-2 font-semibold hidden sm:inline">XML</span>
-                                                            </a>
-                                                            <div v-else class="flex items-center text-gray-400">
-                                                                <i class="pi pi-file text-xl"></i>
-                                                                <span class="ml-2 hidden sm:inline">Sin XML</span>
-                                                            </div> -->
                                                         </div>
                                                     </template>
                                                 </Column>
@@ -612,56 +364,6 @@ const showDocument = (url) => {
                                         para ver.</Message>
                                 </div>
                             </Dialog>
-                            <!-- <div class="mt-10">
-                                <h2 class="text-xl font-bold flex items-center gap-2 mb-6">
-                                    <i class="pi pi-folder-open text-indigo-500"></i>
-                                    Documentos de Facturación
-                                </h2>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-                                    <Card v-for="(invoice, index) in invoices" :key="index"
-                                        class="shadow-md hover:shadow-xl transition-all duration-300 rounded-xl">
-                                        <template #header>
-                                            <div
-                                                class="flex items-center justify-between bg-gradient-to-r from-indigo-500 to-blue-600 px-4 py-3 rounded-t-xl">
-                                                <span class="font-semibold">Factura #{{ invoice.id }}</span>
-                                                <Chip :label="new Date(invoice.created_at).toLocaleDateString()"
-                                                    class="text-xs text-indigo-600 px-2 py-1 rounded-md font-medium" />
-                                            </div>
-                                        </template>
-
-                                        <template #content>
-                                            <div class="flex flex-col items-center justify-center gap-4 py-6">
-                                                <div class="flex flex-col items-center">
-                                                    <a v-if="invoice.pdf_route" :href="`/storage/${invoice.pdf_route}`"
-                                                        target="_blank"
-                                                        class="flex flex-col items-center text-red-500 hover:text-red-700 transition">
-                                                        <i class="pi pi-file-pdf text-6xl"></i>
-                                                        <span class="mt-2 text-sm font-semibold">PDF</span>
-                                                    </a>
-                                                    <div v-else class="flex flex-col items-center text-gray-400">
-                                                        <i class="pi pi-file text-6xl"></i>
-                                                        <span class="mt-2 text-sm">Sin PDF</span>
-                                                    </div>
-                                                </div>
-                                                <div class="flex flex-col items-center">
-                                                    <a v-if="invoice.xml_route" :href="`/storage/${invoice.xml_route}`"
-                                                        target="_blank"
-                                                        class="flex flex-col items-center text-green-600 hover:text-green-800 transition">
-                                                        <i class="pi pi-code text-6xl"></i>
-                                                        <span class="mt-2 text-sm font-semibold">XML</span>
-                                                    </a>
-                                                    <div v-else class="flex flex-col items-center text-gray-400">
-                                                        <i class="pi pi-file text-6xl"></i>
-                                                        <span class="mt-2 text-sm">Sin XML</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </Card>
-                                </div>
-                            </div> -->
                         </div>
                     </div>
                 </div>
