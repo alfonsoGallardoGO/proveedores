@@ -45,47 +45,47 @@ class SupplierPurchaseOrderController extends Controller
     }
     public function store(Request $request)
     {
-        return "jotolon";
-        // $data = $request;
+        // dd($request->supplier_purchase_order_id);
 
-        // $gastos = [];
-        // $articulos = [];
-        // foreach ($data['cantidades'] as $itemId => $amount) {
-        //     SupplierPurchaseOrdersItemsDelivery::create([
-        //         'supplier_purchase_orders_item_id' => $itemId,
-        //         'amount' => $amount ?? 0,
-        //     ]);
 
-        // }
+        $data = $request;
+        
+        $gastos = [];
+        $articulos = [];
+        foreach ($data['cantidades'] as $itemId => $amount) {
+            SupplierPurchaseOrdersItemsDelivery::create([
+                'supplier_purchase_orders_item_id' => $itemId,
+                'amount' => $amount ?? 0,
+            ]);
+        }
 
-        // $supplierId = Auth::user()->supplier_id ?? 1;
-        // $pdfPath = null;
-        // $xmlPath = null;
+        $supplierId = Auth::user()->supplier_id ?? 1;
+        $pdfPath = null;
+        $xmlPath = null;
 
-        // if ($request->hasFile('factura')) {
-        //     Storage::disk('public')->makeDirectory('invoices/pdf');
-        //     $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
+        if ($request->hasFile('factura')) {
+            Storage::disk('public')->makeDirectory('invoices/pdf');
+            $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
 
-        //     $pdfContent = Storage::disk('public')->get($pdfPath);
-        //     $pdfBase64  = base64_encode($pdfContent);
+            $pdfContent = Storage::disk('public')->get($pdfPath);
+            $pdfBase64  = base64_encode($pdfContent);
+        }
 
-        // }
+        if ($request->hasFile('xml')) {
+            Storage::disk('public')->makeDirectory('invoices/xml');
+            $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
 
-        // if ($request->hasFile('xml')) {
-        //     Storage::disk('public')->makeDirectory('invoices/xml');
-        //     $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
+            $xmlContent = Storage::disk('public')->get($xmlPath);
+            $xmlBase64  = base64_encode($xmlContent);
+        }
 
-        //     $xmlContent = Storage::disk('public')->get($xmlPath);
-        //     $xmlBase64  = base64_encode($xmlContent);
 
-        // }
-
-        // SupplierInvoice::create([
-        //     'supplier_id' => $supplierId,
-        //     'supplier_purchase_order_id' => $request->supplier_purchase_order_id ?? 0,
-        //     'pdf_route' => $pdfPath,
-        //     'xml_route' => $xmlPath,
-        // ]);
+        SupplierInvoice::create([
+            'supplier_id' => $supplierId,
+            'supplier_purchase_order_id' => $request->supplier_purchase_order_id ?? 0,
+            'pdf_route' => $pdfPath,
+            'xml_route' => $xmlPath,
+        ]);
 
         // $order = SupplierPurchaseOrder::where('purchase_order_id', $request->supplier_purchase_order_id)
         //     ->get();
@@ -101,14 +101,14 @@ class SupplierPurchaseOrderController extends Controller
         // $xml->registerXPathNamespace('tfd',  $ns['tfd']);
         // $xml->registerXPathNamespace('pago20', $ns['pago20']);
 
-        
+
 
         // $emisorNode   = $xml->xpath('//cfdi:Emisor')[0] ?? null;
         // $receptorNode = $xml->xpath('//cfdi:Receptor')[0] ?? null;
 
         // $rfcEmisor    = $emisorNode ? (string)$emisorNode['Rfc'] : '';
         // $rfcReceptor  = $receptorNode ? (string)$receptorNode['Rfc'] : '';
-        
+
         // $pagoNode = $xml->xpath('//pago20:Pago')[0] ?? null;
         // $monedaP  = $pagoNode ? (string)$pagoNode['MonedaP'] : 'MXN';
         // $tipoCambioP = $pagoNode ? (string)$pagoNode['TipoCambioP'] : '1';
@@ -182,8 +182,8 @@ class SupplierPurchaseOrderController extends Controller
 
         // return 1;
 
-        // return redirect()->route('purchase-orders.index')
-        //     ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
+        return redirect()->route('purchase-orders.index')
+            ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
     }
 
     public function storePurchaseOrder(Request $request)

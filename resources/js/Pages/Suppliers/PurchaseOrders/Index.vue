@@ -261,7 +261,7 @@ const getSeverity = (status) => {
                             </Column>
                         </DataTable>
 
-                        <Dialog v-model:visible="showOrder" :style="{ width: '80%' }" header="ORDEN DE COMPRA"
+                        <!-- <Dialog v-model:visible="showOrder" :style="{ width: '80%' }" header="ORDEN DE COMPRA"
                             :modal="true">
 
                             <div class="card flex justify-center" v-if="isLooadingItems">
@@ -419,7 +419,7 @@ const getSeverity = (status) => {
                                 <Button label="Cancelar" icon="pi pi-times" text @click="showOrder = false" />
                                 <Button label="Guardar" icon="pi pi-check" @click="store()" />
                             </template>
-                        </Dialog>
+                        </Dialog> -->
                     </div>
                 </div>
             </div>
