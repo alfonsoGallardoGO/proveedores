@@ -18,8 +18,6 @@ class SupplierPurchaseOrderController extends Controller
     {
         $orders = SupplierPurchaseOrder::where('supplier_external_id', $supplierId = Auth::user()->supplier_id ?? 65424)
             ->get();
-
-
         return Inertia::render('Suppliers/PurchaseOrders/Index', [
             'orders' => $orders
         ]);
@@ -47,101 +45,145 @@ class SupplierPurchaseOrderController extends Controller
     }
     public function store(Request $request)
     {
-        $data = $request;
+        return $request;
+        // $data = $request;
 
-        $gastos = [];
-        $articulos = [];
-        foreach ($data['cantidades'] as $itemId => $amount) {
-            SupplierPurchaseOrdersItemsDelivery::create([
-                'supplier_purchase_orders_item_id' => $itemId,
-                'amount' => $amount ?? 0,
-            ]);
+        // $gastos = [];
+        // $articulos = [];
+        // foreach ($data['cantidades'] as $itemId => $amount) {
+        //     SupplierPurchaseOrdersItemsDelivery::create([
+        //         'supplier_purchase_orders_item_id' => $itemId,
+        //         'amount' => $amount ?? 0,
+        //     ]);
+
+        // }
+
+        // $supplierId = Auth::user()->supplier_id ?? 1;
+        // $pdfPath = null;
+        // $xmlPath = null;
+
+        // if ($request->hasFile('factura')) {
+        //     Storage::disk('public')->makeDirectory('invoices/pdf');
+        //     $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
+
+        //     $pdfContent = Storage::disk('public')->get($pdfPath);
+        //     $pdfBase64  = base64_encode($pdfContent);
+
+        // }
+
+        // if ($request->hasFile('xml')) {
+        //     Storage::disk('public')->makeDirectory('invoices/xml');
+        //     $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
+
+        //     $xmlContent = Storage::disk('public')->get($xmlPath);
+        //     $xmlBase64  = base64_encode($xmlContent);
+
+        // }
+
+        // SupplierInvoice::create([
+        //     'supplier_id' => $supplierId,
+        //     'supplier_purchase_order_id' => $request->supplier_purchase_order_id ?? 0,
+        //     'pdf_route' => $pdfPath,
+        //     'xml_route' => $xmlPath,
+        // ]);
+
+        // $order = SupplierPurchaseOrder::where('purchase_order_id', $request->supplier_purchase_order_id)
+        //     ->get();
 
 
-            $item = SupplierPurchaseOrderItem::find($itemId);
 
-            if ($item ->type ='GASTO') {
-                $gastos[] = [
-                    "categoria"     => $item->categoria,
-                    "costo"         => (string) $amount,
-                    "ubicacion"     => $item->location,
-                    "departamento"  => $item->department,
-                    "clase"         => $item->class,
-                    "concepto"      => $item->description,
-                    // "claveprodser"  => $item->claveprodser ?? "81112101",
-                    // "Impuestos"     => [
-                    //     "Traslados" => [
-                    //         "Traslado" => [[
-                    //             "Base"       => (string) $amount,
-                    //             "Impuesto"   => "002",
-                    //             "TipoFactor" => "Tasa",
-                    //             "TasaOCuota" => "0.160000",
-                    //             "Importe"    => (string) round($amount * 0.16, 2)
-                    //         ]]
-                    //     ]
-                    // ]
-                ];
-            }
+        // $path = storage_path('app/public/invoices/xml/vM7xw0qvKIXTyT8BV7ixNQAt0WQceSdC1fJUmbAZ.xml');
+        // $xmlContent = file_get_contents($path);
+        // $xml = simplexml_load_string($xmlContent);
+
+        // $ns = $xml->getNamespaces(true);
+        // $xml->registerXPathNamespace('cfdi', $ns['cfdi']);
+        // $xml->registerXPathNamespace('tfd',  $ns['tfd']);
+        // $xml->registerXPathNamespace('pago20', $ns['pago20']);
+
+        
+
+        // $emisorNode   = $xml->xpath('//cfdi:Emisor')[0] ?? null;
+        // $receptorNode = $xml->xpath('//cfdi:Receptor')[0] ?? null;
+
+        // $rfcEmisor    = $emisorNode ? (string)$emisorNode['Rfc'] : '';
+        // $rfcReceptor  = $receptorNode ? (string)$receptorNode['Rfc'] : '';
+        
+        // $pagoNode = $xml->xpath('//pago20:Pago')[0] ?? null;
+        // $monedaP  = $pagoNode ? (string)$pagoNode['MonedaP'] : 'MXN';
+        // $tipoCambioP = $pagoNode ? (string)$pagoNode['TipoCambioP'] : '1';
+        // $montoPago   = $pagoNode ? (string)$pagoNode['Monto'] : '0';
+
+        // $conceptoNode = $xml->xpath('//cfdi:Concepto')[0] ?? null;
+        // $claveProdServPago = $conceptoNode ? (string)$conceptoNode['ClaveProdServ'] : '0';
 
 
-        }
+        // $trasladosP = $xml->xpath('//pago20:TrasladoP') ?? [];
 
-        $supplierId = Auth::user()->supplier_id ?? 1;
-        $pdfPath = null;
-        $xmlPath = null;
+        // $termino      = "4";
+        // $departamento = "106";
+        // $clase        = "490";
+        // $operacion    = "3";
+        // $ubicacion    = "533";
+        // $categoria    = "125";
 
-        if ($request->hasFile('factura')) {
-            Storage::disk('public')->makeDirectory('invoices/pdf');
-            $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
+        // $gastos = [];
+        // foreach ($trasladosP as $item_traslado) {
+        //     $baseP      = (string)$item_traslado['BaseP'];   
+        //     $impuestoP  = (string)$item_traslado['ImpuestoP'];
+        //     $tipoFactor = (string)$item_traslado['TipoFactorP'];
+        //     $tasaOCuota = (string)$item_traslado['TasaOCuotaP'];
+        //     $importeP   = (string)$item_traslado['ImporteP'];
 
-            $pdfContent = Storage::disk('public')->get($pdfPath);
-            $pdfBase64  = base64_encode($pdfContent);
+        //     $gastos[] = [
+        //         "categoria"     => $categoria,
+        //         "costo"         => (string) (float) $baseP,
+        //         "ubicacion"     => $ubicacion,
+        //         "departamento"  => $departamento,
+        //         "clase"         => $clase,
+        //         "concepto"      => "Pago",
+        //         "claveprodser"  => $claveProdServPago,
+        //         "Impuestos"     => [
+        //             "Traslados" => [
+        //                 "Traslado" => [[
+        //                     "Base"       => (string) (float) $baseP,
+        //                     "Impuesto"   => $impuestoP,
+        //                     "TipoFactor" => $tipoFactor,
+        //                     "TasaOCuota" => $tasaOCuota,
+        //                     "Importe"    => (string) (float) $importeP,
+        //                 ]]
+        //             ]
+        //         ]
+        //     ];
+        // }
 
-        }
 
-        if ($request->hasFile('xml')) {
-            Storage::disk('public')->makeDirectory('invoices/xml');
-            $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
+        // $jsonPayload = [
+        //     "rfc"            => 0 ,
+        //     "nfactura"       => "27249",
+        //     "regimenfiscal"  => "626",
+        //     "moneda"         => "MXN",
+        //     "termino"        => "4",
+        //     "departamento"   => "106",
+        //     "clase"          => "490",
+        //     "operacion"      => "3",
+        //     "tipocambio"     => 0,
+        //     "fecha"          => "04/08/2025",
+        //     "ubicacion"      => "533",
+        //     "idnetsuite"     => "",
+        //     "uuid"           => "AB05BA85-C615-456C-8580-600D3C0EDDA8",
+        //     "gastos"         =>$gastos,
+        //     "articulos"      => 0,
+        //     "nota"           => "",
+        //     "generico"       => "",
+        //     "xml" => 0,
+        //     "pdf" => 0
+        // ];
 
-            $xmlContent = Storage::disk('public')->get($xmlPath);
-            $xmlBase64  = base64_encode($xmlContent);
+        // return 1;
 
-        }
-
-        SupplierInvoice::create([
-            'supplier_id' => $supplierId,
-            'supplier_purchase_order_id' => $request->supplier_purchase_order_id ?? 0,
-            'pdf_route' => $pdfPath,
-            'xml_route' => $xmlPath,
-        ]);
-
-        $order = SupplierPurchaseOrder::where('purchase_order_id', $request->supplier_purchase_order_id)
-            ->get();
-
-        $jsonPayload = [
-            "rfc"            =>  $order->rfc,
-            "nfactura"       => "27249",
-            "regimenfiscal"  => "626",
-            "moneda"         => "MXN",
-            "termino"        => "4",
-            "departamento"   => "106",
-            "clase"          => "490",
-            "operacion"      => "3",
-            "tipocambio"     => 0,
-            "fecha"          => "04/08/2025",
-            "ubicacion"      => "533",
-            "idnetsuite"     => "",
-            "uuid"           => "AB05BA85-C615-456C-8580-600D3C0EDDA8",
-            "gastos"         => $gastos,
-            "articulos"      => $articulos,
-            "nota"           => "",
-            "generico"       => "",
-            "xml" => $xmlBase64,
-            "pdf" => $pdfBase64
-        ];
-
-        return redirect()->route('purchase-orders.index')
-            ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
+        // return redirect()->route('purchase-orders.index')
+        //     ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
     }
 
     public function storePurchaseOrder(Request $request)
