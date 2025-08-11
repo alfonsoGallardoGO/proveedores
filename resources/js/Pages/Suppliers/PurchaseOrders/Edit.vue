@@ -17,10 +17,10 @@ const props = defineProps({
     items: Array,
 });
 
-onMounted(() => {
-    console.log('Datos de invoices:', props.invoices);
-    console.log('Datos de items:', props.items);
-});
+// onMounted(() => {
+//     console.log('Datos de invoices:', props.invoices);
+//     console.log('Datos de items:', props.items);
+// });
 
 
 const toast = useToast();
@@ -109,8 +109,6 @@ const store = async () => {
                 },
             });
 
-            toast.removeGroup("headless");
-
             toast.add({
                 severity: "success",
                 summary: "Guardado",
@@ -122,12 +120,10 @@ const store = async () => {
     } catch (error) {
         console.error(error);
 
-        toast.removeGroup("headless");
-
         toast.add({
             severity: "error",
             summary: "Error",
-            detail: "Hubo un problema al guardar",
+            detail: "Hubo un problema al guardar los datos",
             life: 3000,
         });
     } finally {
@@ -166,6 +162,7 @@ const showDocument = (url) => {
     currentDocumentUrl.value = url;
     dialogVisible.value = true;
 };
+
 </script>
 
 <template>
@@ -175,6 +172,7 @@ const showDocument = (url) => {
             <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
+                        <Toast />
                         <div class="card flex justify-center">
                             <Toolbar class="p-5">
                                 <template #start>
