@@ -68,6 +68,7 @@ class SupplierPurchaseOrderController extends Controller
         $supplierId = Auth::user()->supplier_id ?? 1;
         $pdfPath = null;
         $xmlPath = null;
+        
 
         if ($request->hasFile('factura')) {
             Storage::disk('public')->makeDirectory('invoices/pdf');
