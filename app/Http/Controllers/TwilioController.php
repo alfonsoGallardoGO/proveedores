@@ -92,7 +92,7 @@ class TwilioController extends Controller
         $client = new Client($sid, $token);
 
         try {
-            $pdfUrl = "https://proveedores.grupo-ortiz.site/{$pdfRuta}";
+            
             $message = $client->messages->create(
                 "whatsapp:$telefono",
                 [
@@ -101,8 +101,8 @@ class TwilioController extends Controller
                     'contentVariables' => json_encode([
                         '1'       => $request->proveedor,
                         '2'       => $request->receiptId,
+                        '3'       => $pdfRuta,
                     ]),
-                    'mediaUrl' => [$pdfUrl]
                 ]
             );
 
