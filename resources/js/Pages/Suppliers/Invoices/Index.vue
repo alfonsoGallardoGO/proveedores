@@ -163,7 +163,24 @@ const tableData = computed(() => {
     return result;
 });
 
-
+const getSeverity = (status) => {
+    switch (status) {
+        case "Recepción pendiente":
+            return "warning";
+        case "Cerrada":
+            return "success";
+        case "Parcialmente recibida":
+            return "info";
+        case "Factura pendiente":
+            return "danger";
+        case "Totalmente facturada":
+            return "success";
+        case "Facturación pendiente/parcialmente recibido":
+            return "warning";
+        default:
+            return "secondary";
+    }
+};
 </script>
 
 <template>
@@ -200,15 +217,33 @@ const tableData = computed(() => {
                                 style="width: 3rem"
                                 :exportable="false"
                             ></Column> -->
-                            <Column field="id" header="Id" sortable style="min-width: 12rem"></Column>
-                            <Column field="status" header="Estatus" sortable style="min-width: 16rem" bodyClass="ml-2">
+                            <Column field="id" header="Id" sortable style="min-width: 8rem"></Column>
+                            <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 12rem"
+                                bodyClass="ml-2"></Column>
+                            <Column field="impuesto" header="Impuestos" sortable style="min-width: 8rem"
+                                bodyClass="ml-2"></Column>
+                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 8rem"
+                                bodyClass="ml-2"></Column>
+                            <Column field="total" header="Total" sortable style="min-width: 8rem" bodyClass="ml-2">
                             </Column>
-                            <Column field="date" header="Fecha" sortable style="min-width: 10rem" bodyClass="ml-2">
-                            </Column>
-                            <Column :exportable="false" header="Ver Factura" style="min-width: 2rem">
+                            <Column field="status" header="Estatus" sortable style="min-width: 16rem">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-file-pdf" outlined rounded severity="danger" class="mr-2"
-                                        @click="showCompletedInvoices($event, slotProps.data.id)" />
+                                    <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)"
+                                        rounded />
+                                </template>
+                            </Column>
+                            <Column field="date" header="Fecha" sortable style="min-width: 8rem" bodyClass="ml-2">
+                            </Column>
+                            <Column :exportable="false" header="Facturas" style="min-width: 13rem">
+                                <template #body="slotProps">
+                                    <!-- <Button icon="pi pi-file-pdf" outlined severity="danger" class="w-full py-0.5"
+                                        @click="showCompletedInvoices($event, slotProps.data.id)" /> -->
+                                    <Button 
+                                        label="Facturas Cargadas"
+                                        outlined 
+                                        severity="danger" 
+                                        @click="showCompletedInvoices($event, slotProps.data.id)" 
+                                    />
                                 </template>
                             </Column>
                         </DataTable>
@@ -219,8 +254,9 @@ const tableData = computed(() => {
                                     style="border: none;"></iframe>
                             </div>
                         </Dialog>
-
-                        <Dialog v-model:visible="showFiltrer" header="Aplicar Filtros" :style="{ width: '35rem' }">
+                        <!-- FILTROS PARA BUSCAR RESULTADOS EN TABLA -->
+                        <Dialog v-model:visible="showFiltrer" header="Aplicar Filtros" :style="{ width: '35rem' }"
+                            :position="'top'" :modal="true" :draggable="false">
                             <div class="flex items-center gap-4 mb-8">
                                 <Select v-model="selectedStatus" :options="statuses" optionLabel="name"
                                     placeholder="Selecciona el estatus" class="w-full md:w-65" />
@@ -243,16 +279,9 @@ const tableData = computed(() => {
                         </Dialog>
                         <Popover ref="op">
                             <div class="flex flex-col gap-4">
-                                <Select 
-                                    v-model="selectedInvoices"
-                                    filter
-                                    :options="invoices" 
-                                    optionLabel="label"
-                                    optionValue="value" 
-                                    placeholder="Selecciona una factura" 
-                                    class="w-full md:w-26"
-                                    @change="handleInvoiceSelect" 
-                                />
+                                <Select v-model="selectedInvoices" filter :options="invoices" optionLabel="label"
+                                    optionValue="value" placeholder="Selecciona una factura" class="w-full md:w-26"
+                                    @change="handleInvoiceSelect" />
                             </div>
                         </Popover>
                     </div>
