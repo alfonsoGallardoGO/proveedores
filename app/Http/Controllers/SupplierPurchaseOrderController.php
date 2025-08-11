@@ -261,7 +261,8 @@ class SupplierPurchaseOrderController extends Controller
 
     public function xml(Request $request)
     {
-        $path = storage_path('app/public/invoices/xml/prueba_xml.xml');
+        
+        $path = storage_path('app/public/invoices/xml/jdsL7BXETZ8dMpw9XgWWGWQPLDhRn1pqgTuiC7xK.xml');
 
         if (!file_exists($path)) {
             abort(404, 'XML no encontrado');
@@ -433,8 +434,8 @@ class SupplierPurchaseOrderController extends Controller
         // $xmlBase64 = base64_encode($xmlContent);
         // $pdfBase64 = "";
 
-        $pdfPath = storage_path('app/public/invoices/pdf/3k7iu4Ic9anZsJAThPjsBYbmH8FEad3mWriV6pwB.pdf');
-        $xmlPath = storage_path('app/public/invoices/xml/prueba_xml.xml');
+        $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
+        $xmlPath = storage_path('app/public/invoices/xml/jdsL7BXETZ8dMpw9XgWWGWQPLDhRn1pqgTuiC7xK.xml');
 
         $pdfBase64 = base64_encode(file_get_contents($pdfPath));
         $xmlBase64 = base64_encode(file_get_contents($xmlPath));
