@@ -36,7 +36,6 @@ class TwilioController extends Controller
         if ($request->filled('pdfBase64')) {
             $base64 = $request->pdfBase64;
 
-            // Si viene con encabezado data URI lo quitamos
             if (str_starts_with($base64, 'data:')) {
                 $base64 = preg_replace('/^data:application\/pdf;base64,/', '', $base64);
             }
@@ -44,16 +43,42 @@ class TwilioController extends Controller
 
             $binary = base64_decode($base64, true);
 
-            if ($binary !== false) {
-                // Guardar en storage/public/whatsapp/receipts
-                $filename = 'receipt_'.Str::uuid().'.pdf';
-                $path = "whatsapp/receipts/{$filename}";
-                Storage::disk('public')->makeDirectory('whatsapp/receipts');
-                Storage::disk('public')->put($path, $binary);
+            // if ($binary !== false) {
 
-                $pdfRuta = $path;
+            //     $filename = 'receipt_'.Str::uuid().'.pdf';
+            //     $path = "whatsapp/receipts/{$filename}";
+            //     Storage::disk('public')->makeDirectory('whatsapp/receipts');
+            //     Storage::disk('public')->put($path, $binary);
+
+            //     $pdfRuta = $path;
+            //     $pdfBase64 = $base64;
+            // }
+
+            if ($binary !== false) {
+                $filename = 'receipt_' . Str::uuid() . '.pdf';
+
+                // Ruta física en /public/whatsapp/receipts
+                $folderPath = public_path('whatsapp/receipts');
+
+                // Crear carpeta si no existe
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0775, true);
+                }
+
+                // Guardar archivo
+                file_put_contents($folderPath . '/' . $filename, $binary);
+
+                // Ruta relativa para guardar en BD
+                $pdfRuta = "whatsapp/receipts/{$filename}";
+
+                // Base64 original si quieres guardarlo también
                 $pdfBase64 = $base64;
+
+                // URL pública accesible desde navegador
+                $pdfUrl = url($pdfRuta);
             }
+
+
         }
 
 
@@ -64,7 +89,7 @@ class TwilioController extends Controller
             'date'                 => $fechaDb,
             'phone'                => $request->numeroWhatsapp,
             'pdf_base_64'          => null,
-            'pdf_rute'             => null,
+            'pdf_rute'             => $pdfRuta ?? null,
         ]);
 
         // $sid = env('TWILIO_SID');
