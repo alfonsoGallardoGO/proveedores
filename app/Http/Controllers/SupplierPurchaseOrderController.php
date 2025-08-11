@@ -465,65 +465,66 @@ class SupplierPurchaseOrderController extends Controller
             "pdf"           => $pdfBase64,
         ];
         
+
         $data = [
-            [
-                "idproveedor" => "65424",
-                "iddoc" => "4414137",
-                "tipo_doc" => "PurchOrd",
-                "rfc" => "FIRA860812RX3",
-                "nfactura" => "15329",
-                "regimenfiscal" => "601",
-                "moneda" => "MXN",
-                "termino" => "4",
-                "departamento" => "106",
-                "clase" => "490",
-                "operacion" => "3",
-                "tipocambio" => 1,
-                "fecha" => "26/09/2024",
-                "ubicacion" => "533",
-                "idnetsuite" => "",
-                "uuid" => "9c5e171f-0561-46f1-8496-f7e8b644ddc7",
-                "gastos" => [
-                    [
-                        "categoria" => "125",
-                        "costo" => "8000",
-                        "ubicacion" => "533",
-                        "departamento" => "106",
-                        "clase" => "490",
-                        "concepto" => "Pago relacionado TCAM 23897",
-                        "claveprodser" => "84111506",
-                        "Impuestos" => [
-                            "Traslados" => [
-                                "Traslado" => [
-                                    [
-                                        "Base" => "8000",
-                                        "Impuesto" => "002",
-                                        "TipoFactor" => "Tasa",
-                                        "TasaOCuota" => "0.160000",
-                                        "Importe" => "1"
-                                    ]
+            "idproveedor" => "65424",
+            "iddoc" => "4414137",
+            "tipo_doc" => "PurchOrd",
+            "rfc" => "SET0912148T6",
+            "nfactura" => "74186",
+            "regimenfiscal" => "601",
+            "moneda" => "MXN",
+            "termino" => "4",
+            "departamento" => "105",
+            "clase" => "447",
+            "operacion" => "3",
+            "tipocambio" => 0,
+            "fecha" => "11/08/2025",
+            "ubicacion" => "128",
+            "idnetsuite" => "",
+            "uuid" => "729D0E96-CEDB-4C50-AAAD-13CB4A797065",
+            "gastos" => [
+                [
+                    "categoria" => "112",
+                    "costo" => "68.97",
+                    "ubicacion" => "128",
+                    "departamento" => "105",
+                    "clase" => "447",
+                    "concepto" => "Telefonia Telefonía Neg Ilim Plus Mensualidad Princ - Del 01/08/2025 al 31/08/2025",
+                    "claveprodser" => "81161700",
+                    "Impuestos" => [
+                        "Traslados" => [
+                            "Traslado" => [
+                                [
+                                    "Base" => "68.970000",
+                                    "Impuesto" => "002",
+                                    "TipoFactor" => "Tasa",
+                                    "TasaOCuota" => "0.160000",
+                                    "Importe" => "11.03"
                                 ]
                             ]
                         ]
                     ]
-                ],
-                "articulos" => [],
-                "nota" => "",
-                "generico" => "",
-                "xml" =>$xmlBase64,
-                "pdf" =>$pdfBase64
-            ]
+                ]
+            ],
+            "articulos" => [],
+            "nota" => "TELEFONIA NEG LLIUM PLUS MES DE AGOSTO",
+            "generico" => "8345",
+            "xml" =>$xmlBase64,
+            "pdf" =>$pdfBase64
         ];
 
-        return $data;
+        
 
-        // $restletPath = "/restlet.nl?script=5141&deploy=1";
-        // try {
-        //     $response = $this->netSuiteRestService->request($restletPath, 'POST', $data);
-        //     return response()->json(['ok' => true, 'response' => $response]);
-        // } catch (\Throwable $e) {
-        //     return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
-        // }
+        // return $data;
+
+        $restletPath = "/restlet.nl?script=5141&deploy=1";
+        try {
+            $response = $this->netSuiteRestService->request($restletPath, 'POST', $data);
+            return response()->json(['ok' => true, 'response' => $response]);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+        }
     }
 
 }
