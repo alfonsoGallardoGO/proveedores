@@ -86,23 +86,32 @@ const store = async () => {
         if (form.factura) formData.append("factura", form.factura);
         if (form.xml) formData.append("xml", form.xml);
 
-        await axios.post(route("purchase-orders.store"), formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-            onUploadProgress: (event) => {
-                if (event.total) {
-                    progress.value = Math.round((event.loaded * 100) / event.total);
-                }
-            },
-        });
+        if (!form.factura && !form.xml) {
+            toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: "Hubo un problema al guardar",
+                life: 3000,
+            });
+        } else {
+            await axios.post(route("purchase-orders.store"), formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                onUploadProgress: (event) => {
+                    if (event.total) {
+                        progress.value = Math.round((event.loaded * 100) / event.total);
+                    }
+                },
+            });
 
-        toast.removeGroup("headless");
+            toast.removeGroup("headless");
 
-        toast.add({
-            severity: "success",
-            summary: "Guardado",
-            detail: "Datos guardados correctamente",
-            life: 3000,
-        });
+            toast.add({
+                severity: "success",
+                summary: "Guardado",
+                detail: "Datos guardados correctamente",
+                life: 3000,
+            });
+        }
 
     } catch (error) {
         console.error(error);
@@ -211,7 +220,7 @@ const showDocument = (url) => {
                                 <Column header="Monto" style="min-width: 10rem">
                                     <template #body="{ data }">
                                         <span class="font-bold text-gray-800">{{ formatCurrency(data.amount)
-                                            }}</span>
+                                        }}</span>
                                     </template>
                                 </Column>
                                 <Column header="Entrega" style="min-width: 12rem">
@@ -237,25 +246,19 @@ const showDocument = (url) => {
                                     </Tabs>
                                 </div>
 
-                                <div class="tab-content">
+                                <div class="tab-content0 mt-4">
                                     <div v-if="activeTab === 'Subir Archivos'" class="flex gap-4">
                                         <div class="card w-1/2 p-4 border rounded-lg shadow-sm">
                                             <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
                                                 <i class="pi pi-file-pdf text-red-500"></i>
                                                 Subir Factura (PDF)
                                             </h4>
-                                            <!-- <FileUpload mode="basic" name="factura" accept=".pdf" :auto="false"
-                                                @select="onFacturaUpload" chooseLabel="Seleccionar Factura"
-                                                uploadLabel="Subir" cancelLabel="Cancelar" class="w-full" />
-                                            <small class="block mt-2 text-gray-500">Solo archivos PDF. Máximo
-                                                2MB.</small> -->
-
                                             <FileUpload name="factura" accept=".pdf" :auto="false"
                                                 @select="onFacturaUpload" :customUpload="true">
                                                 <template #header="{ chooseCallback }">
                                                     <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
                                                         @click="chooseCallback()" severity="error"
-                                                        class="p-button-sm p-button-rounded" />
+                                                        class="p-button-sm p-button-rounded" outlined />
                                                 </template>
                                                 <template #content="{ files }">
                                                     <div v-for="file of files" :key="file.name"
@@ -273,18 +276,12 @@ const showDocument = (url) => {
                                                 <i class="pi pi-code text-green-600"></i>
                                                 Subir XML
                                             </h4>
-                                            <!-- <FileUpload mode="basic" name="xml" accept=".xml" :auto="false"
-                                                @select="onXmlUpload" chooseLabel="Seleccionar XML" uploadLabel="Subir"
-                                                cancelLabel="Cancelar" class="w-full" />
-                                            <small class="block mt-2 text-gray-500">Solo archivos XML. Máximo
-                                                1MB.</small> -->
-
                                             <FileUpload name="xml" accept=".xml" :auto="false" @select="onXmlUpload"
                                                 :customUpload="true">
                                                 <template #header="{ chooseCallback }">
                                                     <Button :label="buttonLabelXml" icon="pi pi-file-excel"
                                                         @click="chooseCallback()" severity="success"
-                                                        class="p-button-sm p-button-rounded" />
+                                                        class="p-button-sm p-button-rounded" outlined />
                                                 </template>
                                                 <template #content="{ files }">
                                                     <div v-for="file of files" :key="file.name"
@@ -298,11 +295,17 @@ const showDocument = (url) => {
                                             </FileUpload>
                                         </div>
                                     </div>
-                                    <div v-if="activeTab === 'Subir Archivos'" class="mt-6 flex justify-end">
-                                        <Button label="Subir Documentos" icon="pi pi-cloud-upload" severity="help"
-                                            @click="store()" />
+                                    <div v-if="activeTab === 'Subir Archivos'" class="flex flex-col gap-4">
+                                        <div class="flex gap-4">
+                                        </div>
+
+                                        <div class="flex justify-center w-full">
+                                            <div class="card p-4">
+                                                <Button label="Subir Documentos" icon="pi pi-cloud-upload"
+                                                    severity="help" @click="store()" outlined class="w-80" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="pb-12"></div>
                                     <div v-if="activeTab === 'Lista de Documentos'">
                                         <div class="card">
                                             <DataTable :value="invoices" stripedRows paginator :rows="10"
