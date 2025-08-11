@@ -37,6 +37,8 @@ import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import Message from 'primevue/message';
+import DatePicker from 'primevue/datepicker';
+
 
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
@@ -142,6 +144,7 @@ createInertiaApp({
         app.component("TabList", TabList);
         app.component("Tab", Tab);
         app.component("Message", Message);
+        app.component("DatePicker", DatePicker);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {

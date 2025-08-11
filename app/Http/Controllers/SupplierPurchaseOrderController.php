@@ -39,12 +39,15 @@ class SupplierPurchaseOrderController extends Controller
 
     public function show($id)
     {
+        // dd($id);
         $items = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $id)
             ->withSum('deliveries', 'amount')
             ->get();
+        // dd($items);
 
         $invoices = SupplierInvoice::where('supplier_purchase_order_id', $id)->get();
 
+        // dd($invoices);
 
         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,

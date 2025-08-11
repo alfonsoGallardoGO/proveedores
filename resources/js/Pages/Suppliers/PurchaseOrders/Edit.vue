@@ -17,6 +17,12 @@ const props = defineProps({
     items: Array,
 });
 
+onMounted(() => {
+    console.log('Datos de invoices:', props.invoices);
+    console.log('Datos de items:', props.items);
+});
+
+
 const toast = useToast();
 const dtItems = ref();
 const progress = ref(0);

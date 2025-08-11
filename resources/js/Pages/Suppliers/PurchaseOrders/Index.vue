@@ -14,6 +14,11 @@ const props = defineProps({
     orders: Array,
 });
 
+onMounted(() => {
+    console.log('Datos de orders:', props.orders);
+});
+
+
 const navigateToOrders = (id) => {
     router.visit(route('suppliers.orders-files'), {
         method: 'post',
