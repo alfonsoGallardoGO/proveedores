@@ -56,28 +56,20 @@ class TwilioController extends Controller
 
             if ($binary !== false) {
                 $filename = 'receipt_' . Str::uuid() . '.pdf';
-
-                // Ruta física en /public/whatsapp/receipts
                 $folderPath = public_path('whatsapp/receipts');
 
-                // Crear carpeta si no existe
                 if (!file_exists($folderPath)) {
                     mkdir($folderPath, 0775, true);
                 }
 
-                // Guardar archivo
                 file_put_contents($folderPath . '/' . $filename, $binary);
 
-                // Ruta relativa para guardar en BD
                 $pdfRuta = "whatsapp/receipts/{$filename}";
 
-                // Base64 original si quieres guardarlo también
                 $pdfBase64 = $base64;
 
-                // URL pública accesible desde navegador
                 $pdfUrl = url($pdfRuta);
             }
-
 
         }
 
@@ -92,38 +84,41 @@ class TwilioController extends Controller
             'pdf_rute'             => $pdfRuta ?? null,
         ]);
 
-        // $sid = env('TWILIO_SID');
-        // $token = env('TWILIO_TOKEN');
-        // $from = env('TWILIO_WHATSAPP_FROM');
-        // $templateSid = env('TWILIO_TEMPLATE_SID');
+        $sid = env('TWILIO_SID');
+        $token = env('TWILIO_TOKEN');
+        $from = env('TWILIO_WHATSAPP_FROM');
+        $templateSid = env('TWILIO_TEMPLATE_SID');
     
-        // $client = new Client($sid, $token);
+        $client = new Client($sid, $token);
 
-        // try {
-        //     $message = $client->messages->create(
-        //         "whatsapp:$telefono",
-        //         [
-        //             'from' => $from,
-        //             'contentSid' => $templateSid,
-        //             'contentVariables' => json_encode([
-        //                 '1' => $orderNumber,
-        //             ]),
-        //         ]
-        //     );
+        try {
+            $pdfUrl = "https://proveedores.grupo-ortiz.site/{$pdfRuta}";
+            $message = $client->messages->create(
+                "whatsapp:$telefono",
+                [
+                    'from' => $from,
+                    'contentSid' => $templateSid,
+                    'contentVariables' => json_encode([
+                        '1'       => $request->proveedor,
+                        '2'       => $request->receiptId,
+                    ]),
+                    'mediaUrl' => [$pdfUrl]
+                ]
+            );
 
-        //     return response()->json([
-        //         'success' => true,
-        //         'sid' => $message->sid,
-        //         'message' => 'Mensaje enviado correctamente',
-        //     ]);
-        // } catch (\Exception $e) {
-        //     \Log::error('Error al enviar WhatsApp: ' . $e->getMessage());
+            return response()->json([
+                'success' => true,
+                'sid' => $message->sid,
+                'message' => 'Mensaje enviado correctamente',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error al enviar WhatsApp: ' . $e->getMessage());
 
-        //     return response()->json([
-        //         'success' => false,
-        //         'error' => $e->getMessage(),
-        //     ], 500);
-        // }
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
 
