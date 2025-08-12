@@ -74,15 +74,9 @@ const onXmlUpload = (event) => {
 const store = async () => {
     try {
         progress.value = 0;
-        toast.add({
-            severity: 'info',
-            summary: 'Subiendo archivos...',
-            group: 'headless',
-            life: 999999,
-        });
+
         const formData = new FormData();
         for (const [itemId, amount] of Object.entries(form.cantidades)) {
-            // console.log(`El item con ID ${itemId} tiene una cantidad de ${amount}.`);
             formData.append(`cantidades[${itemId}]`, amount);
         }
 
@@ -96,26 +90,27 @@ const store = async () => {
             toast.add({
                 severity: "error",
                 summary: "Error",
-                detail: "Hubo un problema al guardar",
-                life: 3000,
+                detail: "Los documentos no pueden ir vacios, favor de cargar la Factura y el XML.",
+                life: 4000,
             });
-        } else {
-            await axios.post(route("purchase-orders.store"), formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-                onUploadProgress: (event) => {
-                    if (event.total) {
-                        progress.value = Math.round((event.loaded * 100) / event.total);
-                    }
-                },
-            });
-
-            toast.add({
-                severity: "success",
-                summary: "Guardado",
-                detail: "Datos guardados correctamente",
-                life: 3000,
-            });
+            return;
         }
+        await axios.post(route("purchase-orders.store"), formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (event) => {
+                if (event.total) {
+                    progress.value = Math.round((event.loaded * 100) / event.total);
+                }
+            },
+        });
+
+        toast.add({
+            severity: "success",
+            summary: "Guardado",
+            detail: "Datos guardados correctamente",
+            life: 3000,
+        });
+
 
     } catch (error) {
         console.error(error);
@@ -161,6 +156,18 @@ const currentDocumentUrl = ref('');
 const showDocument = (url) => {
     currentDocumentUrl.value = url;
     dialogVisible.value = true;
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
 };
 
 </script>
@@ -260,9 +267,14 @@ const showDocument = (url) => {
                                             <FileUpload name="factura" accept=".pdf" :auto="false"
                                                 @select="onFacturaUpload" :customUpload="true">
                                                 <template #header="{ chooseCallback }">
-                                                    <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
-                                                        @click="chooseCallback()" severity="error"
-                                                        class="p-button-sm p-button-rounded" outlined />
+                                                    <Button 
+                                                        :label="buttonLabelPdf" 
+                                                        icon="pi pi-file-pdf"
+                                                        @click="chooseCallback()" 
+                                                        severity="danger"
+                                                        class="p-button-sm p-button-rounded" 
+                                                        outlined 
+                                                    />
                                                 </template>
                                                 <template #content="{ files }">
                                                     <div v-for="file of files" :key="file.name"
@@ -283,9 +295,14 @@ const showDocument = (url) => {
                                             <FileUpload name="xml" accept=".xml" :auto="false" @select="onXmlUpload"
                                                 :customUpload="true">
                                                 <template #header="{ chooseCallback }">
-                                                    <Button :label="buttonLabelXml" icon="pi pi-file-excel"
-                                                        @click="chooseCallback()" severity="success"
-                                                        class="p-button-sm p-button-rounded" outlined />
+                                                    <Button 
+                                                        :label="buttonLabelXml" 
+                                                        icon="pi pi-file-excel"
+                                                        @click="chooseCallback()" 
+                                                        severity="success"
+                                                        class="p-button-sm p-button-rounded" 
+                                                        outlined 
+                                                    />
                                                 </template>
                                                 <template #content="{ files }">
                                                     <div v-for="file of files" :key="file.name"
@@ -337,17 +354,20 @@ const showDocument = (url) => {
                                                 <Column field="created_at" header="Fecha" sortable
                                                     style="min-width: 12rem">
                                                     <template #body="slotProps">
-                                                        {{ new Date(slotProps.data.created_at).toLocaleDateString() }}
+                                                        {{ formatDate(slotProps.data.created_at) }}
                                                     </template>
                                                 </Column>
                                                 <Column header="Documentos" style="min-width: 16rem">
                                                     <template #body="slotProps">
                                                         <div class="flex items-center gap-4">
-                                                            <Button v-if="slotProps.data.pdf_route"
+                                                            <Button 
+                                                                v-if="slotProps.data.pdf_route"
                                                                 @click="showDocument(`/storage/${slotProps.data.pdf_route}`)"
                                                                 label="Ver PDF" icon="pi pi-file-pdf"
                                                                 class="p-button-sm p-button-outlined"
-                                                                aria-label="Ver PDF" />
+                                                                aria-label="Ver PDF"
+                                                                severity="danger" 
+                                                            />
                                                             <span v-else class="flex items-center text-gray-400">
                                                                 <i class="pi pi-file text-xl"></i>
                                                                 <span class="ml-2 hidden sm:inline">Sin PDF</span>

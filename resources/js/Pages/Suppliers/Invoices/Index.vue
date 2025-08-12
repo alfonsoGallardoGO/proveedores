@@ -67,6 +67,14 @@ const selectedInvoices = ref(null);
 const currentOpenPopoverId = ref(null);
 const invoicePdfRoute = ref(null);
 const showInvoice = ref(false);
+const filteredInvoices = ref([]);
+
+const onFilter = (event) => {
+    const filterValue = event.value.toLowerCase();
+    filteredInvoices.value = invoices.value.filter(invoice => {
+        return invoice.label.toLowerCase().includes(filterValue);
+    });
+};
 
 const handleInvoiceSelect = () => {
     if (selectedInvoices.value) {
@@ -98,7 +106,13 @@ const showCompletedInvoices = async (event, id) => {
             .filter(invoice => invoice.pdf_route)
             .map(invoice => {
                 const fecha = new Date(invoice.created_at);
-                const fechaFormateada = fecha.toLocaleDateString();
+                // Obtiene el día, mes y año de la fecha
+                const day = String(fecha.getDate()).padStart(2, '0');
+                const month = String(fecha.getMonth() + 1).padStart(2, '0');
+                const year = fecha.getFullYear();
+
+                // Combina las partes en el formato deseado
+                const fechaFormateada = `${day}-${month}-${year}`;
                 return {
                     label: fechaFormateada,
                     value: invoice.pdf_route
@@ -181,6 +195,8 @@ const getSeverity = (status) => {
             return "secondary";
     }
 };
+
+
 </script>
 
 <template>
@@ -238,12 +254,8 @@ const getSeverity = (status) => {
                                 <template #body="slotProps">
                                     <!-- <Button icon="pi pi-file-pdf" outlined severity="danger" class="w-full py-0.5"
                                         @click="showCompletedInvoices($event, slotProps.data.id)" /> -->
-                                    <Button 
-                                        label="Facturas Cargadas"
-                                        outlined 
-                                        severity="danger" 
-                                        @click="showCompletedInvoices($event, slotProps.data.id)" 
-                                    />
+                                    <Button label="Facturas Cargadas" outlined severity="danger"
+                                        @click="showCompletedInvoices($event, slotProps.data.id)" />
                                 </template>
                             </Column>
                         </DataTable>
@@ -278,10 +290,35 @@ const getSeverity = (status) => {
                             </div>
                         </Dialog>
                         <Popover ref="op">
-                            <div class="flex flex-col gap-4">
-                                <Select v-model="selectedInvoices" filter :options="invoices" optionLabel="label"
-                                    optionValue="value" placeholder="Selecciona una factura" class="w-full md:w-26"
-                                    @change="handleInvoiceSelect" />
+                            <div class="card flex justify-center">
+                                <Select 
+                                    v-model="selectedInvoices" 
+                                    :options="invoices" 
+                                    filter 
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecciona una factura"
+                                    class="w-full md:w-56"
+                                    @change="handleInvoiceSelect"
+                                    @filter="onFilter"
+                                >
+                                    <template #value="slotProps">
+                                        <div v-if="slotProps.value" class="flex items-center">
+                                            <i class="pi pi-file-pdf mr-2" style="font-size: 1.2rem; color: #C42102;"></i>
+                                            <div>{{ slotProps.value.label }}</div>
+                                        </div>
+                                        <span v-else>
+                                            {{ slotProps.placeholder }}
+                                        </span>
+                                    </template>
+
+                                    <template #option="slotProps">
+                                        <div class="flex items-center">
+                                            <i class="pi pi-file-pdf mr-2" style="font-size: 1.2rem; color: #C42102;"></i>
+                                            <div>{{ `Factura: ${slotProps.option.label}` }}</div>
+                                        </div>
+                                    </template>
+                                </Select>
                             </div>
                         </Popover>
                     </div>

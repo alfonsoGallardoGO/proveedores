@@ -9,6 +9,7 @@ import axios from "axios";
 import Card from 'primevue/card';
 import { Link } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
+import ProgressBar from 'primevue/progressbar';
 
 const props = defineProps({
     orders: Array,
@@ -216,7 +217,7 @@ const getSeverity = (status) => {
                             </template>
                         </Toast>
 
-                        <DataTable ref="dt" v-model:selection="selectedBenefits" :value="orders" dataKey="id" paginator
+                        <DataTable ref="dt"  :value="orders" dataKey="id" paginator
                             :rows="10" :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
                             <template #header>
@@ -231,30 +232,30 @@ const getSeverity = (status) => {
                                 </div>
                             </template>
                             
-                            <Column field="id" header="Id" sortable style="min-width: 12rem"></Column>
-                            <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 16rem"
+                            <Column field="id" header="Id" sortable style="min-width: 2rem"></Column>
+                            <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 8rem"
                                 bodyClass="ml-2"></Column>
-                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 16rem"
+                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 8rem"
                                 bodyClass="ml-2" :body="formatNumber">
                             </Column>
-                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 16rem"
+                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 8rem"
                                 bodyClass="ml-2" :body="formatNumber">
                             </Column>
-                            <Column field="total" header="Total" sortable style="min-width: 16rem" bodyClass="ml-2"
+                            <Column field="total" header="Total" sortable style="min-width: 8rem" bodyClass="ml-2"
                                 :body="formatNumber">
                             </Column>
 
 
-                            <Column field="status" header="Estatus" sortable style="min-width: 16rem">
+                            <Column field="status" header="Estatus" sortable style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)"
                                         rounded />
                                 </template>
                             </Column>
 
-                            <Column field="date" header="Fecha" sortable style="min-width: 10rem" bodyClass="ml-2">
+                            <Column field="date" header="Fecha" sortable style="min-width: 8rem" bodyClass="ml-2">
                             </Column>
-                            <Column :exportable="false" header="Acciones" style="min-width: 12rem">
+                            <Column :exportable="false" header="Acciones" style="min-width: 4rem">
                                 <template #body="slotProps">
                                     <Link :href="route('purchase-orders.show', slotProps.data.id)">
                                         <Button 
