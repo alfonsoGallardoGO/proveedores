@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\SupplierPurchaseOrder;
@@ -13,6 +14,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Services\NetSuiteRestService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
+use App\Services\CfdiParser; 
+
 
 class SupplierPurchaseOrderController extends Controller
 {
@@ -265,266 +269,339 @@ class SupplierPurchaseOrderController extends Controller
     public function xml(Request $request)
     {
         
-        $path = storage_path('app/public/invoices/xml/jdsL7BXETZ8dMpw9XgWWGWQPLDhRn1pqgTuiC7xK.xml');
+        $purchase_order_id = 4;
+        $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
+        $xmlPath = storage_path('app/public/invoices/xml/eKQ8yQhsQvEZhkLQe2RYipeo0bKD76wwNZTMatVG.xml');
 
-        if (!file_exists($path)) {
-            abort(404, 'XML no encontrado');
+        if (!File::exists($xmlPath)) {
+            return response()->json(['error' => 'XML no encontrado'], 404);
         }
 
-        $xp = function($xml, $query) { return $xml->xpath($query) ?: []; };
-        $first = function($arr) { return is_array($arr) && count($arr) ? $arr[0] : null; };
-        $attr = function($node, $name) { return $node ? (string)($node[$name] ?? '') : ''; };
 
         libxml_use_internal_errors(true);
-        $xmlContent = file_get_contents($path);
-        $xml = simplexml_load_string($xmlContent);
-        if (!$xml) {
-            abort(422, 'XML inválido');
+        $dom = new \DOMDocument();
+
+        $loaded = $dom->load($xmlPath, LIBXML_NONET | LIBXML_NOBLANKS);
+        if (!$loaded) {
+            $errs = array_map(fn($e) => trim($e->message), libxml_get_errors());
+            libxml_clear_errors();
+            return response()->json(['ok' => false, 'error' => 'No se pudo cargar el XML', 'detalles' => $errs], 422);
         }
+        $xp = new \DOMXPath($dom);
 
-        $ns = $xml->getNamespaces(true);
-        if (isset($ns['cfdi']))   $xml->registerXPathNamespace('cfdi',   $ns['cfdi']);
-        if (isset($ns['tfd']))    $xml->registerXPathNamespace('tfd',    $ns['tfd']);
-        if (isset($ns['pago20'])) $xml->registerXPathNamespace('pago20', $ns['pago20']);
-
-        $emisorNode   = $first($xp($xml, '//cfdi:Emisor'));
-        $receptorNode = $first($xp($xml, '//cfdi:Receptor'));
-        $tfdNode      = $first($xp($xml, '//tfd:TimbreFiscalDigital'));
-
-        $serie     = (string)($xml['Serie'] ?? '');
-        $folio     = (string)($xml['Folio'] ?? '');
-        $fechaCfd  = (string)($xml['Fecha'] ?? '');
-        $fechaJson = $fechaCfd ? \Carbon\Carbon::parse($fechaCfd)->format('d/m/Y') : '';
-
-        $rfcEmisor      = $attr($emisorNode, 'Rfc');
-        $regimenFiscal  = $attr($emisorNode, 'RegimenFiscal');
-        $rfcReceptor    = $attr($receptorNode, 'Rfc');
-        $uuid           = $attr($tfdNode, 'UUID');
-
-        $isPago = isset($ns['pago20']) && count($xp($xml, '//pago20:Pago')) > 0;
-
-        if ($isPago) {
-            $pagoNode   = $first($xp($xml, '//pago20:Pago'));
-            $moneda     = $attr($pagoNode, 'MonedaP') ?: 'MXN';
-            $tipoCambio = $attr($pagoNode, 'TipoCambioP') ?: '1';
+        $root = $dom->documentElement;
+        $nsUri = $root?->namespaceURI ?? '';
+        if ($nsUri) {
+            $xp->registerNamespace('cfdi', $nsUri);
         } else {
-            $moneda     = (string)($xml['Moneda'] ?? 'MXN');
-            $tipoCambio = (string)($xml['TipoCambio'] ?? '1');
+            $xp->registerNamespace('cfdi', 'http://www.sat.gob.mx/cfd/4');
         }
+        $xp->registerNamespace('tfd', 'http://www.sat.gob.mx/TimbreFiscalDigital');
 
-        $conceptoNode   = $first($xp($xml, '//cfdi:Concepto'));
-        $claveProdServ  = $attr($conceptoNode, 'ClaveProdServ') ?: '84111506';
-        $descripcion    = $attr($conceptoNode, 'Descripcion') ?: 'Concepto';
+        $compPath = '//cfdi:Comprobante';
 
-        $gastos = [];
+        $data = [
+            'version'            => $xp->evaluate("string($compPath/@Version)"),
+            'serie'              => $xp->evaluate("string($compPath/@Serie)"),
+            'folio'              => $xp->evaluate("string($compPath/@Folio)"),
+            'fecha'              => $xp->evaluate("string($compPath/@Fecha)"),
+            'subtotal'           => $xp->evaluate("string($compPath/@SubTotal)"),
+            'descuento'          => $xp->evaluate("string($compPath/@Descuento)"),
+            'moneda'             => $xp->evaluate("string($compPath/@Moneda)"),
+            'tipo_cambio'        => $xp->evaluate("string($compPath/@TipoCambio)"),
+            'total'              => $xp->evaluate("string($compPath/@Total)"),
+            'forma_pago'         => $xp->evaluate("string($compPath/@FormaPago)"),
+            'metodo_pago'        => $xp->evaluate("string($compPath/@MetodoPago)"),
+            'tipo_de_comprobante'=> $xp->evaluate("string($compPath/@TipoDeComprobante)"),
+            'exportacion'        => $xp->evaluate("string($compPath/@Exportacion)"),
+            'emisor' => [
+                'rfc'     => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Emisor/@Rfc)'),
+                'nombre'  => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Emisor/@Nombre)'),
+                'regimen' => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Emisor/@RegimenFiscal)'),
+                'clave_prod_serv' => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Conceptos/cfdi:Concepto[1]/@ClaveProdServ)')
+            ],
+            'receptor' => [
+                'rfc'     => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Receptor/@Rfc)'),
+                'nombre'  => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Receptor/@Nombre)'),
+                'uso_cfdi'=> $xp->evaluate('string(//cfdi:Comprobante/cfdi:Receptor/@UsoCFDI)'),
+            ],
+            'timbre' => [
+                'uuid'           => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital/@UUID)'),
+                'fechaTimbrado'  => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital/@FechaTimbrado)'),
+                'noCertSAT'      => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital/@NoCertificadoSAT)'),
+            ],
+        ];
 
-        if ($isPago) {
-            $trasladosP = $xp($xml, '//pago20:TrasladoP');
-            if (!empty($trasladosP)) {
-                $docRel = $first($xp($xml, '//pago20:DoctoRelacionado'));
-                $conceptoTxt = trim('Pago relacionado ' . $attr($docRel, 'Serie') . ' ' . $attr($docRel, 'Folio'));
+        $xp->registerNamespace('pago20', 'http://www.sat.gob.mx/Pagos20');
 
-                foreach ($trasladosP as $t) {
-                    $base = (string)$t['BaseP'];
-                    $gastos[] = [
-                        "categoria"     => "125",
-                        "costo"         => (string)(float)$base,
-                        "ubicacion"     => "533",
-                        "departamento"  => "106",
-                        "clase"         => "490",
-                        "concepto"      => $conceptoTxt ?: 'Pago',
-                        "claveprodser"  => $claveProdServ,
-                        "Impuestos"     => [
-                            "Traslados" => [
-                                "Traslado" => [[
-                                    "Base"       => (string)(float)$base,
-                                    "Impuesto"   => (string)$t['ImpuestoP'],
-                                    "TipoFactor" => (string)$t['TipoFactorP'],
-                                    "TasaOCuota" => (string)$t['TasaOCuotaP'],
-                                    "Importe"    => (string)(float)$t['ImporteP'],
-                                ]]
-                            ]
-                        ]
+
+        $pagos20 = [
+            'totales' => [
+                'MontoTotalPagos'             => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Totales/@MontoTotalPagos)'),
+                'TotalRetencionesIVA'         => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalRetencionesIVA)'),
+                'TotalRetencionesISR'         => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalRetencionesISR)'),
+                'TotalTrasladosBaseIVA16'     => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalTrasladosBaseIVA16)'),
+                'TotalTrasladosImpuestoIVA16' => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalTrasladosImpuestoIVA16)'),
+            ],
+            'pagos' => [],
+        ];
+
+
+        $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
+
+        foreach ($pagoNodes as $pago) {
+            /** @var \DOMElement $pago */
+            $pagoData = [
+                'FechaPago'    => $pago->getAttribute('FechaPago'),
+                'FormaDePagoP' => $pago->getAttribute('FormaDePagoP'),
+                'MonedaP'      => $pago->getAttribute('MonedaP'),
+                'TipoCambioP'  => $pago->getAttribute('TipoCambioP'),
+                'Monto'        => $pago->getAttribute('Monto'),
+                'NumOperacion' => $pago->getAttribute('NumOperacion'),
+                'rfcEmisorCtaOrd' => $pago->getAttribute('RfcEmisorCtaOrd'),
+                'ctaOrdenante'    => $pago->getAttribute('CtaOrdenante'),
+                'rfcEmisorCtaBen' => $pago->getAttribute('RfcEmisorCtaBen'),
+                'ctaBeneficiario' => $pago->getAttribute('CtaBeneficiario'),
+                'doctos_relacionados' => [],
+                'impuestosP' => [
+                    'retencionesP' => [],
+                    'trasladosP'   => [],
+                ],
+            ];
+
+            $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
+            foreach ($doctoNodes as $doc) {
+                /** @var \DOMElement $doc */
+                $docto = [
+                    'IdDocumento'      => $doc->getAttribute('IdDocumento'),
+                    'Serie'            => $doc->getAttribute('Serie'),
+                    'Folio'            => $doc->getAttribute('Folio'),
+                    'MonedaDR'         => $doc->getAttribute('MonedaDR'),
+                    'EquivalenciaDR'   => $doc->getAttribute('EquivalenciaDR'),
+                    'NumParcialidad'   => $doc->getAttribute('NumParcialidad'),
+                    'ImpPagado'        => $doc->getAttribute('ImpPagado'),
+                    'ImpSaldoAnt'      => $doc->getAttribute('ImpSaldoAnt'),
+                    'ImpSaldoInsoluto' => $doc->getAttribute('ImpSaldoInsoluto'),
+                    'ObjetoImpDR'      => $doc->getAttribute('ObjetoImpDR'),
+                    'impuestosDR' => [
+                        'trasladosDR'   => [],
+                        'retencionesDR' => [],
+                    ],
+                ];
+
+                $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
+                foreach ($trasDRNodes as $t) {
+                    /** @var \DOMElement $t */
+                    $docto['impuestosDR']['trasladosDR'][] = [
+                        'BaseDR'       => $t->getAttribute('BaseDR'),
+                        'ImpuestoDR'   => $t->getAttribute('ImpuestoDR'),
+                        'TipoFactorDR' => $t->getAttribute('TipoFactorDR'),
+                        'TasaOCuotaDR' => $t->getAttribute('TasaOCuotaDR'),
+                        'ImporteDR'    => $t->getAttribute('ImporteDR'),
                     ];
                 }
-            }
-
-            if (empty($gastos)) {
-                $trasladosDR = $xp($xml, '//pago20:TrasladoDR');
-                foreach ($trasladosDR as $t) {
-                    $base = (string)$t['BaseDR'];
-                    $gastos[] = [
-                        "categoria"     => "125",
-                        "costo"         => (string)(float)$base,
-                        "ubicacion"     => "533",
-                        "departamento"  => "106",
-                        "clase"         => "490",
-                        "concepto"      => $descripcion ?: 'Pago',
-                        "claveprodser"  => $claveProdServ,
-                        "Impuestos"     => [
-                            "Traslados" => [
-                                "Traslado" => [[
-                                    "Base"       => (string)(float)$base,
-                                    "Impuesto"   => (string)$t['ImpuestoDR'],
-                                    "TipoFactor" => (string)$t['TipoFactorDR'],
-                                    "TasaOCuota" => (string)$t['TasaOCuotaDR'],
-                                    "Importe"    => (string)(float)$t['ImporteDR'],
-                                ]]
-                            ]
-                        ]
+                $retDRNodes = $xp->query('pago20:ImpuestosDR/pago20:RetencionesDR/pago20:RetencionDR', $doc);
+                foreach ($retDRNodes as $r) {
+                    /** @var \DOMElement $r */
+                    $docto['impuestosDR']['retencionesDR'][] = [
+                        'BaseDR'       => $r->getAttribute('BaseDR'),
+                        'ImpuestoDR'   => $r->getAttribute('ImpuestoDR'),
+                        'TipoFactorDR' => $r->getAttribute('TipoFactorDR'),
+                        'TasaOCuotaDR' => $r->getAttribute('TasaOCuotaDR'),
+                        'ImporteDR'    => $r->getAttribute('ImporteDR'),
                     ];
                 }
-            }
-        }
 
-        if (empty($gastos)) {
-            $trasGlobal = $xp($xml, '//cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
-            foreach ($trasGlobal as $t) {
-                $base = (string)($t['Base'] ?? $t['Importe'] ?? '0');
-                $gastos[] = [
-                    "categoria"     => "125",
-                    "costo"         => (string)(float)$base,
-                    "ubicacion"     => "533",
-                    "departamento"  => "106",
-                    "clase"         => "490",
-                    "concepto"      => $descripcion,
-                    "claveprodser"  => $claveProdServ,
-                    "Impuestos"     => [
-                        "Traslados" => [
-                            "Traslado" => [[
-                                "Base"       => (string)(float)$base,
-                                "Impuesto"   => (string)$t['Impuesto'],
-                                "TipoFactor" => (string)$t['TipoFactor'],
-                                "TasaOCuota" => (string)$t['TasaOCuota'],
-                                "Importe"    => (string)(float)$t['Importe'],
-                            ]]
-                        ]
-                    ]
+                $pagoData['doctos_relacionados'][] = $docto;
+            }
+
+            $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
+            foreach ($retPNodes as $rP) {
+                /** @var \DOMElement $rP */
+                $pagoData['impuestosP']['retencionesP'][] = [
+                    'ImpuestoP' => $rP->getAttribute('ImpuestoP'),
+                    'ImporteP'  => $rP->getAttribute('ImporteP'),
                 ];
             }
-        }
 
-        if (empty($gastos)) {
-            $conceptos = $xp($xml, '//cfdi:Concepto');
-            foreach ($conceptos as $c) {
-                $trasC = $xp($c, './cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
-                foreach ($trasC as $t) {
-                    $base = (string)($t['Base'] ?? $t['Importe'] ?? '0');
-                    $gastos[] = [
-                        "categoria"     => "125",
-                        "costo"         => (string)(float)$base,
-                        "ubicacion"     => "533",
-                        "departamento"  => "106",
-                        "clase"         => "490",
-                        "concepto"      => (string)($c['Descripcion'] ?? $descripcion),
-                        "claveprodser"  => (string)($c['ClaveProdServ'] ?? $claveProdServ),
-                        "Impuestos"     => [
-                            "Traslados" => [
-                                "Traslado" => [[
-                                    "Base"       => (string)(float)$base,
-                                    "Impuesto"   => (string)$t['Impuesto'],
-                                    "TipoFactor" => (string)$t['TipoFactor'],
-                                    "TasaOCuota" => (string)$t['TasaOCuota'],
-                                    "Importe"    => (string)(float)$t['Importe'],
-                                ]]
-                            ]
-                        ]
-                    ];
-                }
+            $trasPNodes = $xp->query('pago20:ImpuestosP/pago20:TrasladosP/pago20:TrasladoP', $pago);
+            foreach ($trasPNodes as $tP) {
+                /** @var \DOMElement $tP */
+                $pagoData['impuestosP']['trasladosP'][] = [
+                    'BaseP'       => $tP->getAttribute('BaseP'),
+                    'ImpuestoP'   => $tP->getAttribute('ImpuestoP'),
+                    'TipoFactorP' => $tP->getAttribute('TipoFactorP'),
+                    'TasaOCuotaP' => $tP->getAttribute('TasaOCuotaP'),
+                    'ImporteP'    => $tP->getAttribute('ImporteP'),
+                ];
             }
+
+            $pagos20['pagos'][] = $pagoData;
         }
+        $data['complemento_pagos20'] = $pagos20;
 
-        // $xmlBase64 = base64_encode($xmlContent);
-        // $pdfBase64 = "";
-
-        $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
-        $xmlPath = storage_path('app/public/invoices/xml/jdsL7BXETZ8dMpw9XgWWGWQPLDhRn1pqgTuiC7xK.xml');
 
         $pdfBase64 = base64_encode(file_get_contents($pdfPath));
         $xmlBase64 = base64_encode(file_get_contents($xmlPath));
 
-        $jsonPayload = [
-            "rfc"           => $rfcEmisor ?: $rfcReceptor,
-            "nfactura"      => $folio, 
-            "regimenfiscal" => $regimenFiscal,
-            "moneda"        => $moneda,
-            "termino"       => "4", 
-            "departamento"  => "106",
-            "clase"         => "490",
-            "operacion"     => "3",
-            "tipocambio"    => (float)$tipoCambio,
-            "fecha"         => $fechaJson,
-            "ubicacion"     => "533",
-            "idnetsuite"    => "",
-            "uuid"          => $uuid,
-            "gastos"        => $gastos,
-            "articulos"     => [],
-            "nota"          => "",
-            "generico"      => "",
-            "xml"           => $xmlBase64,
-            "pdf"           => $pdfBase64,
-        ];
-        
+        // $data = [
+        //     "idproveedor" => "65424",
+        //     "iddoc" => "4414137",
+        //     "tipo_doc" => "PurchOrd",
+        //     "rfc" => "FIRA860812RX3",
+        //     "nfactura" => "74186",
+        //     "regimenfiscal" => "601",
+        //     "moneda" => "MXN",
+        //     "termino" => "4",
+        //     "departamento" => "105",
+        //     "clase" => "447",
+        //     "operacion" => "3",
+        //     "tipocambio" => 0,
+        //     "fecha" => "11/08/2025",
+        //     "ubicacion" => "314",
+        //     "idnetsuite" => "65424",
+        //     "modo_prueba" => true,
+        //     "uuid" => "729D0E96-CEDB-4C50-AAAD-13CB4A797065",
+        //     "gastos" => [
+        //         [
+        //             "categoria" => "112",
+        //             "costo" => "68.97",
+        //             "ubicacion" => "314",
+        //             "departamento" => "105",
+        //             "clase" => "447",
+        //             "concepto" => "Telefonia Telefonía Neg Ilim Plus Mensualidad Princ - Del 01/08/2025 al 31/08/2025",
+        //             "claveprodser" => "81161700",
+        //             "Impuestos" => [
+        //                 "Traslados" => [
+        //                     "Traslado" => [
+        //                         [
+        //                             "Base" => "68.970000",
+        //                             "Impuesto" => "002",
+        //                             "TipoFactor" => "Tasa",
+        //                             "TasaOCuota" => "0.160000",
+        //                             "Importe" => "11.03"
+        //                         ]
+        //                     ]
+        //                 ]
+        //             ]
+        //         ]
+        //     ],
+        //     "articulos" => [],
+        //     "nota" => "TELEFONIA NEG LLIUM PLUS MES DE AGOSTO",
+        //     "generico" => "8345",
+        //     "xml" =>$xmlBase64,
+        //     "pdf" =>$pdfBase64
+        // ];
 
-        $data = [
-            "idproveedor" => "65424",
-            "iddoc" => "4414137",
+        $nf6 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 6, '.', '');
+        $nf2 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 2, '.', '');
+        $uuid      = $data['timbre']['uuid'] ?? null;
+        $emisorRfc = $data['emisor']['rfc'] ?? null;
+        $receptRfc = $data['receptor']['rfc'] ?? null;
+        $moneda =  $data['moneda'] ?? null;
+        $regimen =  $data['emisor']['regimen'] ?? null;
+        $folio =  $data['folio'] ?? null;
+        $tipo_cambio =  $data['tipo_cambio'] ?? 0;
+        $clave_prod_serv =  $data['emisor']['clave_prod_serv'] ?? null;
+
+        $iso = $data['fecha'] ?? '2025-08-11T00:00:00';
+        $fecha = Carbon::parse($iso)
+            ->timezone('America/Mexico_City')
+            ->format('d/m/Y');  
+
+        $traslados = [];
+
+        foreach (($data['complemento_pagos20']['pagos'] ?? []) as $pago) {
+            foreach (($pago['impuestosP']['trasladosP'] ?? []) as $t) {
+                $traslados[] = [
+                    "Traslado" => [
+                        "Base"       => $nf6($t['BaseP']       ?? 0),
+                        "Impuesto"   => (string)($t['ImpuestoP']   ?? ''),
+                        "TipoFactor" => (string)($t['TipoFactorP'] ?? ''),
+                        "TasaOCuota" => $nf6($t['TasaOCuotaP'] ?? 0),
+                        "Importe"    => $nf2($t['ImporteP']    ?? 0),
+                    ]
+                ];
+            }
+
+            // foreach (($pago['doctos_relacionados'] ?? []) as $dr) {
+            //     foreach (($dr['impuestosDR']['trasladosDR'] ?? []) as $tdr) {
+            //         $traslados[] = [
+            //             "Traslado" => [
+            //                 "Base"       => $nf6($tdr['BaseDR']       ?? 0),
+            //                 "Impuesto"   => (string)($tdr['ImpuestoDR']   ?? ''),
+            //                 "TipoFactor" => (string)($tdr['TipoFactorDR'] ?? ''),
+            //                 "TasaOCuota" => $nf6($tdr['TasaOCuotaDR'] ?? 0),
+            //                 "Importe"    => $nf2($tdr['ImporteDR']    ?? 0),
+            //             ]
+            //         ];
+            //     }
+            // }
+        }
+
+        $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
+            ->where('type', 'GASTO')
+            ->first();                 // ya no uses get() ni limit(1)
+
+        $department = $item?->department;
+
+
+
+
+
+
+        $data_netsuite = [
+            "idproveedor" => "",
+            "iddoc" => "",
             "tipo_doc" => "PurchOrd",
-            "rfc" => "FIRA860812RX3",
-            "nfactura" => "74186",
-            "regimenfiscal" => "601",
-            "moneda" => "MXN",
-            "termino" => "4",
-            "departamento" => "105",
-            "clase" => "447",
-            "operacion" => "3",
-            "tipocambio" => 0,
-            "fecha" => "11/08/2025",
-            "ubicacion" => "128",
+            "rfc" => $emisorRfc,
+            "nfactura" => $folio,
+            "regimenfiscal" => $regimen,
+            "moneda" => $moneda,
+            "termino" => "",
+            "departamento" => $department,
+            "clase" => "",
+            "operacion" => "",
+            "tipocambio" => $tipo_cambio,
+            "fecha" => $fecha,
+            "ubicacion" => "",
             "idnetsuite" => "",
-            "uuid" => "729D0E96-CEDB-4C50-AAAD-13CB4A797065",
+            "modo_prueba" => true,
+            "uuid" => $uuid,
             "gastos" => [
                 [
-                    "categoria" => "112",
-                    "costo" => "68.97",
-                    "ubicacion" => "128",
-                    "departamento" => "105",
-                    "clase" => "447",
-                    "concepto" => "Telefonia Telefonía Neg Ilim Plus Mensualidad Princ - Del 01/08/2025 al 31/08/2025",
-                    "claveprodser" => "81161700",
+                    "categoria" => "",
+                    "costo" => "",
+                    "ubicacion" => "",
+                    "departamento" => $department,
+                    "clase" => "",
+                    "concepto" => "",
+                    "claveprodser" => $clave_prod_serv,
                     "Impuestos" => [
                         "Traslados" => [
-                            "Traslado" => [
-                                [
-                                    "Base" => "68.970000",
-                                    "Impuesto" => "002",
-                                    "TipoFactor" => "Tasa",
-                                    "TasaOCuota" => "0.160000",
-                                    "Importe" => "11.03"
-                                ]
-                            ]
+                            $traslados
                         ]
                     ]
                 ]
             ],
             "articulos" => [],
-            "nota" => "TELEFONIA NEG LLIUM PLUS MES DE AGOSTO",
-            "generico" => "8345",
+            "nota" => "",
+            "generico" => "",
             "xml" =>$xmlBase64,
             "pdf" =>$pdfBase64
         ];
 
         
 
-        // return $data;
+        return $data_netsuite;
 
-        $restletPath = "/restlet.nl?script=5141&deploy=1";
-        try {
-            $response = $this->netSuiteRestService->request($restletPath, 'POST', $data);
-            return response()->json(['ok' => true, 'response' => $response]);
-        } catch (\Throwable $e) {
-            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
-        }
+        // $restletPath = "/restlet.nl?script=5141&deploy=1";
+        // try {
+        //     $response = $this->netSuiteRestService->request($restletPath, 'POST', $data);
+        //     return response()->json(['ok' => true, 'response' => $response]);
+        // } catch (\Throwable $e) {
+        //     return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+        // }
     }
 
 }
