@@ -470,7 +470,7 @@ class SupplierPurchaseOrderController extends Controller
             "idproveedor" => "65424",
             "iddoc" => "4414137",
             "tipo_doc" => "PurchOrd",
-            "rfc" => "SET0912148T6",
+            "rfc" => "FIRA860812RX3",
             "nfactura" => "74186",
             "regimenfiscal" => "601",
             "moneda" => "MXN",
