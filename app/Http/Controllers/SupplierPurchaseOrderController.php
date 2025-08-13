@@ -21,6 +21,7 @@ use App\Services\NetSuiteRestService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use App\Services\CfdiParser;
+ use Illuminate\Support\Str;
 
 
 class SupplierPurchaseOrderController extends Controller
@@ -82,20 +83,65 @@ class SupplierPurchaseOrderController extends Controller
         $xmlPath = null;
 
 
-        if ($request->hasFile('factura')) {
-            Storage::disk('public')->makeDirectory('invoices/pdf');
-            $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
+        // if ($request->hasFile('factura')) {
+            
+        //     Storage::disk('public')->makeDirectory('invoices/pdf');
+        //     $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
 
-            $pdfContent = Storage::disk('public')->get($pdfPath);
-            $pdfBase64  = base64_encode($pdfContent);
+        //     $pdfContent = Storage::disk('public')->get($pdfPath);
+        //     $pdfBase64  = base64_encode($pdfContent);
+        // }
+
+        // if ($request->hasFile('xml')) {
+        //     Storage::disk('public')->makeDirectory('invoices/xml');
+        //     $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
+
+        //     $xmlContent = Storage::disk('public')->get($xmlPath);
+        //     $xmlBase64  = base64_encode($xmlContent);
+        // }
+
+        if ($request->hasFile('factura')) {
+            $file = $request->file('factura');
+            abort_unless($file->isValid(), 422, 'Archivo inválido');
+
+            
+            $folderPath = public_path('suppliers/invoices/pdf');
+            File::ensureDirectoryExists($folderPath, 0755, true);
+
+            
+            $ext = $file->getClientOriginalExtension() ?: 'pdf';
+            $filename = 'receipt_' . (string) Str::uuid() . '.' . $ext;
+
+            
+            $file->move($folderPath, $filename);
+
+            
+            $pdfAbsolute = $folderPath . DIRECTORY_SEPARATOR . $filename;
+            $pdfPath      = asset('suppliers/invoices/pdf/' . $filename); 
+
+            $pdfBase64 = base64_encode(file_get_contents($pdfAbsolute));
         }
 
         if ($request->hasFile('xml')) {
-            Storage::disk('public')->makeDirectory('invoices/xml');
-            $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
+            $file = $request->file('xml');
+            abort_unless($file->isValid(), 422, 'Archivo inválido');
 
-            $xmlContent = Storage::disk('public')->get($xmlPath);
-            $xmlBase64  = base64_encode($xmlContent);
+            
+            $folderPath = public_path('suppliers/invoices/xml');
+            File::ensureDirectoryExists($folderPath, 0755, true);
+
+            
+            $ext = $file->getClientOriginalExtension() ?: 'xml';
+            $filename = 'receipt_' . (string) Str::uuid() . '.' . $ext;
+
+            
+            $file->move($folderPath, $filename);
+
+            
+            $pdfAbsolute = $folderPath . DIRECTORY_SEPARATOR . $filename;
+            $xmlPath      = asset('suppliers/invoices/xml/' . $filename); 
+
+            $xmlBase64 = base64_encode(file_get_contents($pdfAbsolute));
         }
 
         SupplierInvoice::create([
@@ -504,33 +550,55 @@ class SupplierPurchaseOrderController extends Controller
         $uuid      = $data['timbre']['uuid'] ?? null;
         $emisorRfc = $data['emisor']['rfc'] ?? null;
         $receptRfc = $data['receptor']['rfc'] ?? null;
-        $moneda =  $data['moneda'] ?? null;
+        $moneda =  $data['complemento_pagos20']['pagos'][0]['MonedaP'] ?? null;
         $regimen =  $data['emisor']['regimen'] ?? null;
         $folio =  $data['folio'] ?? null;
-        $tipo_cambio =  $data['tipo_cambio'] ?? 0;
+        $tipo_cambio =  $data['complemento_pagos20']['pagos'][0]['TipoCambioP'] ?? null;
         $clave_prod_serv =  $data['emisor']['clave_prod_serv'] ?? null;
+        $monto =  $data['complemento_pagos20']['pagos'][0]['Monto'] ?? null;
 
         $iso = $data['fecha'] ?? '2025-08-11T00:00:00';
         $fecha = Carbon::parse($iso)
             ->timezone('America/Mexico_City')
             ->format('d/m/Y');
 
+        // $traslados = [];
+
+        // foreach (($data['complemento_pagos20']['pagos'] ?? []) as $pago) {
+        //     foreach (($pago['impuestosP']['trasladosP'] ?? []) as $t) {
+        //         $traslados[] = [
+        //             "Traslado" => [
+        //                 "Base"       => $nf6($t['BaseP']       ?? 0),
+        //                 "Impuesto"   => (string)($t['ImpuestoP']   ?? ''),
+        //                 "TipoFactor" => (string)($t['TipoFactorP'] ?? ''),
+        //                 "TasaOCuota" => $nf6($t['TasaOCuotaP'] ?? 0),
+        //                 "Importe"    => $nf2($t['ImporteP']    ?? 0),
+        //         ];
+        //         ];
+        //     }
+
+            
+        // }
+
         $traslados = [];
 
         foreach (($data['complemento_pagos20']['pagos'] ?? []) as $pago) {
             foreach (($pago['impuestosP']['trasladosP'] ?? []) as $t) {
                 $traslados[] = [
-                    "Traslado" => [
-                        "Base"       => $nf6($t['BaseP']       ?? 0),
-                        "Impuesto"   => (string)($t['ImpuestoP']   ?? ''),
-                        "TipoFactor" => (string)($t['TipoFactorP'] ?? ''),
-                        "TasaOCuota" => $nf6($t['TasaOCuotaP'] ?? 0),
-                        "Importe"    => $nf2($t['ImporteP']    ?? 0),
-                    ]
+                    "Base"       => $nf6($t['BaseP']       ?? 0),
+                    "Impuesto"   => (string)($t['ImpuestoP']   ?? ''),
+                    "TipoFactor" => (string)($t['TipoFactorP'] ?? ''),
+                    "TasaOCuota" => $nf6($t['TasaOCuotaP'] ?? 0),
+                    "Importe"    => $nf2($t['ImporteP']    ?? 0),
                 ];
             }
+        }
 
-            // foreach (($pago['doctos_relacionados'] ?? []) as $dr) {
+        
+
+
+        
+        // foreach (($pago['doctos_relacionados'] ?? []) as $dr) {
             //     foreach (($dr['impuestosDR']['trasladosDR'] ?? []) as $tdr) {
             //         $traslados[] = [
             //             "Traslado" => [
@@ -543,68 +611,90 @@ class SupplierPurchaseOrderController extends Controller
             //         ];
             //     }
             // }
-        }
 
-        
 
         $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
             ->where('type', 'GASTO')
-            ->first();                 // ya no uses get() ni limit(1)
+            ->first();
 
-        $department = $item?->department;
+        $department_name = $item?->department;
+        $class_name = $item?->class; 
+        $location_name = Str::of($item->location ?? '')
+            ->replaceMatches('/^.*:\s*/', '')
+            ->squish()
+            ->toString();
 
+        $category_name = $item?->categoria;
+        $description = $item?->description;
 
+        $departamentos = NetsuiteDepartments::where('name', $department_name)
+            ->first();
+        $department_id = $departamentos?->external_id;
+
+        $clases = NetsuiteClass::where('name', $class_name)
+            ->first();
+        $class_id = $clases?->external_id;
+
+        $ubicaciones = NetsuiteLocations::where('name', $location_name)
+            ->first();
+        $ubicacion_id = $ubicaciones?->external_id;
+
+        $categorias = NetsuiteExpenseCategories::where('name', $category_name)
+            ->first();
+        $catergoria_id = $categorias?->external_id;
+        
+        $ordenes_compra = SupplierPurchaseOrder::where('id', $purchase_order_id)
+            ->first();
+        $purchase_order_id = $ordenes_compra?->purchase_order_id;
+        $supplier_external_id = $ordenes_compra?->supplier_external_id;
 
 
         $data_netsuite = [
-            "idproveedor" => "",
-            "iddoc" => "",
+            "idproveedor" => $supplier_external_id,
+            "iddoc" => $purchase_order_id,
             "tipo_doc" => "PurchOrd",
             "rfc" => $emisorRfc,
             "nfactura" => $folio,
             "regimenfiscal" => $regimen,
             "moneda" => $moneda,
             "termino" => "",
-            "departamento" => $department,
-            "clase" => "",
+            "departamento" => $department_id,
+            "clase" => $class_id,
             "operacion" => "",
             "tipocambio" => $tipo_cambio,
             "fecha" => $fecha,
-            "ubicacion" => "",
+            "ubicacion" => $ubicacion_id,
             "idnetsuite" => "",
             "modo_prueba" => true,
             "uuid" => $uuid,
             "gastos" => [
                 [
-                    "categoria" => "",
-                    "costo" => "",
-                    "ubicacion" => "",
-                    "departamento" => $department,
-                    "clase" => "",
-                    "concepto" => "",
+                    "categoria" => $catergoria_id,
+                    "costo" => $monto,
+                    "ubicacion" => $ubicacion_id,
+                    "departamento" => $department_id,
+                    "clase" => $class_id,
+                    "concepto" => $description,
                     "claveprodser" => $clave_prod_serv,
-                    "Impuestos" => [
-                        "Traslados" => [
-                            $traslados
-                        ]
-                    ]
+                    "Impuestos" => []
                 ]
             ],
             "articulos" => [],
-            "nota" => "",
+            "nota" => $description,
             "generico" => "",
             "xml" => $xmlBase64,
             "pdf" => $pdfBase64
         ];
 
+        $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
 
 
-        // return $data_netsuite;
-        return $data;
+        // return $monto;
+        // return $traslados;
 
         // $restletPath = "/restlet.nl?script=5141&deploy=1";
         // try {
-        //     $response = $this->netSuiteRestService->request($restletPath, 'POST', $data);
+        //     $response = $this->netSuiteRestService->request($restletPath, 'POST', $data_netsuite);
         //     return response()->json(['ok' => true, 'response' => $response]);
         // } catch (\Throwable $e) {
         //     return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
