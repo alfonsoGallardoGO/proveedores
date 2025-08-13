@@ -165,6 +165,20 @@ export default {
                             <span class="menu-title">Usuarios</span>
                         </Link>
                     </div>
+                    <div
+                        data-kt-menu-trigger="click"
+                        class="menu-item menu-accordion"
+                    >
+                        <Link
+                            :href="route('supplier-whatsapp.index')"
+                            class="menu-link"
+                        >
+                            <span class="menu-icon">
+                                <i class="ki-solid ki-whatsapp fs-2"></i>
+                            </span>
+                            <span class="menu-title">Whatsapps</span>
+                        </Link>
+                    </div>
                 </div>
                 <!--end::Menu-->
             </div>
