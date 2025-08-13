@@ -8,6 +8,7 @@ use App\Http\Controllers\SupplierPurchaseOrderController;
 use App\Http\Controllers\SuplierUserController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierInvoicesController;
+use App\Http\Controllers\SupplierWhatsappController;
 
 Route::resource('suppliers/purchase-orders', SupplierPurchaseOrderController::class);
 Route::resource('suppliers/invoices', SupplierInvoicesController::class);
@@ -38,6 +39,8 @@ Route::middleware([
     Route::delete('/users/{id}', [SuplierUserController::class, 'destroy'])->name('users.destroy');
     Route::put('/users/{id}/update', [SuplierUserController::class, 'update'])->name('users.update');
     Route::delete('/users', [SuplierUserController::class, 'destroySelected'])->name('users.destroySelected');
+
+    Route::resource('supplier-whatsapp', SupplierWhatsappController::class)->only(['index']);
 
 });
 
