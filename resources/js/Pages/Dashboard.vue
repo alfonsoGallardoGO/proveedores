@@ -151,6 +151,256 @@ const setChartOptionsDoughnut = () => {
                                     <div class="px-9 pt-7 card-rounded h-275px w-100 bg-primary">
                                         <!--begin::Heading-->
                                         <div class="d-flex flex-stack">
+                                            <h3 class="m-0 text-white fw-bold fs-3">ORDENES</h3>
+                                            <!-- <div class="ms-1">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-icon btn-color-white btn-active-white border-0 me-n3"
+                                                    data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <i class="pi pi-bars" style="font-size: 2rem"></i>
+                                                </button>
+                                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3"
+                                                    data-kt-menu="true">
+                                                    <div class="menu-item px-3">
+                                                        <div
+                                                            class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
+                                                            Payments</div>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a href="#" class="menu-link px-3">Create Invoice</a>
+                                                    </div>
+                                                    
+                                                    <div class="menu-item px-3 my-1">
+                                                        <a href="#" class="menu-link px-3">Settings</a>
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                        <div class="d-flex text-center flex-column text-white pt-8">
+                                            <span class="fw-semibold fs-7">TOTAL DE ORDENES</span>
+                                            <span class="fw-bold fs-2x pt-1">39</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-body shadow-sm card-rounded mx-9 mb-9 px-6 py-9 position-relative z-index-1"
+                                        style="margin-top: -100px">
+                                        <div class="d-flex align-items-center mb-6">
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-clock" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Factura pendientes</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">2</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-6">
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-times-circle" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Cerrada</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">1</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-6">
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-clock" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Facturación pendiente/Parcialmente recibido</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">0</div>
+                                                </div>
+                                            </div>
+                                        </div>
+										<div class="d-flex align-items-center mb-6">
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-copy" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Parcialmete recibida</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">2</div>
+                                                </div>
+                                            </div>
+                                        </div>
+										<div class="d-flex align-items-center mb-6">
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-clock" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Recepción pendiente</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">33</div>
+                                                </div>
+                                            </div>
+                                        </div>
+										<div class="d-flex align-items-center mb-6">
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-file-check" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Totalmente facturada</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">1</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						<div class="col-xxl-4 col-md-4 mb-xxl-10">
+                            <!--begin::Mixed Widget 1-->
+                            <div class="card h-md-100">
+                                <!--begin::Body-->
+                                <div class="card-body p-0">
+                                    <!--begin::Header-->
+                                    <div class="px-9 pt-7 card-rounded h-275px w-100 bg-primary">
+                                        <!--begin::Heading-->
+                                        <div class="d-flex flex-stack">
+                                            <h3 class="m-0 text-white fw-bold fs-3">COSTOS</h3>
+                                            <div class="ms-1">
+                                                <!--begin::Menu-->
+                                                <button type="button"
+                                                    class="btn btn-sm btn-icon btn-color-white btn-active-white border-0 me-n3"
+                                                    data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <i class="pi pi-bars" style="font-size: 2rem"></i>
+                                                </button>
+                                                <!--begin::Menu 3-->
+                                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3"
+                                                    data-kt-menu="true">
+                                                    <!--begin::Heading-->
+                                                    <div class="menu-item px-3">
+                                                        <div
+                                                            class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
+                                                            Payments</div>
+                                                    </div>
+                                                    <!--end::Heading-->
+                                                    <!--begin::Menu item-->
+                                                    <div class="menu-item px-3">
+                                                        <a href="#" class="menu-link px-3">Create Invoice</a>
+                                                    </div>
+                                                    
+                                                    <div class="menu-item px-3 my-1">
+                                                        <a href="#" class="menu-link px-3">Settings</a>
+                                                    </div>
+                                                    <!--end::Menu item-->
+                                                </div>
+                                                <!--end::Menu 3-->
+                                                <!--end::Menu-->
+                                            </div>
+                                        </div>
+                                        <!--end::Heading-->
+                                        <!--begin::Balance-->
+                                        <div class="d-flex text-center flex-column text-white pt-8">
+                                            <span class="fw-semibold fs-7">TOTAL DE GASTO DEL MES</span>
+                                            <span class="fw-bold fs-2x pt-1">$37,562.00</span>
+                                        </div>
+                                        <!--end::Balance-->
+                                    </div>
+                                    <!--end::Header-->
+                                    <!--begin::Items-->
+                                    <div class="bg-body shadow-sm card-rounded mx-9 mb-9 px-6 py-9 position-relative z-index-1"
+                                        style="margin-top: -100px">
+                                        <!--begin::Item-->
+                                        <div class="d-flex align-items-center mb-6">
+                                            <!--begin::Symbol-->
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-clock" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <!--end::Symbol-->
+                                            <!--begin::Description-->
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <!--begin::Title-->
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Ordenes pendientes</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">100 Regions</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--end::Item-->
+                                        <!--begin::Item-->
+                                        <div class="d-flex align-items-center mb-6">
+                                            <!--begin::Symbol-->
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-dollar" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <!--end::Symbol-->
+                                            <!--begin::Description-->
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <!--begin::Title-->
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Valor Ordenes Pendientes</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">Quarter 2/3</div>
+                                                </div>
+                                            </div>
+                                            <!--end::Description-->
+                                        </div>
+                                        <!--end::Item-->
+                                        <!--begin::Item-->
+                                        <div class="d-flex align-items-center mb-6">
+                                            <!--begin::Symbol-->
+                                            <div class="symbol symbol-45px w-40px me-5">
+                                                <span class="symbol-label bg-lighten">
+                                                    <i class="pi pi-clock" style="font-size: 2rem"></i>
+                                                </span>
+                                            </div>
+                                            <!--end::Symbol-->
+                                            <!--begin::Description-->
+                                            <div class="d-flex align-items-center flex-wrap w-100">
+                                                <!--begin::Title-->
+                                                <div class="mb-1 pe-3 flex-grow-1">
+                                                    <a href="#"
+                                                        class="fs-5 text-gray-800 text-hover-primary fw-bold">Facturas Pendientes</a>
+                                                    <div class="text-gray-500 fw-semibold fs-7">80% Rate</div>
+                                                </div>
+                                            </div>
+                                            <!--end::Description-->
+                                        </div>
+                                        <!--end::Item-->
+                                    </div>
+                                    <!--end::Items-->
+                                </div>
+                                <!--end::Body-->
+                            </div>
+                            <!--end::Mixed Widget 1-->
+                        </div>
+						<div class="col-xxl-4 col-md-4 mb-xxl-10">
+                            <!--begin::Mixed Widget 1-->
+                            <div class="card h-md-100">
+                                <!--begin::Body-->
+                                <div class="card-body p-0">
+                                    <!--begin::Header-->
+                                    <div class="px-9 pt-7 card-rounded h-275px w-100 bg-primary">
+                                        <!--begin::Heading-->
+                                        <div class="d-flex flex-stack">
                                             <h3 class="m-0 text-white fw-bold fs-3">Resumen Ejecutivo</h3>
                                             <div class="ms-1">
                                                 <!--begin::Menu-->
@@ -264,47 +514,8 @@ const setChartOptionsDoughnut = () => {
                             </div>
                             <!--end::Mixed Widget 1-->
                         </div>
-                        <div class="col-xxl-8 col-md-8 mb-xxl-10">
-                            <!--begin::Tables Widget 9-->
-                            <div class="card h-md-100">
-                                <!--begin::Header-->
-                                <div class="card-header border-0 pt-5">
-                                    <h3 class="card-title align-items-start flex-column">
-                                        <span class="card-label fw-bold fs-3 mb-1">GRAFICOS DE PROVEEDOR</span>
-                                        <!-- <span class="text-muted mt-1 fw-semibold fs-7">Over 500 members</span> -->
-                                    </h3>
-                                </div>
-                                <!--end::Header-->
-                                <!--begin::Body-->
-                                <div class="card-body py-3">
-                                    <!--begin::Table container-->
-                                    <div class="card">
-                                        <Chart type="line" :data="chartData" :options="chartOptions" class="h-[30rem]" />
-                                    </div>
-                                </div>
-                                <!--begin::Body-->
-                            </div>
-                            <!--end::Tables Widget 9-->
-                        </div>
-                        <div class="col-xxl-6 col-md-6 mb-xxl-6">
-                            <!--begin::Tables Widget 9-->
-                            <div class="card h-md-100">
-                                <!--begin::Header-->
-                                <div class="card-header border-0 pt-5">
-                                    <h3 class="card-title align-items-start flex-column">
-                                        <span class="card-label fw-bold fs-3 mb-1">GRAFICOS DE GASTOS</span>
-                                        <!-- <span class="text-muted mt-1 fw-semibold fs-7">Over 500 members</span> -->
-                                    </h3>
-                                </div>
-                                <!--end::Header-->
-                                <!--begin::Body-->
-                                <div class="card flex justify-center">
-                                    <Chart type="doughnut" :data="chartDataDoughnut" :options="chartOptionsDoughnut" class="w-full md:w-[40rem]" />
-                                </div>
-                                <!--begin::Body-->
-                            </div>
-                            <!--end::Tables Widget 9-->
-                        </div>
+                        
+                        
                         <!--end::Col-->
                     </div>
                     <!--end::Row-->

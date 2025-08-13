@@ -9,13 +9,18 @@ use App\Models\SupplierPurchaseOrder;
 use App\Models\SupplierPurchaseOrderItem;
 use App\Models\SupplierPurchaseOrdersItemsDelivery;
 use App\Models\SupplierInvoice;
+use App\Models\NetsuiteAccountingAccounts;
+use App\Models\NetsuiteClass;
+use App\Models\NetsuiteDepartments;
+use App\Models\NetsuiteExpenseCategories;
+use App\Models\NetsuiteLocations;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Services\NetSuiteRestService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
-use App\Services\CfdiParser; 
+use App\Services\CfdiParser;
 
 
 class SupplierPurchaseOrderController extends Controller
@@ -69,13 +74,12 @@ class SupplierPurchaseOrderController extends Controller
                 'supplier_purchase_orders_item_id' => $itemId,
                 'amount' => $amount ?? 0,
             ]);
-
         }
 
         $supplierId = Auth::user()->supplier_id ?? 1;
         $pdfPath = null;
         $xmlPath = null;
-        
+
 
         if ($request->hasFile('factura')) {
             Storage::disk('public')->makeDirectory('invoices/pdf');
@@ -83,7 +87,6 @@ class SupplierPurchaseOrderController extends Controller
 
             $pdfContent = Storage::disk('public')->get($pdfPath);
             $pdfBase64  = base64_encode($pdfContent);
-
         }
 
         if ($request->hasFile('xml')) {
@@ -92,7 +95,6 @@ class SupplierPurchaseOrderController extends Controller
 
             $xmlContent = Storage::disk('public')->get($xmlPath);
             $xmlBase64  = base64_encode($xmlContent);
-
         }
 
         SupplierInvoice::create([
@@ -268,10 +270,13 @@ class SupplierPurchaseOrderController extends Controller
 
     public function xml(Request $request)
     {
-        
+
         $purchase_order_id = 4;
-        $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
-        $xmlPath = storage_path('app/public/invoices/xml/eKQ8yQhsQvEZhkLQe2RYipeo0bKD76wwNZTMatVG.xml');
+        // $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
+        // $xmlPath = storage_path('app/public/invoices/xml/prueba_xml_2.xml');
+        $pdfPath = public_path('invoices/pdf/f6725ff5-9497-44ee-a7db-1e79257dcb7d.pdf');
+        $xmlPath = public_path('invoices/xml/prueba_xml_2.xml');
+
 
         if (!File::exists($xmlPath)) {
             return response()->json(['error' => 'XML no encontrado'], 404);
@@ -312,7 +317,7 @@ class SupplierPurchaseOrderController extends Controller
             'total'              => $xp->evaluate("string($compPath/@Total)"),
             'forma_pago'         => $xp->evaluate("string($compPath/@FormaPago)"),
             'metodo_pago'        => $xp->evaluate("string($compPath/@MetodoPago)"),
-            'tipo_de_comprobante'=> $xp->evaluate("string($compPath/@TipoDeComprobante)"),
+            'tipo_de_comprobante' => $xp->evaluate("string($compPath/@TipoDeComprobante)"),
             'exportacion'        => $xp->evaluate("string($compPath/@Exportacion)"),
             'emisor' => [
                 'rfc'     => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Emisor/@Rfc)'),
@@ -323,7 +328,7 @@ class SupplierPurchaseOrderController extends Controller
             'receptor' => [
                 'rfc'     => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Receptor/@Rfc)'),
                 'nombre'  => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Receptor/@Nombre)'),
-                'uso_cfdi'=> $xp->evaluate('string(//cfdi:Comprobante/cfdi:Receptor/@UsoCFDI)'),
+                'uso_cfdi' => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Receptor/@UsoCFDI)'),
             ],
             'timbre' => [
                 'uuid'           => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital/@UUID)'),
@@ -507,7 +512,7 @@ class SupplierPurchaseOrderController extends Controller
         $iso = $data['fecha'] ?? '2025-08-11T00:00:00';
         $fecha = Carbon::parse($iso)
             ->timezone('America/Mexico_City')
-            ->format('d/m/Y');  
+            ->format('d/m/Y');
 
         $traslados = [];
 
@@ -539,13 +544,13 @@ class SupplierPurchaseOrderController extends Controller
             // }
         }
 
+        
+
         $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
             ->where('type', 'GASTO')
             ->first();                 // ya no uses get() ni limit(1)
 
         $department = $item?->department;
-
-
 
 
 
@@ -587,13 +592,14 @@ class SupplierPurchaseOrderController extends Controller
             "articulos" => [],
             "nota" => "",
             "generico" => "",
-            "xml" =>$xmlBase64,
-            "pdf" =>$pdfBase64
+            "xml" => $xmlBase64,
+            "pdf" => $pdfBase64
         ];
 
-        
 
-        return $data_netsuite;
+
+        // return $data_netsuite;
+        return $data;
 
         // $restletPath = "/restlet.nl?script=5141&deploy=1";
         // try {
@@ -603,5 +609,4 @@ class SupplierPurchaseOrderController extends Controller
         //     return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
         // }
     }
-
 }
