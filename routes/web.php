@@ -9,11 +9,18 @@ use App\Http\Controllers\SuplierUserController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierInvoicesController;
 use App\Http\Controllers\SupplierWhatsappController;
+use App\Models\SupplierInvoice;
 
-Route::resource('suppliers/purchase-orders', SupplierPurchaseOrderController::class);
-Route::resource('suppliers/invoices', SupplierInvoicesController::class);
-Route::resource('suppliers', SupplierController::class);
 
+
+
+
+
+Route::prefix('suppliers')->group(function () {
+    Route::resource('purchase-orders', SupplierPurchaseOrderController::class);
+    Route::resource('purchase-orders-invoices', SupplierInvoicesController::class);
+    Route::resource('supplier', SupplierController::class);
+});
 
 
 Route::get('/', function () {
@@ -41,7 +48,6 @@ Route::middleware([
     Route::delete('/users', [SuplierUserController::class, 'destroySelected'])->name('users.destroySelected');
 
     Route::resource('supplier-whatsapp', SupplierWhatsappController::class)->only(['index']);
-
 });
 
 Route::get('/netsuite/restlet/{scriptId}/{deployId}', [RestletController::class, 'getRestletResponse']);

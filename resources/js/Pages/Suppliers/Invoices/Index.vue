@@ -23,51 +23,23 @@ const form = useForm({
     supplier_purchase_order_id: null,
 });
 
-const toast = useToast();
 const dt = ref();
-const benefitDialog = ref(false);
 const showFiltrer = ref(false);
-const deleteBenefitsDialog = ref(false);
 const op = ref(null);
-
-
-const selectedBenefits = ref();
-// const invoices = ref();
-
-
-// Variables para los inputs (lo que el usuario selecciona)
 const selectedStatus = ref(null);
 const selectedDate = ref(null);
-
-// Variables para los filtros que se aplicarán (solo cuando se haga clic en "Buscar")
 const appliedStatus = ref(null);
 const appliedDate = ref(null);
-
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-});
-
-const submitted = ref(false);
-
-const openNew = () => {
-    benefitDialog.value = true;
-};
-const hideDialog = () => {
-    benefitDialog.value = false;
-    submitted.value = false;
-    showInvoice.value = false;
-    showFiltrer.value = false;
-    selectedOrder.value = null;
-};
-
-
-const selectedOrder = ref(null);
 const invoices = ref([]);
-const selectedInvoices = ref(null);
 const currentOpenPopoverId = ref(null);
 const invoicePdfRoute = ref(null);
 const showInvoice = ref(false);
 const filteredInvoices = ref([]);
+const selectedInvoices = ref(null);
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
 
 const onFilter = (event) => {
     const filterValue = event.value.toLowerCase();
@@ -79,7 +51,8 @@ const onFilter = (event) => {
 const handleInvoiceSelect = () => {
     if (selectedInvoices.value) {
         invoicePdfRoute.value = selectedInvoices.value;
-        showInvoice.value = true;
+        // showInvoice.value = true;
+        window.open(selectedInvoices.value, '_blank');
     } else {
         invoicePdfRoute.value = null;
         showInvoice.value = false;
@@ -100,11 +73,12 @@ const showCompletedInvoices = async (event, id) => {
 
     try {
         op.value.show(event);
-        const response = await axios.get(route('invoices.show', id));
+        const response = await axios.get(route('purchase-orders-invoices.show', id));
 
         invoices.value = (response.data?.invoices || [])
             .filter(invoice => invoice.pdf_route)
             .map(invoice => {
+                console.log(invoice.pdf_route);
                 const fecha = new Date(invoice.created_at);
                 // Obtiene el día, mes y año de la fecha
                 const day = String(fecha.getDate()).padStart(2, '0');
@@ -213,8 +187,8 @@ const getSeverity = (status) => {
                                     @click="filtrer()" />
                             </template>
                         </Toolbar>
-                        <DataTable ref="dt" v-model:selection="selectedBenefits" :value="tableData" dataKey="id"
-                            paginator :rows="10" :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
+                        <DataTable ref="dt" :value="tableData" dataKey="id" paginator :rows="10" :filters="filters"
+                            :rowsPerPageOptions="[5, 10, 25]"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
                             <template #header>
                                 <div class="flex flex-wrap gap-2 items-center justify-between">
@@ -227,12 +201,6 @@ const getSeverity = (status) => {
                                     </IconField>
                                 </div>
                             </template>
-
-                            <!-- <Column
-                                selectionMode="multiple"
-                                style="width: 3rem"
-                                :exportable="false"
-                            ></Column> -->
                             <Column field="id" header="Id" sortable style="min-width: 8rem"></Column>
                             <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 12rem"
                                 bodyClass="ml-2"></Column>
@@ -260,12 +228,12 @@ const getSeverity = (status) => {
                             </Column>
                         </DataTable>
 
-                        <Dialog v-model:visible="showInvoice" :style="{ width: '80%' }" header="FACTURA" :modal="true">
+                        <!-- <Dialog v-model:visible="showInvoice" :style="{ width: '80%' }" header="FACTURA" :modal="true">
                             <div class="card flex justify-center w-full h-full">
-                                <iframe v-if="invoicePdfRoute" :src="`/${invoicePdfRoute}`" width="100%" height="600px"
+                                <iframe v-if="invoicePdfRoute" :src="invoicePdfRoute" width="100%" height="600px"
                                     style="border: none;"></iframe>
                             </div>
-                        </Dialog>
+                        </Dialog> -->
                         <!-- FILTROS PARA BUSCAR RESULTADOS EN TABLA -->
                         <Dialog v-model:visible="showFiltrer" header="Aplicar Filtros" :style="{ width: '35rem' }"
                             :position="'top'" :modal="true" :draggable="false">
@@ -305,7 +273,7 @@ const getSeverity = (status) => {
                                     <template #value="slotProps">
                                         <div v-if="slotProps.value" class="flex items-center">
                                             <i class="pi pi-file-pdf mr-2" style="font-size: 1.2rem; color: #C42102;"></i>
-                                            <div>{{ slotProps.value.label }}</div>
+                                            <div>{{ slotProps.value[slotProps.optionLabel] }}</div>
                                         </div>
                                         <span v-else>
                                             {{ slotProps.placeholder }}

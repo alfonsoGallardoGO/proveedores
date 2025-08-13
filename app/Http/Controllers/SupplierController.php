@@ -8,7 +8,6 @@ use Inertia\Inertia;
 
 class SupplierController extends Controller
 {
-   
     public function index()
     {
         $suppliers = Supplier::orderBy('id', 'desc')
@@ -19,10 +18,10 @@ class SupplierController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('Suppliers/Suppliers/Create');
-    }
+    // public function create()
+    // {
+    //     return Inertia::render('Suppliers/Suppliers/Create');
+    // }
 
     public function store(Request $request)
     {

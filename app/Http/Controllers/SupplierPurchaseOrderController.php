@@ -21,7 +21,7 @@ use App\Services\NetSuiteRestService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use App\Services\CfdiParser;
- use Illuminate\Support\Str;
+use Illuminate\Support\Str;
 
 
 class SupplierPurchaseOrderController extends Controller
@@ -688,7 +688,7 @@ class SupplierPurchaseOrderController extends Controller
 
         $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
 
-
+        return $data_netsuite;
         // return $monto;
         // return $traslados;
 

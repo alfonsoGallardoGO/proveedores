@@ -10,7 +10,6 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import FileUpload from "primevue/fileupload";
 import Message from 'primevue/message';
-import ProgressBar from "primevue/progressbar";
 import Toast from 'primevue/toast';
 
 const props = defineProps({
@@ -26,7 +25,7 @@ const props = defineProps({
 
 const toast = useToast();
 const dtItems = ref();
-const progress = ref(0);
+const loading = ref(false);
 
 const form = useForm({
     cantidades: {},
@@ -82,17 +81,70 @@ const onXmlRemove = () => {
 };
 
 const store = async () => {
+    loading.value = true;
+
     try {
-        progress.value = 0;
+
+        const hasEmptyFields = Object.values(form.cantidades).some(amount => amount === null || amount === '');
+        if (hasEmptyFields) {
+            setTimeout(() => {
+                loading.value = false;
+                toast.add({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Ninguno de los campos de cantidad puede ir vacío.",
+                    life: 4000,
+                });
+            }, 1000);
+            return;
+        }
+
+        if (!form.factura && !form.xml) {
+            setTimeout(() => {
+                loading.value = false;
+                toast.add({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Los documentos no pueden ir vacios, favor de cargar la Factura y el XML.",
+                    life: 4000,
+                });
+            }, 1000);
+            return;
+        }
+
+        if (!form.factura) {
+            setTimeout(() => {
+                loading.value = false;
+                toast.add({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Favor de cargar la Factura.",
+                    life: 4000,
+                });
+            }, 1000);
+            return;
+        }
+
+        if (!form.xml) {
+            setTimeout(() => {
+                loading.value = false;
+                toast.add({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Favor de cargar el XML.",
+                    life: 4000,
+                });
+            }, 1000);
+            return;
+        }
+
 
         const formData = new FormData();
         for (const [itemId, amount] of Object.entries(form.cantidades)) {
             formData.append(`cantidades[${itemId}]`, amount);
         }
         // console.log(form.cantidades);
-        // for (const [key, value] of formData.entries()) {
-        //     console.log(`${key}: ${value}`);
-        // }
+
 
         // formData.append("supplier_id", form.supplier_id);
         formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
@@ -100,67 +152,33 @@ const store = async () => {
         if (form.factura) formData.append("factura", form.factura);
         if (form.xml) formData.append("xml", form.xml);
 
-        if (!form.factura && !form.xml) {
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: "Los documentos no pueden ir vacios, favor de cargar la Factura y el XML.",
-                life: 4000,
-            });
-            return;
-        }
-        if (!form.factura) {
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: "Favor de cargar la Factura.",
-                life: 4000,
-            });
-            return;
-        }
-        if (!form.xml) {
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: "Favor de cargar el XML.",
-                life: 4000,
-            });
-            return;
-        }
-
         const response = await axios.post(route("purchase-orders.store"), formData, {
             headers: { "Content-Type": "multipart/form-data" },
-            onUploadProgress: (event) => {
-                if (event.total) {
-                    progress.value = Math.round((event.loaded * 100) / event.total);
-                }
-            },
         });
 
-        // Imprime la respuesta completa en la consola
-        console.log("Respuesta del servidor:", response);
-
-        // Respuesta del servidor
-        console.log("Datos de la respuesta:", response.data);
-
-        toast.add({
-            severity: "success",
-            summary: "Guardado",
-            detail: "Factura registrada y artículos recibidos",
-            life: 3000,
-        });
+        setTimeout(() => {
+            loading.value = false;
+            toast.add({
+                severity: "success",
+                summary: "Guardado",
+                detail: "Factura registrada y artículos recibidos",
+                life: 3000,
+            });
+            window.location.reload();
+        }, 3000);
 
     } catch (error) {
         console.error(error);
-
-        toast.add({
-            severity: "error",
-            summary: "Error",
-            detail: "Hubo un problema al guardar los datos",
-            life: 3000,
-        });
-    } finally {
-        progress.value = 0;
+        setTimeout(() => {
+            loading.value = false;
+            toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: "Hubo un problema al guardar los datos",
+                life: 3000,
+            });
+            window.location.reload();
+        }, 2000);
     }
 };
 
@@ -217,7 +235,6 @@ const formatDate = (dateString) => {
             <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
-                        <ProgressBar :value="progress" v-if="progress > 0" />
                         <Toast />
                         <div class="card flex justify-center">
                             <Toolbar class="p-5">
@@ -270,7 +287,7 @@ const formatDate = (dateString) => {
                                 <Column header="Monto" style="min-width: 10rem">
                                     <template #body="{ data }">
                                         <span class="font-bold text-gray-800">{{ formatCurrency(data.amount)
-                                            }}</span>
+                                        }}</span>
                                     </template>
                                 </Column>
                                 <Column header="Entrega" style="min-width: 12rem">
@@ -303,7 +320,7 @@ const formatDate = (dateString) => {
                                                 <i class="pi pi-file-pdf text-red-500"></i>
                                                 Subir Factura (PDF)
                                             </h4>
-                                            <FileUpload name="factura" accept=".pdf" :auto="false"
+                                            <FileUpload name="factura" ref="facturaFileUpload" accept=".pdf" :auto="false"
                                                 @select="onFacturaUpload" @remove="onFacturaRemove"
                                                 :customUpload="true">
                                                 <template #header="{ chooseCallback }">
@@ -331,7 +348,7 @@ const formatDate = (dateString) => {
                                                 <i class="pi pi-code text-green-600"></i>
                                                 Subir XML
                                             </h4>
-                                            <FileUpload name="xml" accept=".xml" :auto="false" @select="onXmlUpload"
+                                            <FileUpload name="xml" ref="xmlFileUpload" accept=".xml" :auto="false" @select="onXmlUpload"
                                                 @remove="onXmlRemove" :customUpload="true">
                                                 <template #header="{ chooseCallback }">
                                                     <Button :label="buttonLabelXml" icon="pi pi-file-excel"
@@ -361,7 +378,8 @@ const formatDate = (dateString) => {
                                         <div class="flex justify-center w-full">
                                             <div class="card p-4">
                                                 <Button label="Subir Documentos" icon="pi pi-cloud-upload"
-                                                    severity="help" @click="store()" outlined class="w-80" />
+                                                    severity="help" :loading="loading" @click="store()" outlined
+                                                    class="w-80" />
                                             </div>
                                         </div>
                                     </div>
@@ -399,7 +417,7 @@ const formatDate = (dateString) => {
                                                     <template #body="slotProps">
                                                         <div class="flex items-center gap-4">
                                                             <Button v-if="slotProps.data.pdf_route"
-                                                                @click="showDocument(`/storage/${slotProps.data.pdf_route}`)"
+                                                                @click="showDocument(slotProps.data.pdf_route)"
                                                                 label="Ver PDF" icon="pi pi-file-pdf"
                                                                 class="p-button-sm p-button-outlined"
                                                                 aria-label="Ver PDF" severity="danger" />

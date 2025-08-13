@@ -112,7 +112,7 @@ export default {
                         class="menu-item menu-accordion"
                     >
                         <Link
-                            :href="route('suppliers.index')"
+                            :href="route('supplier.index')"
                             class="menu-link"
                         >
                             <span class="menu-icon">
@@ -143,7 +143,7 @@ export default {
                         data-kt-menu-trigger="click"
                         class="menu-item menu-accordion"
                     >
-                        <Link :href="route('invoices.index')" class="menu-link">
+                        <Link :href="route('purchase-orders-invoices.index')" class="menu-link">
                             <span class="menu-icon">
                                 <i
                                     class="ki-solid ki-questionnaire-tablet fs-2"
