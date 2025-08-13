@@ -12,7 +12,7 @@ class SupplierWhatsappController extends Controller
 {
     public function index()
     {
-        $supplierId = Auth::user()->supplier_id ?? 1;
+        $supplierId = Auth::user()->supplier_id;
         $supplier = Supplier::where('external_id', $supplierId)->first();
         //dd($supplierId);
 
@@ -20,7 +20,7 @@ class SupplierWhatsappController extends Controller
         return Inertia::render('Whatsapp/Index', [
             'supplierWhatsapps' => $supplierWhatsapps,
             'supplierId' => $supplierId,
-            'supplierName' => $supplier->company_name,
+            'supplierName' => $supplier?->company_name,
         ]);
     }
 }
