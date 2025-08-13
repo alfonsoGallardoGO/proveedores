@@ -10,7 +10,8 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import FileUpload from "primevue/fileupload";
 import Message from 'primevue/message';
-
+import ProgressBar from "primevue/progressbar";
+import Toast from 'primevue/toast';
 
 const props = defineProps({
     invoices: Array,
@@ -59,6 +60,11 @@ const onFacturaUpload = (event) => {
     }
 };
 
+const onFacturaRemove = () => {
+    form.factura = null;
+    buttonLabelPdf.value = 'Seleccionar Factura';
+};
+
 const onXmlUpload = (event) => {
     const file = event.files[0];
     form.xml = file;
@@ -70,6 +76,10 @@ const onXmlUpload = (event) => {
     }
 };
 
+const onXmlRemove = () => {
+    form.xml = null;
+    buttonLabelXml.value = 'Seleccionar XML';
+};
 
 const store = async () => {
     try {
@@ -79,6 +89,10 @@ const store = async () => {
         for (const [itemId, amount] of Object.entries(form.cantidades)) {
             formData.append(`cantidades[${itemId}]`, amount);
         }
+        // console.log(form.cantidades);
+        // for (const [key, value] of formData.entries()) {
+        //     console.log(`${key}: ${value}`);
+        // }
 
         // formData.append("supplier_id", form.supplier_id);
         formData.append("supplier_purchase_order_id", form.supplier_purchase_order_id);
@@ -95,7 +109,26 @@ const store = async () => {
             });
             return;
         }
-        await axios.post(route("purchase-orders.store"), formData, {
+        if (!form.factura) {
+            toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: "Favor de cargar la Factura.",
+                life: 4000,
+            });
+            return;
+        }
+        if (!form.xml) {
+            toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: "Favor de cargar el XML.",
+                life: 4000,
+            });
+            return;
+        }
+
+        const response = await axios.post(route("purchase-orders.store"), formData, {
             headers: { "Content-Type": "multipart/form-data" },
             onUploadProgress: (event) => {
                 if (event.total) {
@@ -104,13 +137,18 @@ const store = async () => {
             },
         });
 
+        // Imprime la respuesta completa en la consola
+        console.log("Respuesta del servidor:", response);
+
+        // Respuesta del servidor
+        console.log("Datos de la respuesta:", response.data);
+
         toast.add({
             severity: "success",
             summary: "Guardado",
-            detail: "Datos guardados correctamente",
+            detail: "Factura registrada y artículos recibidos",
             life: 3000,
         });
-
 
     } catch (error) {
         console.error(error);
@@ -179,6 +217,7 @@ const formatDate = (dateString) => {
             <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
+                        <ProgressBar :value="progress" v-if="progress > 0" />
                         <Toast />
                         <div class="card flex justify-center">
                             <Toolbar class="p-5">
@@ -231,7 +270,7 @@ const formatDate = (dateString) => {
                                 <Column header="Monto" style="min-width: 10rem">
                                     <template #body="{ data }">
                                         <span class="font-bold text-gray-800">{{ formatCurrency(data.amount)
-                                        }}</span>
+                                            }}</span>
                                     </template>
                                 </Column>
                                 <Column header="Entrega" style="min-width: 12rem">
@@ -265,24 +304,24 @@ const formatDate = (dateString) => {
                                                 Subir Factura (PDF)
                                             </h4>
                                             <FileUpload name="factura" accept=".pdf" :auto="false"
-                                                @select="onFacturaUpload" :customUpload="true">
+                                                @select="onFacturaUpload" @remove="onFacturaRemove"
+                                                :customUpload="true">
                                                 <template #header="{ chooseCallback }">
-                                                    <Button 
-                                                        :label="buttonLabelPdf" 
-                                                        icon="pi pi-file-pdf"
-                                                        @click="chooseCallback()" 
-                                                        severity="danger"
-                                                        class="p-button-sm p-button-rounded" 
-                                                        outlined 
-                                                    />
+                                                    <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
+                                                        @click="chooseCallback()" severity="danger"
+                                                        class="p-button-sm p-button-rounded" outlined />
                                                 </template>
-                                                <template #content="{ files }">
-                                                    <div v-for="file of files" :key="file.name"
+
+                                                <template #content="{ files, removeFileCallback }">
+                                                    <div v-for="(file, index) of files" :key="file.name"
                                                         class="p-4 flex items-center justify-between">
                                                         <span class="flex items-center gap-2">
                                                             <i class="pi pi-check-circle text-green-500" />
                                                             {{ file.name }}
                                                         </span>
+
+                                                        <Button icon="pi pi-times" severity="danger" outlined rounded
+                                                            class="p-button-sm" @click="removeFileCallback(index)" />
                                                     </div>
                                                 </template>
                                             </FileUpload>
@@ -293,24 +332,23 @@ const formatDate = (dateString) => {
                                                 Subir XML
                                             </h4>
                                             <FileUpload name="xml" accept=".xml" :auto="false" @select="onXmlUpload"
-                                                :customUpload="true">
+                                                @remove="onXmlRemove" :customUpload="true">
                                                 <template #header="{ chooseCallback }">
-                                                    <Button 
-                                                        :label="buttonLabelXml" 
-                                                        icon="pi pi-file-excel"
-                                                        @click="chooseCallback()" 
-                                                        severity="success"
-                                                        class="p-button-sm p-button-rounded" 
-                                                        outlined 
-                                                    />
+                                                    <Button :label="buttonLabelXml" icon="pi pi-file-excel"
+                                                        @click="chooseCallback()" severity="success"
+                                                        class="p-button-sm p-button-rounded" outlined />
                                                 </template>
-                                                <template #content="{ files }">
-                                                    <div v-for="file of files" :key="file.name"
+
+                                                <template #content="{ files, removeFileCallback }">
+                                                    <div v-for="(file, index) of files" :key="file.name"
                                                         class="p-4 flex items-center justify-between">
                                                         <span class="flex items-center gap-2">
                                                             <i class="pi pi-check-circle text-green-500" />
                                                             {{ file.name }}
                                                         </span>
+
+                                                        <Button icon="pi pi-times" severity="danger" outlined rounded
+                                                            class="p-button-sm" @click="removeFileCallback(index)" />
                                                     </div>
                                                 </template>
                                             </FileUpload>
@@ -360,14 +398,11 @@ const formatDate = (dateString) => {
                                                 <Column header="Documentos" style="min-width: 16rem">
                                                     <template #body="slotProps">
                                                         <div class="flex items-center gap-4">
-                                                            <Button 
-                                                                v-if="slotProps.data.pdf_route"
+                                                            <Button v-if="slotProps.data.pdf_route"
                                                                 @click="showDocument(`/storage/${slotProps.data.pdf_route}`)"
                                                                 label="Ver PDF" icon="pi pi-file-pdf"
                                                                 class="p-button-sm p-button-outlined"
-                                                                aria-label="Ver PDF"
-                                                                severity="danger" 
-                                                            />
+                                                                aria-label="Ver PDF" severity="danger" />
                                                             <span v-else class="flex items-center text-gray-400">
                                                                 <i class="pi pi-file text-xl"></i>
                                                                 <span class="ml-2 hidden sm:inline">Sin PDF</span>

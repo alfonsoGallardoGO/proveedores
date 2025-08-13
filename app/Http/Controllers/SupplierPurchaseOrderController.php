@@ -63,6 +63,7 @@ class SupplierPurchaseOrderController extends Controller
             'invoices' => $invoices,
         ]);
     }
+
     public function store(Request $request)
     {
         $data = $request;
