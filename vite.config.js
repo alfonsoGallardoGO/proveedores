@@ -27,6 +27,7 @@ export default defineConfig({
                 __dirname,
                 "./storage/app/public/profile-photos"
             ),
+            "~": path.resolve(__dirname, "./node_modules"),
         },
     },
 });
