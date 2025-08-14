@@ -9,9 +9,7 @@ use App\Http\Controllers\SuplierUserController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierInvoicesController;
 use App\Http\Controllers\SupplierWhatsappController;
-use App\Models\SupplierInvoice;
-
-
+use App\Http\Controllers\DashboardController;
 
 
 
@@ -37,9 +35,8 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    // Route::get('/dashboard', function () {return Inertia::render('Dashboard');})->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/users', [SuplierUserController::class, 'index'])->name('users.index');
     Route::post('/users', [SuplierUserController::class, 'store'])->name('users.store');
