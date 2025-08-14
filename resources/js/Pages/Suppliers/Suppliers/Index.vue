@@ -140,30 +140,10 @@ const validateEmail = () => {
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
                         <Toast />
-                        <!-- <Toolbar class="p-5">
-                            <template #start>
-                                <Button
-                                    label="Añadir"
-                                    icon="pi pi-plus"
-                                    class="mr-2"
-                                    @click="openNew"
-                                />
-                                <Button
-                                    label="Eliminar Seleccionados"
-                                    icon="pi pi-trash"
-                                    severity="danger"
-                                    outlined
-                                    @click="confirmDeleteSelected"
-                                    :disabled="
-                                        !selectedBenefits ||
-                                        !selectedBenefits.length
-                                    "
-                                />
-                            </template>
-</Toolbar> -->
                         <DataTable ref="dt" v-model:selection="selectedBenefits" :value="suppliers" dataKey="id"
                             paginator :rows="10" :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
-                            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores">
+                            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores"
+                            sortField="id" sortOrder="-1">
                             <template #header>
                                 <div class="flex flex-wrap gap-2 items-center justify-between">
                                     <h4 class="m-0"></h4>
