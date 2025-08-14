@@ -6,7 +6,8 @@
 import { ref, onMounted, watch } from 'vue';
 import * as pdfjsLib from 'pdfjs-dist';
 // Código corregido para la importación
-import PdfjsWorker from '~/pdfjs-dist/build/pdf.worker.min.mjs?url';
+// import PdfjsWorker from '~/pdfjs-dist/build/pdf.worker.min.mjs?url';
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/build/assets/pdf.worker.min.mjs';
 
 const props = defineProps({
     pdfUrl: {
