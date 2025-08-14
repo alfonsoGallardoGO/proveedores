@@ -53,8 +53,8 @@ const handleInvoiceSelect = () => {
     if (selectedInvoices.value) {
         const pdfUrl = selectedInvoices.value.value; 
         invoicePdfRoute.value = pdfUrl;
-        // window.open(pdfUrl, '_blank');
-        showInvoice.value = true;
+        window.open(pdfUrl, '_blank');
+        // showInvoice.value = true;
         
     } else {
         invoicePdfRoute.value = null;
@@ -229,13 +229,13 @@ const getSeverity = (status) => {
                                 </template>
                             </Column>
                         </DataTable>
-                        <Dialog v-model:visible="showInvoice" :style="{ width: '62%' }" header="FACTURA" :modal="true">
+                        <!-- <Dialog v-model:visible="showInvoice" :style="{ width: '62%' }" header="FACTURA" :modal="true">
                             <div class="card flex justify-center w-full h-full">
                                 <div v-if="invoicePdfRoute">
                                     <PdfViewer :pdfUrl="invoicePdfRoute" />
                                 </div>
                             </div>
-                        </Dialog>
+                        </Dialog> -->
                         <!-- FILTROS PARA BUSCAR RESULTADOS EN TABLA -->
                         <Dialog v-model:visible="showFiltrer" header="Aplicar Filtros" :style="{ width: '35rem' }"
                             :position="'top'" :modal="true" :draggable="false">
