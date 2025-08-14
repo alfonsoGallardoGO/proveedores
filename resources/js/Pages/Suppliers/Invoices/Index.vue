@@ -6,6 +6,7 @@ import { FilterMatchMode } from "@primevue/core/api";
 import { useToast } from "primevue/usetoast";
 import { useForm } from "@inertiajs/vue3";
 import axios from "axios";
+import PdfViewer from '@/Components/PdfViewer.vue';
 
 const props = defineProps({
     orders: Array,
@@ -50,9 +51,11 @@ const onFilter = (event) => {
 
 const handleInvoiceSelect = () => {
     if (selectedInvoices.value) {
-        invoicePdfRoute.value = selectedInvoices.value;
-        // showInvoice.value = true;
-        window.open(selectedInvoices.value, '_blank');
+        const pdfUrl = selectedInvoices.value.value; 
+        invoicePdfRoute.value = pdfUrl;
+        // window.open(pdfUrl, '_blank');
+        showInvoice.value = true;
+        
     } else {
         invoicePdfRoute.value = null;
         showInvoice.value = false;
@@ -78,7 +81,6 @@ const showCompletedInvoices = async (event, id) => {
         invoices.value = (response.data?.invoices || [])
             .filter(invoice => invoice.pdf_route)
             .map(invoice => {
-                console.log(invoice.pdf_route);
                 const fecha = new Date(invoice.created_at);
                 // Obtiene el día, mes y año de la fecha
                 const day = String(fecha.getDate()).padStart(2, '0');
@@ -227,13 +229,13 @@ const getSeverity = (status) => {
                                 </template>
                             </Column>
                         </DataTable>
-
-                        <!-- <Dialog v-model:visible="showInvoice" :style="{ width: '80%' }" header="FACTURA" :modal="true">
+                        <Dialog v-model:visible="showInvoice" :style="{ width: '62%' }" header="FACTURA" :modal="true">
                             <div class="card flex justify-center w-full h-full">
-                                <iframe v-if="invoicePdfRoute" :src="invoicePdfRoute" width="100%" height="600px"
-                                    style="border: none;"></iframe>
+                                <div v-if="invoicePdfRoute">
+                                    <PdfViewer :pdfUrl="invoicePdfRoute" />
+                                </div>
                             </div>
-                        </Dialog> -->
+                        </Dialog>
                         <!-- FILTROS PARA BUSCAR RESULTADOS EN TABLA -->
                         <Dialog v-model:visible="showFiltrer" header="Aplicar Filtros" :style="{ width: '35rem' }"
                             :position="'top'" :modal="true" :draggable="false">
@@ -264,7 +266,6 @@ const getSeverity = (status) => {
                                     :options="invoices" 
                                     filter 
                                     optionLabel="label"
-                                    optionValue="value"
                                     placeholder="Selecciona una factura"
                                     class="w-full md:w-56"
                                     @change="handleInvoiceSelect"
@@ -273,7 +274,7 @@ const getSeverity = (status) => {
                                     <template #value="slotProps">
                                         <div v-if="slotProps.value" class="flex items-center">
                                             <i class="pi pi-file-pdf mr-2" style="font-size: 1.2rem; color: #C42102;"></i>
-                                            <div>{{ slotProps.value[slotProps.optionLabel] }}</div>
+                                            <div>{{ slotProps.value.label }}</div>
                                         </div>
                                         <span v-else>
                                             {{ slotProps.placeholder }}

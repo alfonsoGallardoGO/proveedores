@@ -75,8 +75,10 @@ const editSupplier = async (id) => {
             phone: supplierForm.phone,
         };
 
-        const response = await axios.patch(
-            route("suppliers.update", id),
+        // const response = await axios.patch(route('supplier.update', id),
+        //     updatedData
+        // );
+        const response = await axios.patch(route('supplier.update', { supplier: id }),
             updatedData
         );
 
@@ -103,7 +105,7 @@ const editSupplier = async (id) => {
 
 const show = async (id) => {
     try {
-        const response = await axios.get(`/suppliers/${id}`);
+        const response = await axios.get(`supplier/${id}`);
         const data = response.data;
 
         supplierForm.id = data.id || null;
@@ -213,12 +215,9 @@ const validateEmail = () => {
                                             <i class="pi pi-envelope text-red-400"></i>
                                             Correo
                                         </label>
-                                        <InputText v-model="supplierForm.email"
-                                            @input="validateEmail"
-                                            :class="{ 'p-invalid': !isEmailValid }"
-                                            placeholder="correo@ejemplo.com"
-                                            class="w-full p-inputtext-sm"
-                                        />
+                                        <InputText v-model="supplierForm.email" @input="validateEmail"
+                                            :class="{ 'p-invalid': !isEmailValid }" placeholder="correo@ejemplo.com"
+                                            class="w-full p-inputtext-sm" />
                                     </div>
                                     <div class="flex flex-col">
                                         <label class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
