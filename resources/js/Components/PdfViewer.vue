@@ -5,6 +5,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import * as pdfjsLib from 'pdfjs-dist';
+import PdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 const props = defineProps({
     pdfUrl: {
@@ -16,7 +17,8 @@ const props = defineProps({
 const container = ref(null);
 
 // pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/resources/js/pdf.worker.min.mjs';
+// pdfjsLib.GlobalWorkerOptions.workerSrc = '/resources/js/pdf.worker.min.mjs';
+pdfjsLib.GlobalWorkerOptions.workerSrc = PdfjsWorker;
 
 const renderPdf = async (url) => {
     if (!url) return;
