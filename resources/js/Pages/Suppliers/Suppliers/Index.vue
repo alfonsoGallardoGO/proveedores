@@ -90,7 +90,7 @@ const editSupplier = async (id) => {
             life: 3000,
         });
         validateEmail();
-        router.reload();
+        window.location.reload();
     } catch (error) {
         console.log(error);
         hideDialog();
