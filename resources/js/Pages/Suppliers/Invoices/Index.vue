@@ -223,9 +223,7 @@ const getSeverity = (status) => {
                             </Column>
                             <Column :exportable="false" header="Facturas" style="min-width: 13rem">
                                 <template #body="slotProps">
-                                    <!-- <Button icon="pi pi-file-pdf" outlined severity="danger" class="w-full py-0.5"
-                                        @click="showCompletedInvoices($event, slotProps.data.id)" /> -->
-                                    <Button label="Facturas Cargadas" outlined severity="danger"
+                                    <Button label="Ver Facturas" outlined severity="danger"
                                         @click="showCompletedInvoices($event, slotProps.data.id)" />
                                 </template>
                             </Column>
