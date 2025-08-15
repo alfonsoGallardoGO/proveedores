@@ -34,15 +34,12 @@ const supplierForm = useForm({
 
 const tipo = ref(null);
 const intervalo = ref(null);
-// const supplierForm = ref(null);
 const isEmailValid = ref(true);
-
 const reglas = ref([]);
-
 const toast = useToast();
 const dt = ref();
 const supplierDialog = ref(false);
-const selectedBenefits = ref();
+const loading = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -58,14 +55,18 @@ const hideDialog = () => {
 };
 
 const editSupplier = async (id) => {
+    loading.value = true;
     validateEmail();
     if (!isEmailValid.value) {
-        toast.add({
-            severity: "error",
-            summary: "Error",
-            detail: "Por favor, ingresa un correo electrónico válido.",
-            life: 3000,
-        });
+        setTimeout(() => {
+            loading.value = false;
+            toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: "Por favor, ingresa un correo electrónico válido.",
+                life: 3000,
+            });
+        }, 1000);
         return;
     }
     try {
@@ -74,32 +75,35 @@ const editSupplier = async (id) => {
             email: supplierForm.email,
             phone: supplierForm.phone,
         };
-
-        // const response = await axios.patch(route('supplier.update', id),
-        //     updatedData
-        // );
         const response = await axios.patch(route('supplier.update', { supplier: id }),
             updatedData
         );
 
-        hideDialog();
-        toast.add({
-            severity: "success",
-            summary: "Actualizado",
-            detail: response.data.message || "Proveedor actualizado con éxito.",
-            life: 3000,
-        });
-        validateEmail();
-        window.location.reload();
+        setTimeout(() => {
+            loading.value = false;
+            toast.add({
+                severity: "success",
+                summary: "Actualizado",
+                detail: response.data.message || "Proveedor actualizado con éxito.",
+                life: 3000,
+            });
+            hideDialog();
+            window.location.reload();
+        }, 3000);        
+        return;
+        
     } catch (error) {
-        console.log(error);
-        hideDialog();
-        toast.add({
-            severity: "error",
-            summary: "Error",
-            detail: error.response?.data?.message || "Error al actualizar el proveedor.",
-            life: 3000,
-        });
+        setTimeout(() => {
+            loading.value = false;
+            toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: error.response?.data?.message || "Error al actualizar el proveedor.",
+                life: 3000,
+            });
+            hideDialog();
+        }, 1000);
+        return;
     }
 };
 
@@ -140,10 +144,10 @@ const validateEmail = () => {
                 <div class="container-fluid" id="kt_content_container">
                     <div class="card">
                         <Toast />
-                        <DataTable ref="dt" v-model:selection="selectedBenefits" :value="suppliers" dataKey="id"
-                            paginator :rows="10" :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
+                        <DataTable ref="dt" :value="suppliers" dataKey="id" paginator :rows="10" :filters="filters"
+                            :rowsPerPageOptions="[5, 10, 25]"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores"
-                            sortField="id" sortOrder="-1">
+                            sortField="id" :sortOrder="-1">
                             <template #header>
                                 <div class="flex flex-wrap gap-2 items-center justify-between">
                                     <h4 class="m-0"></h4>
@@ -172,8 +176,8 @@ const validateEmail = () => {
 
                             <Column :exportable="false" style="min-width: 4rem">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-pencil" severity="help" outlined rounded class="mr-2"
-                                        @click="show(slotProps.data.id)" />
+                                    <Button icon="pi pi-pencil" severity="help" outlined rounded
+                                        class="mr-2" @click="show(slotProps.data.id)" />
                                 </template>
                             </Column>
                         </DataTable>
@@ -212,7 +216,7 @@ const validateEmail = () => {
 
                             <template #footer>
                                 <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                                <Button label="Guardar" icon="pi pi-check" @click="editSupplier(supplierForm.id)" />
+                                <Button label="Guardar" icon="pi pi-cloud-upload" :loading="loading" @click="editSupplier(supplierForm.id)" />
                             </template>
                         </Dialog>
                     </div>

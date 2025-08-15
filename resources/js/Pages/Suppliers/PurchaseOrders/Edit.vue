@@ -278,9 +278,13 @@ const formatDate = (dateString) => {
                                 </Column>
                                 <Column header="Faltan" style="min-width: 8rem">
                                     <template #body="{ data }">
-                                        <span
+                                        <!-- <span
                                             :class="(data.quantity - (data.deliveries_sum_amount ?? 0)) > 0 ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'">
                                             {{ data.quantity - (data.deliveries_sum_amount ?? 0) }}
+                                        </span> -->
+                                        <span
+                                            :class="(data.quantity - (data.deliveries_sum_amount ?? 0)) > 0 ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'">
+                                            {{ Math.max(0, data.quantity - (data.deliveries_sum_amount ?? 0)) }}
                                         </span>
                                     </template>
                                 </Column>
@@ -292,9 +296,12 @@ const formatDate = (dateString) => {
                                 </Column>
                                 <Column header="Entrega" style="min-width: 12rem">
                                     <template #body="{ data }">
-                                        <InputNumber v-model="form.cantidades[data.id]" :min="0"
+                                        <!-- <InputNumber v-model="form.cantidades[data.id]" :min="0"
                                             :max="data.quantity - (data.deliveries_sum_amount ?? 0)" showButtons
-                                            inputClass="w-20 text-center" class="w-full" />
+                                            inputClass="w-20 text-center" class="w-full" /> -->
+                                        <InputNumber v-model="form.cantidades[data.id]" :min="0"
+                                            :max="Math.max(0, data.quantity - (data.deliveries_sum_amount ?? 0))"
+                                            showButtons inputClass="w-20 text-center" class="w-full" />
                                     </template>
                                 </Column>
                             </DataTable>
@@ -320,8 +327,8 @@ const formatDate = (dateString) => {
                                                 <i class="pi pi-file-pdf text-red-500"></i>
                                                 Subir Factura (PDF)
                                             </h4>
-                                            <FileUpload name="factura" ref="facturaFileUpload" accept=".pdf" :auto="false"
-                                                @select="onFacturaUpload" @remove="onFacturaRemove"
+                                            <FileUpload name="factura" ref="facturaFileUpload" accept=".pdf"
+                                                :auto="false" @select="onFacturaUpload" @remove="onFacturaRemove"
                                                 :customUpload="true">
                                                 <template #header="{ chooseCallback }">
                                                     <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
@@ -348,8 +355,8 @@ const formatDate = (dateString) => {
                                                 <i class="pi pi-code text-green-600"></i>
                                                 Subir XML
                                             </h4>
-                                            <FileUpload name="xml" ref="xmlFileUpload" accept=".xml" :auto="false" @select="onXmlUpload"
-                                                @remove="onXmlRemove" :customUpload="true">
+                                            <FileUpload name="xml" ref="xmlFileUpload" accept=".xml" :auto="false"
+                                                @select="onXmlUpload" @remove="onXmlRemove" :customUpload="true">
                                                 <template #header="{ chooseCallback }">
                                                     <Button :label="buttonLabelXml" icon="pi pi-file-excel"
                                                         @click="chooseCallback()" severity="success"

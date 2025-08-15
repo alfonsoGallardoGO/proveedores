@@ -103,7 +103,7 @@ const getSeverity = (status) => {
                         <DataTable ref="dt"  :value="orders" dataKey="id" paginator
                             :rows="10" :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones"
-                            sortField="id" sortOrder="-1">
+                            sortField="id" :sortOrder="-1">
                             <template #header>
                                 <div class="flex flex-wrap gap-2 items-center justify-between">
                                     <h4 class="m-0"></h4>
