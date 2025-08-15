@@ -11,6 +11,7 @@ import Tab from 'primevue/tab';
 import FileUpload from "primevue/fileupload";
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
+import Ripple from 'primevue/ripple';
 
 const props = defineProps({
     invoices: Array,
@@ -207,11 +208,12 @@ const tabsItems = ref([
 ]);
 
 const dialogVisible = ref(false);
-const currentDocumentUrl = ref('');
+// const currentDocumentUrl = ref('');
 
 const showDocument = (url) => {
-    currentDocumentUrl.value = url;
-    dialogVisible.value = true;
+    // currentDocumentUrl.value = url;
+    window.open(url, '_blank');
+    // dialogVisible.value = true;
 };
 
 const formatDate = (dateString) => {
@@ -440,7 +442,7 @@ const formatDate = (dateString) => {
                                     </div>
                                 </div>
                             </div>
-                            <Dialog v-model:visible="dialogVisible" modal :style="{ width: '80vw' }"
+                            <!-- <Dialog v-model:visible="dialogVisible" modal :style="{ width: '80vw' }"
                                 header="Visualización de Factura">
                                 <div v-if="currentDocumentUrl" class="h-[80vh] w-full">
                                     <iframe :src="currentDocumentUrl" class="w-full h-full border-none"
@@ -450,7 +452,7 @@ const formatDate = (dateString) => {
                                     <Message severity="error" variant="outlined">No se ha seleccionado ningún documento
                                         para ver.</Message>
                                 </div>
-                            </Dialog>
+                            </Dialog> -->
                         </div>
                     </div>
                 </div>

@@ -38,6 +38,7 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import Message from 'primevue/message';
 import DatePicker from 'primevue/datepicker';
+import Ripple from 'primevue/ripple';
 
 
 
@@ -109,6 +110,7 @@ createInertiaApp({
         app.use(plugin);
         app.use(ZiggyVue);
         app.use(PrimeVue, {
+            ripple: true,
             theme: {
                 preset: MyPreset,
                 options: {
@@ -125,6 +127,7 @@ createInertiaApp({
                 clear: "Limpiar"
             }
         });
+        app.directive('ripple', Ripple);
         app.use(ToastService);
         app.component("Toolbar", Toolbar);
         app.component("Button", Button);
