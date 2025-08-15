@@ -308,7 +308,8 @@ const totalTotalmenteFacturada = computed(() => {
 										</div>
 										<div class="d-flex text-center flex-column text-white pt-8">
 											<span class="fw-semibold fs-7">TOTAL DE IMPUESTOS</span>
-											<span class="fw-bold fs-2x pt-1">{{ totalImpuestos }}</span>
+											<span class="fw-bold fs-2x pt-1">${{ totalImpuestos.toLocaleString('es-MX',
+												{ minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
 										</div>
 									</div>
 									<div class="bg-body shadow-sm card-rounded mx-9 mb-9 px-6 py-9 position-relative z-index-1"
@@ -324,8 +325,10 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Factura
 														pendientes</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{ impuestosFacturaPendientes
-													}}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														impuestosFacturaPendientes.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 })
+														}}</div>
 												</div>
 											</div>
 										</div>
@@ -339,7 +342,9 @@ const totalTotalmenteFacturada = computed(() => {
 												<div class="mb-1 pe-3 flex-grow-1">
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Cerrada</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{ impuestosCerrada }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														impuestosCerrada.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -354,8 +359,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Facturación
 														pendiente/Parcialmente recibido</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														impuestosFacturacionPendiente }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														impuestosFacturacionPendiente.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -370,8 +376,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Parcialmete
 														recibida</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														impuestosParcialmenteRecibida }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														impuestosParcialmenteRecibida.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -386,8 +393,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Recepción
 														pendiente</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														impuestosRecepcionPendiente }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														impuestosRecepcionPendiente.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -402,8 +410,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Totalmente
 														facturada</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														impuestosTotalmenteFacturada }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														impuestosTotalmenteFacturada.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -420,7 +429,8 @@ const totalTotalmenteFacturada = computed(() => {
 										</div>
 										<div class="d-flex text-center flex-column text-white pt-8">
 											<span class="fw-semibold fs-7">TOTAL DE SUBTOTALES</span>
-											<span class="fw-bold fs-2x pt-1">{{ totalSubtotal }}</span>
+											<span class="fw-bold fs-2x pt-1">${{ totalSubtotal.toLocaleString('es-MX', {
+												minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
 										</div>
 									</div>
 									<div class="bg-body shadow-sm card-rounded mx-9 mb-9 px-6 py-9 position-relative z-index-1"
@@ -436,8 +446,10 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Factura
 														pendientes</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{ subtotalFacturaPendientes
-													}}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														subtotalFacturaPendientes.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 })
+														}}</div>
 												</div>
 											</div>
 										</div>
@@ -451,7 +463,10 @@ const totalTotalmenteFacturada = computed(() => {
 												<div class="mb-1 pe-3 flex-grow-1">
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Cerrada</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{ subtotalCerrada }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														subtotalCerrada.toLocaleString('es-MX', {
+															minimumFractionDigits:
+																2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -466,8 +481,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Facturación
 														pendiente/Parcialmente recibido</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														subtotalFacturacionPendiente }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														subtotalFacturacionPendiente.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -482,8 +498,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Parcialmete
 														recibida</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														subtotalParcialmenteRecibida }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														subtotalParcialmenteRecibida.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -498,8 +515,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Recepción
 														pendiente</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														subtotalRecepcionPendiente }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														subtotalRecepcionPendiente.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -514,8 +532,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Totalmente
 														facturada</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														subtotalTotalmenteFacturada }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														subtotalTotalmenteFacturada.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -532,7 +551,8 @@ const totalTotalmenteFacturada = computed(() => {
 										</div>
 										<div class="d-flex text-center flex-column text-white pt-8">
 											<span class="fw-semibold fs-7">TOTAL</span>
-											<span class="fw-bold fs-2x pt-1">{{ total }}</span>
+											<span class="fw-bold fs-2x pt-1">${{ total.toLocaleString('es-MX', {
+												minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
 										</div>
 									</div>
 									<div class="bg-body shadow-sm card-rounded mx-9 mb-9 px-6 py-9 position-relative z-index-1"
@@ -548,8 +568,10 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Factura
 														pendientes</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{ totalFacturaPendientes
-													}}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														totalFacturaPendientes.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 })
+														}}</div>
 												</div>
 											</div>
 										</div>
@@ -563,7 +585,10 @@ const totalTotalmenteFacturada = computed(() => {
 												<div class="mb-1 pe-3 flex-grow-1">
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Cerrada</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{ totalCerrada }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														totalCerrada.toLocaleString('es-MX', {
+															minimumFractionDigits: 2,
+														maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -578,8 +603,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Facturación
 														pendiente/Parcialmente recibido</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														totalFacturacionPendiente }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														totalFacturacionPendiente.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -594,8 +620,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Parcialmete
 														recibida</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														totalParcialmenteRecibida }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														totalParcialmenteRecibida.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -610,8 +637,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Recepción
 														pendiente</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														totalRecepcionPendiente }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														totalRecepcionPendiente.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
@@ -626,8 +654,9 @@ const totalTotalmenteFacturada = computed(() => {
 													<a href="#"
 														class="fs-5 text-gray-800 text-hover-primary fw-bold">Totalmente
 														facturada</a>
-													<div class="text-gray-500 fw-semibold fs-7">{{
-														totalTotalmenteFacturada }}</div>
+													<div class="text-gray-500 fw-semibold fs-7">${{
+														totalTotalmenteFacturada.toLocaleString('es-MX', {
+															minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
 												</div>
 											</div>
 										</div>
