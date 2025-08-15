@@ -14,7 +14,7 @@ class SupplierInvoicesController extends Controller
 {
     public function index()
     {
-        $orders = SupplierPurchaseOrder::where('supplier_id', $supplierId = Auth::user()->supplier_id ?? 65424) -> with('items')
+        $orders = SupplierPurchaseOrder::where('supplier_external_id', $supplierId = Auth::user()->supplier_id ?? 65424) -> with('items')
         ->get();
 
         return Inertia::render('Suppliers/Invoices/Index', [
