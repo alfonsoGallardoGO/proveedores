@@ -9,6 +9,7 @@ use App\Models\SupplierPurchaseOrder;
 use App\Models\SupplierPurchaseOrderItem;
 use App\Models\SupplierPurchaseOrdersItemsDelivery;
 use App\Models\SupplierInvoice;
+use App\Models\Supplier;
 use App\Models\NetsuiteAccountingAccounts;
 use App\Models\NetsuiteClass;
 use App\Models\NetsuiteDepartments;
@@ -862,7 +863,6 @@ class SupplierPurchaseOrderController extends Controller
         }
 
         $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
-            ->where('type', 'GASTO')
             ->first();
 
         $department_name = $item?->department;
@@ -896,12 +896,16 @@ class SupplierPurchaseOrderController extends Controller
         $purchase_order_id = $ordenes_compra?->purchase_order_id;
         $supplier_external_id = $ordenes_compra?->supplier_external_id;
 
+        $suppliers= Supplier::where('external_id', $supplier_external_id)
+            ->first();
+        $supplier_rfc = $suppliers?->tax;
+
 
         $data_netsuite = [
             "idproveedor" => $supplier_external_id,
             "iddoc" => $purchase_order_id,
             "tipo_doc" => "PurchOrd",
-            "rfc" => $emisorRfc,
+            "rfc" => $supplier_rfc,
             "nfactura" => $folio,
             "regimenfiscal" => $regimen,
             "moneda" => $moneda,
@@ -910,7 +914,7 @@ class SupplierPurchaseOrderController extends Controller
             "clase" => $class_id,
             "operacion" => "",
             "tipocambio" => $tipo_cambio,
-            "fecha" => $fecha,
+            "fecha" => "20/08/2025",
             "ubicacion" => $ubicacion_id,
             "idnetsuite" => "",
             "modo_prueba" => true,
@@ -922,7 +926,7 @@ class SupplierPurchaseOrderController extends Controller
                     "ubicacion" => $ubicacion_id,
                     "departamento" => $department_id,
                     "clase" => $class_id,
-                    "concepto" => $concepto,
+                    "concepto" => $description,
                     "claveprodser" => $clave_prod_serv,
                     "Impuestos" => []
                 ]
