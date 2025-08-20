@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use App\Services\CfdiParser;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 
 class SupplierPurchaseOrderController extends Controller
@@ -321,7 +322,7 @@ class SupplierPurchaseOrderController extends Controller
     public function xml(Request $request)
     {
 
-        $purchase_order_id = 873;
+        $purchase_order_id = 4;
         // $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
         // $xmlPath = storage_path('app/public/invoices/xml/prueba_xml_2.xml');
         $pdfPath = public_path('invoices/pdf/prueba_3.pdf');
@@ -402,98 +403,318 @@ class SupplierPurchaseOrderController extends Controller
         ];
 
 
-        $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
+        // $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
 
-        foreach ($pagoNodes as $pago) {
-            /** @var \DOMElement $pago */
-            $pagoData = [
-                'FechaPago'    => $pago->getAttribute('FechaPago'),
-                'FormaDePagoP' => $pago->getAttribute('FormaDePagoP'),
-                'MonedaP'      => $pago->getAttribute('MonedaP'),
-                'TipoCambioP'  => $pago->getAttribute('TipoCambioP'),
-                'Monto'        => $pago->getAttribute('Monto'),
-                'NumOperacion' => $pago->getAttribute('NumOperacion'),
-                'rfcEmisorCtaOrd' => $pago->getAttribute('RfcEmisorCtaOrd'),
-                'ctaOrdenante'    => $pago->getAttribute('CtaOrdenante'),
-                'rfcEmisorCtaBen' => $pago->getAttribute('RfcEmisorCtaBen'),
-                'ctaBeneficiario' => $pago->getAttribute('CtaBeneficiario'),
-                'doctos_relacionados' => [],
-                'impuestosP' => [
-                    'retencionesP' => [],
-                    'trasladosP'   => [],
-                ],
+        // foreach ($pagoNodes as $pago) {
+        //     /** @var \DOMElement $pago */
+        //     $pagoData = [
+        //         'FechaPago'    => $pago->getAttribute('FechaPago'),
+        //         'FormaDePagoP' => $pago->getAttribute('FormaDePagoP'),
+        //         'MonedaP'      => $pago->getAttribute('MonedaP'),
+        //         'TipoCambioP'  => $pago->getAttribute('TipoCambioP'),
+        //         'Monto'        => $pago->getAttribute('Monto'),
+        //         'NumOperacion' => $pago->getAttribute('NumOperacion'),
+        //         'rfcEmisorCtaOrd' => $pago->getAttribute('RfcEmisorCtaOrd'),
+        //         'ctaOrdenante'    => $pago->getAttribute('CtaOrdenante'),
+        //         'rfcEmisorCtaBen' => $pago->getAttribute('RfcEmisorCtaBen'),
+        //         'ctaBeneficiario' => $pago->getAttribute('CtaBeneficiario'),
+        //         'doctos_relacionados' => [],
+        //         'impuestosP' => [
+        //             'retencionesP' => [],
+        //             'trasladosP'   => [],
+        //         ],
+        //     ];
+
+        //     $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
+        //     foreach ($doctoNodes as $doc) {
+        //         /** @var \DOMElement $doc */
+        //         $docto = [
+        //             'IdDocumento'      => $doc->getAttribute('IdDocumento'),
+        //             'Serie'            => $doc->getAttribute('Serie'),
+        //             'Folio'            => $doc->getAttribute('Folio'),
+        //             'MonedaDR'         => $doc->getAttribute('MonedaDR'),
+        //             'EquivalenciaDR'   => $doc->getAttribute('EquivalenciaDR'),
+        //             'NumParcialidad'   => $doc->getAttribute('NumParcialidad'),
+        //             'ImpPagado'        => $doc->getAttribute('ImpPagado'),
+        //             'ImpSaldoAnt'      => $doc->getAttribute('ImpSaldoAnt'),
+        //             'ImpSaldoInsoluto' => $doc->getAttribute('ImpSaldoInsoluto'),
+        //             'ObjetoImpDR'      => $doc->getAttribute('ObjetoImpDR'),
+        //             'impuestosDR' => [
+        //                 'trasladosDR'   => [],
+        //                 'retencionesDR' => [],
+        //             ],
+        //         ];
+
+        //         $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
+        //         foreach ($trasDRNodes as $t) {
+        //             /** @var \DOMElement $t */
+        //             $docto['impuestosDR']['trasladosDR'][] = [
+        //                 'BaseDR'       => $t->getAttribute('BaseDR'),
+        //                 'ImpuestoDR'   => $t->getAttribute('ImpuestoDR'),
+        //                 'TipoFactorDR' => $t->getAttribute('TipoFactorDR'),
+        //                 'TasaOCuotaDR' => $t->getAttribute('TasaOCuotaDR'),
+        //                 'ImporteDR'    => $t->getAttribute('ImporteDR'),
+        //             ];
+        //         }
+        //         $retDRNodes = $xp->query('pago20:ImpuestosDR/pago20:RetencionesDR/pago20:RetencionDR', $doc);
+        //         foreach ($retDRNodes as $r) {
+        //             /** @var \DOMElement $r */
+        //             $docto['impuestosDR']['retencionesDR'][] = [
+        //                 'BaseDR'       => $r->getAttribute('BaseDR'),
+        //                 'ImpuestoDR'   => $r->getAttribute('ImpuestoDR'),
+        //                 'TipoFactorDR' => $r->getAttribute('TipoFactorDR'),
+        //                 'TasaOCuotaDR' => $r->getAttribute('TasaOCuotaDR'),
+        //                 'ImporteDR'    => $r->getAttribute('ImporteDR'),
+        //             ];
+        //         }
+
+        //         $pagoData['doctos_relacionados'][] = $docto;
+        //     }
+
+        //     $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
+        //     foreach ($retPNodes as $rP) {
+        //         /** @var \DOMElement $rP */
+        //         $pagoData['impuestosP']['retencionesP'][] = [
+        //             'ImpuestoP' => $rP->getAttribute('ImpuestoP'),
+        //             'ImporteP'  => $rP->getAttribute('ImporteP'),
+        //         ];
+        //     }
+
+        //     $trasPNodes = $xp->query('pago20:ImpuestosP/pago20:TrasladosP/pago20:TrasladoP', $pago);
+        //     foreach ($trasPNodes as $tP) {
+        //         /** @var \DOMElement $tP */
+        //         $pagoData['impuestosP']['trasladosP'][] = [
+        //             'BaseP'       => $tP->getAttribute('BaseP'),
+        //             'ImpuestoP'   => $tP->getAttribute('ImpuestoP'),
+        //             'TipoFactorP' => $tP->getAttribute('TipoFactorP'),
+        //             'TasaOCuotaP' => $tP->getAttribute('TasaOCuotaP'),
+        //             'ImporteP'    => $tP->getAttribute('ImporteP'),
+        //         ];
+        //     }
+
+        //     $pagos20['pagos'][] = $pagoData;
+        // }
+
+
+
+        // Asegura el namespace de Pagos 2.0 (por si es tipo P)
+        $xp->registerNamespace('pago20', 'http://www.sat.gob.mx/Pagos20');
+
+        // Detecta tipo de comprobante
+        $tipo = $xp->evaluate('string(//cfdi:Comprobante/@TipoDeComprobante)'); // "P", "I", "E", ...
+
+        $pagos20 = [
+            'totales' => [
+                'MontoTotalPagos'             => null,
+                'TotalRetencionesIVA'         => null,
+                'TotalRetencionesISR'         => null,
+                'TotalTrasladosBaseIVA16'     => null,
+                'TotalTrasladosImpuestoIVA16' => null,
+            ],
+            'pagos' => [],
+        ];
+
+        // ======== CASO 1: CFDI de Pago (P) -> uso de pago20 ========
+        if ($tipo === 'P') {
+
+            // Totales del complemento pago20 (si existen)
+            $pagos20['totales'] = [
+                'MontoTotalPagos'             => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@MontoTotalPagos)'),
+                'TotalRetencionesIVA'         => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalRetencionesIVA)'),
+                'TotalRetencionesISR'         => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalRetencionesISR)'),
+                'TotalTrasladosBaseIVA16'     => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalTrasladosBaseIVA16)'),
+                'TotalTrasladosImpuestoIVA16' => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalTrasladosImpuestoIVA16)'),
             ];
 
-            $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
-            foreach ($doctoNodes as $doc) {
-                /** @var \DOMElement $doc */
-                $docto = [
-                    'IdDocumento'      => $doc->getAttribute('IdDocumento'),
-                    'Serie'            => $doc->getAttribute('Serie'),
-                    'Folio'            => $doc->getAttribute('Folio'),
-                    'MonedaDR'         => $doc->getAttribute('MonedaDR'),
-                    'EquivalenciaDR'   => $doc->getAttribute('EquivalenciaDR'),
-                    'NumParcialidad'   => $doc->getAttribute('NumParcialidad'),
-                    'ImpPagado'        => $doc->getAttribute('ImpPagado'),
-                    'ImpSaldoAnt'      => $doc->getAttribute('ImpSaldoAnt'),
-                    'ImpSaldoInsoluto' => $doc->getAttribute('ImpSaldoInsoluto'),
-                    'ObjetoImpDR'      => $doc->getAttribute('ObjetoImpDR'),
-                    'impuestosDR' => [
-                        'trasladosDR'   => [],
-                        'retencionesDR' => [],
+            // Busca pagos por XPath
+            $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
+
+            // Fallback: si XPath no devolvió, intenta por DOM NS (por si el prefijo cambia)
+            if (!$pagoNodes || $pagoNodes->length === 0) {
+                $pagoNodes = $dom->getElementsByTagNameNS('http://www.sat.gob.mx/Pagos20', 'Pago');
+            }
+
+            foreach ($pagoNodes as $pago) {
+                /** @var \DOMElement $pago */
+                $pagoData = [
+                    'FechaPago'    => $pago->getAttribute('FechaPago'),
+                    'FormaDePagoP' => $pago->getAttribute('FormaDePagoP'),
+                    'MonedaP'      => $pago->getAttribute('MonedaP'),
+                    'TipoCambioP'  => $pago->getAttribute('TipoCambioP'),
+                    'Monto'        => $pago->getAttribute('Monto'),
+                    'NumOperacion' => $pago->getAttribute('NumOperacion'),
+                    'rfcEmisorCtaOrd' => $pago->getAttribute('RfcEmisorCtaOrd'),
+                    'ctaOrdenante'    => $pago->getAttribute('CtaOrdenante'),
+                    'rfcEmisorCtaBen' => $pago->getAttribute('RfcEmisorCtaBen'),
+                    'ctaBeneficiario' => $pago->getAttribute('CtaBeneficiario'),
+                    'doctos_relacionados' => [],
+                    'impuestosP' => [
+                        'retencionesP' => [],
+                        'trasladosP'   => [],
                     ],
                 ];
 
-                $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
-                foreach ($trasDRNodes as $t) {
+                // Doctos Relacionados de ese pago
+                $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
+                foreach ($doctoNodes as $doc) {
+                    /** @var \DOMElement $doc */
+                    $docto = [
+                        'IdDocumento'      => $doc->getAttribute('IdDocumento'),
+                        'Serie'            => $doc->getAttribute('Serie'),
+                        'Folio'            => $doc->getAttribute('Folio'),
+                        'MonedaDR'         => $doc->getAttribute('MonedaDR'),
+                        'EquivalenciaDR'   => $doc->getAttribute('EquivalenciaDR'),
+                        'NumParcialidad'   => $doc->getAttribute('NumParcialidad'),
+                        'ImpPagado'        => $doc->getAttribute('ImpPagado'),
+                        'ImpSaldoAnt'      => $doc->getAttribute('ImpSaldoAnt'),
+                        'ImpSaldoInsoluto' => $doc->getAttribute('ImpSaldoInsoluto'),
+                        'ObjetoImpDR'      => $doc->getAttribute('ObjetoImpDR'),
+                        'impuestosDR' => [
+                            'trasladosDR'   => [],
+                            'retencionesDR' => [],
+                        ],
+                    ];
+
+                    // ImpuestosDR
+                    $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
+                    foreach ($trasDRNodes as $t) {
+                        /** @var \DOMElement $t */
+                        $docto['impuestosDR']['trasladosDR'][] = [
+                            'BaseDR'       => $t->getAttribute('BaseDR'),
+                            'ImpuestoDR'   => $t->getAttribute('ImpuestoDR'),
+                            'TipoFactorDR' => $t->getAttribute('TipoFactorDR'),
+                            'TasaOCuotaDR' => $t->getAttribute('TasaOCuotaDR'),
+                            'ImporteDR'    => $t->getAttribute('ImporteDR'),
+                        ];
+                    }
+                    $retDRNodes = $xp->query('pago20:ImpuestosDR/pago20:RetencionesDR/pago20:RetencionDR', $doc);
+                    foreach ($retDRNodes as $r) {
+                        /** @var \DOMElement $r */
+                        $docto['impuestosDR']['retencionesDR'][] = [
+                            'BaseDR'       => $r->getAttribute('BaseDR'),
+                            'ImpuestoDR'   => $r->getAttribute('ImpuestoDR'),
+                            'TipoFactorDR' => $r->getAttribute('TipoFactorDR'),
+                            'TasaOCuotaDR' => $r->getAttribute('TasaOCuotaDR'),
+                            'ImporteDR'    => $r->getAttribute('ImporteDR'),
+                        ];
+                    }
+
+                    $pagoData['doctos_relacionados'][] = $docto;
+                }
+
+                // Impuestos a nivel Pago
+                $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
+                foreach ($retPNodes as $rP) {
+                    /** @var \DOMElement $rP */
+                    $pagoData['impuestosP']['retencionesP'][] = [
+                        'ImpuestoP' => $rP->getAttribute('ImpuestoP'),
+                        'ImporteP'  => $rP->getAttribute('ImporteP'),
+                    ];
+                }
+                $trasPNodes = $xp->query('pago20:ImpuestosP/pago20:TrasladosP/pago20:TrasladoP', $pago);
+                foreach ($trasPNodes as $tP) {
+                    /** @var \DOMElement $tP */
+                    $pagoData['impuestosP']['trasladosP'][] = [
+                        'BaseP'       => $tP->getAttribute('BaseP'),
+                        'ImpuestoP'   => $tP->getAttribute('ImpuestoP'),
+                        'TipoFactorP' => $tP->getAttribute('TipoFactorP'),
+                        'TasaOCuotaP' => $tP->getAttribute('TasaOCuotaP'),
+                        'ImporteP'    => $tP->getAttribute('ImporteP'),
+                    ];
+                }
+
+                $pagos20['pagos'][] = $pagoData;
+            }
+
+        // ======== CASO 2: CFDI Ingreso/Egreso (I/E) -> impuestos por CONCEPTO / GLOBALES ========
+        } else {
+
+            // Conceptos con impuestos por concepto
+            $conceptos = [];
+            $conceptNodes = $xp->query('//cfdi:Comprobante/cfdi:Conceptos/cfdi:Concepto');
+            foreach ($conceptNodes as $n) {
+                /** @var \DOMElement $n */
+                $c = [
+                    'ClaveProdServ'  => $n->getAttribute('ClaveProdServ'),
+                    'NoIdentificacion'=> $n->getAttribute('NoIdentificacion'),
+                    'Cantidad'       => $n->getAttribute('Cantidad'),
+                    'ClaveUnidad'    => $n->getAttribute('ClaveUnidad'),
+                    'Unidad'         => $n->getAttribute('Unidad'),
+                    'Descripcion'    => $n->getAttribute('Descripcion'),
+                    'ValorUnitario'  => $n->getAttribute('ValorUnitario'),
+                    'Importe'        => $n->getAttribute('Importe'),
+                    'Descuento'      => $n->getAttribute('Descuento'),
+                    'Impuestos'      => [
+                        'Traslados'   => [],
+                        'Retenciones' => [],
+                    ],
+                ];
+
+                // Impuestos por concepto
+                $tNodes = $xp->query('cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', $n);
+                foreach ($tNodes as $t) {
                     /** @var \DOMElement $t */
-                    $docto['impuestosDR']['trasladosDR'][] = [
-                        'BaseDR'       => $t->getAttribute('BaseDR'),
-                        'ImpuestoDR'   => $t->getAttribute('ImpuestoDR'),
-                        'TipoFactorDR' => $t->getAttribute('TipoFactorDR'),
-                        'TasaOCuotaDR' => $t->getAttribute('TasaOCuotaDR'),
-                        'ImporteDR'    => $t->getAttribute('ImporteDR'),
+                    $c['Impuestos']['Traslados'][] = [
+                        'Base'       => $t->getAttribute('Base'),
+                        'Impuesto'   => $t->getAttribute('Impuesto'),
+                        'TipoFactor' => $t->getAttribute('TipoFactor'),
+                        'TasaOCuota' => $t->getAttribute('TasaOCuota'),
+                        'Importe'    => $t->getAttribute('Importe'),
                     ];
                 }
-                $retDRNodes = $xp->query('pago20:ImpuestosDR/pago20:RetencionesDR/pago20:RetencionDR', $doc);
-                foreach ($retDRNodes as $r) {
+                $rNodes = $xp->query('cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion', $n);
+                foreach ($rNodes as $r) {
                     /** @var \DOMElement $r */
-                    $docto['impuestosDR']['retencionesDR'][] = [
-                        'BaseDR'       => $r->getAttribute('BaseDR'),
-                        'ImpuestoDR'   => $r->getAttribute('ImpuestoDR'),
-                        'TipoFactorDR' => $r->getAttribute('TipoFactorDR'),
-                        'TasaOCuotaDR' => $r->getAttribute('TasaOCuotaDR'),
-                        'ImporteDR'    => $r->getAttribute('ImporteDR'),
+                    $c['Impuestos']['Retenciones'][] = [
+                        'Base'       => $r->getAttribute('Base'),
+                        'Impuesto'   => $r->getAttribute('Impuesto'),
+                        'TipoFactor' => $r->getAttribute('TipoFactor'),
+                        'TasaOCuota' => $r->getAttribute('TasaOCuota'),
+                        'Importe'    => $r->getAttribute('Importe'),
                     ];
                 }
 
-                $pagoData['doctos_relacionados'][] = $docto;
+                $conceptos[] = $c;
             }
 
-            $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
-            foreach ($retPNodes as $rP) {
-                /** @var \DOMElement $rP */
-                $pagoData['impuestosP']['retencionesP'][] = [
-                    'ImpuestoP' => $rP->getAttribute('ImpuestoP'),
-                    'ImporteP'  => $rP->getAttribute('ImporteP'),
+            // Impuestos globales del comprobante
+            $impuestosGlobales = [
+                'TotalImpuestosTrasladados' => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Impuestos/@TotalImpuestosTrasladados)'),
+                'TotalImpuestosRetenidos'   => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Impuestos/@TotalImpuestosRetenidos)'),
+                'Traslados'   => [],
+                'Retenciones' => [],
+            ];
+
+            $tgNodes = $xp->query('//cfdi:Comprobante/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
+            foreach ($tgNodes as $tg) {
+                /** @var \DOMElement $tg */
+                $impuestosGlobales['Traslados'][] = [
+                    'Impuesto'   => $tg->getAttribute('Impuesto'),
+                    'TipoFactor' => $tg->getAttribute('TipoFactor'),
+                    'TasaOCuota' => $tg->getAttribute('TasaOCuota'),
+                    'Importe'    => $tg->getAttribute('Importe'),
+                    'Base'       => $tg->getAttribute('Base'),
+                ];
+            }
+            $rgNodes = $xp->query('//cfdi:Comprobante/cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion');
+            foreach ($rgNodes as $rg) {
+                /** @var \DOMElement $rg */
+                $impuestosGlobales['Retenciones'][] = [
+                    'Impuesto' => $rg->getAttribute('Impuesto'),
+                    'Importe'  => $rg->getAttribute('Importe'),
                 ];
             }
 
-            $trasPNodes = $xp->query('pago20:ImpuestosP/pago20:TrasladosP/pago20:TrasladoP', $pago);
-            foreach ($trasPNodes as $tP) {
-                /** @var \DOMElement $tP */
-                $pagoData['impuestosP']['trasladosP'][] = [
-                    'BaseP'       => $tP->getAttribute('BaseP'),
-                    'ImpuestoP'   => $tP->getAttribute('ImpuestoP'),
-                    'TipoFactorP' => $tP->getAttribute('TipoFactorP'),
-                    'TasaOCuotaP' => $tP->getAttribute('TasaOCuotaP'),
-                    'ImporteP'    => $tP->getAttribute('ImporteP'),
-                ];
-            }
-
-            $pagos20['pagos'][] = $pagoData;
+            // Puedes dejar estos arreglos listos en tu payload:
+            $data['conceptos'] = $conceptos;
+            $data['impuestos_globales'] = $impuestosGlobales;
         }
+
+        // Si usas $pagos20 en tu respuesta final:
         $data['complemento_pagos20'] = $pagos20;
+
+
+        // $data['complemento_pagos20'] = $pagos20;
 
 
         $pdfBase64 = base64_encode(file_get_contents($pdfPath));
@@ -550,38 +771,49 @@ class SupplierPurchaseOrderController extends Controller
 
         $nf6 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 6, '.', '');
         $nf2 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 2, '.', '');
-        $uuid      = $data['timbre']['uuid'] ?? null;
-        $emisorRfc = $data['emisor']['rfc'] ?? null;
-        $receptRfc = $data['receptor']['rfc'] ?? null;
-        $moneda =  $data['complemento_pagos20']['pagos'][0]['MonedaP'] ?? null;
-        $regimen =  $data['emisor']['regimen'] ?? null;
-        $folio =  $data['folio'] ?? null;
-        $tipo_cambio =  $data['complemento_pagos20']['pagos'][0]['TipoCambioP'] ?? null;
-        $clave_prod_serv =  $data['emisor']['clave_prod_serv'] ?? null;
-        $monto =  $data['complemento_pagos20']['pagos'][0]['Monto'] ?? null;
 
-        $iso = $data['fecha'] ?? '2025-08-11T00:00:00';
-        $fecha = Carbon::parse($iso)
-            ->timezone('America/Mexico_City')
-            ->format('d/m/Y');
+        // básicos
+        $uuid       = Arr::get($data, 'timbre.uuid');
+        $emisorRfc  = Arr::get($data, 'emisor.rfc');
+        $receptRfc  = Arr::get($data, 'receptor.rfc');
+        $regimen    = Arr::get($data, 'emisor.regimen');
+        $folio      = Arr::get($data, 'folio');
+        $tipo       = Arr::get($data, 'tipo_de_comprobante'); // "P", "I", "E"
 
-        // $traslados = [];
+        // MONEDA
+        $moneda = $tipo === 'P'
+            ? (Arr::get($data, 'complemento_pagos20.pagos.0.MonedaP') ?: Arr::get($data, 'moneda', 'MXN'))
+            : Arr::get($data, 'moneda', 'MXN');
 
-        // foreach (($data['complemento_pagos20']['pagos'] ?? []) as $pago) {
-        //     foreach (($pago['impuestosP']['trasladosP'] ?? []) as $t) {
-        //         $traslados[] = [
-        //             "Traslado" => [
-        //                 "Base"       => $nf6($t['BaseP']       ?? 0),
-        //                 "Impuesto"   => (string)($t['ImpuestoP']   ?? ''),
-        //                 "TipoFactor" => (string)($t['TipoFactorP'] ?? ''),
-        //                 "TasaOCuota" => $nf6($t['TasaOCuotaP'] ?? 0),
-        //                 "Importe"    => $nf2($t['ImporteP']    ?? 0),
-        //         ];
-        //         ];
-        //     }
+        // TIPO CAMBIO
+        $tipo_cambio = $tipo === 'P'
+            ? (Arr::get($data, 'complemento_pagos20.pagos.0.TipoCambioP') ?: 1)
+            : (Arr::get($data, 'tipo_cambio') ?: 1);
 
+        // MONTO (Pago: Monto; Ingreso/Egreso: Total)
+        $monto_raw = $tipo === 'P'
+            ? Arr::get($data, 'complemento_pagos20.pagos.0.Monto', 0)
+            : Arr::get($data, 'total', 0);
+        $monto = $nf2($monto_raw);
 
-        // }
+        // FECHA (Pago: FechaPago; otros: Fecha del comprobante)
+        $iso = $tipo === 'P'
+            ? (Arr::get($data, 'complemento_pagos20.pagos.0.FechaPago') ?: Arr::get($data, 'fecha', '2025-08-11T00:00:00'))
+            : Arr::get($data, 'fecha', '2025-08-11T00:00:00');
+
+        $fecha = Carbon::parse($iso)->timezone('America/Mexico_City')->format('d/m/Y');
+
+        // CLAVE PROD/SERV Y CONCEPTO
+        $tipo = Arr::get($data, 'tipo_de_comprobante'); // 'I', 'E', 'P', etc.
+
+        // Primer concepto (maneja mayúsculas/minúsculas y fallback para CFDI de Pago)
+        $clave_prod_serv = Arr::get($data, 'conceptos.0.ClaveProdServ')
+            ?: Arr::get($data, 'conceptos.0.clave_prod_serv')
+            ?: ($tipo === 'P' ? '84111506' : null);
+
+        $concepto = Arr::get($data, 'conceptos.0.Descripcion')
+            ?: Arr::get($data, 'conceptos.0.descripcion')
+            ?: ($tipo === 'P' ? 'Pago' : null);
 
         $traslados = [];
 
@@ -598,23 +830,36 @@ class SupplierPurchaseOrderController extends Controller
         }
 
 
+        if (empty($traslados)) {
+            $conceptNodes = $xp->query('//cfdi:Comprobante/cfdi:Conceptos/cfdi:Concepto');
+            foreach ($conceptNodes as $n) {
+                $tNodes = $xp->query('cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', $n);
+                foreach ($tNodes as $tn) {
+                    /** @var \DOMElement $tn */
+                    $traslados[] = [
+                        "Base"       => $nf6($tn->getAttribute('Base')),
+                        "Impuesto"   => (string)$tn->getAttribute('Impuesto'),     // 002 = IVA
+                        "TipoFactor" => (string)$tn->getAttribute('TipoFactor'),   // Tasa/Cuota/Exento
+                        "TasaOCuota" => $nf6($tn->getAttribute('TasaOCuota')),
+                        "Importe"    => $nf2($tn->getAttribute('Importe')),
+                    ];
+                }
+            }
 
-
-
-        // foreach (($pago['doctos_relacionados'] ?? []) as $dr) {
-        //     foreach (($dr['impuestosDR']['trasladosDR'] ?? []) as $tdr) {
-        //         $traslados[] = [
-        //             "Traslado" => [
-        //                 "Base"       => $nf6($tdr['BaseDR']       ?? 0),
-        //                 "Impuesto"   => (string)($tdr['ImpuestoDR']   ?? ''),
-        //                 "TipoFactor" => (string)($tdr['TipoFactorDR'] ?? ''),
-        //                 "TasaOCuota" => $nf6($tdr['TasaOCuotaDR'] ?? 0),
-        //                 "Importe"    => $nf2($tdr['ImporteDR']    ?? 0),
-        //             ]
-        //         ];
-        //     }
-        // }
-
+            if (empty($traslados)) {
+                $tGlobal = $xp->query('//cfdi:Comprobante/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
+                foreach ($tGlobal as $tg) {
+                    /** @var \DOMElement $tg */
+                    $traslados[] = [
+                        "Base"       => $nf6($tg->getAttribute('Base')),
+                        "Impuesto"   => (string)$tg->getAttribute('Impuesto'),
+                        "TipoFactor" => (string)$tg->getAttribute('TipoFactor'),
+                        "TasaOCuota" => $nf6($tg->getAttribute('TasaOCuota')),
+                        "Importe"    => $nf2($tg->getAttribute('Importe')),
+                    ];
+                }
+            }
+        }
 
         $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
             ->where('type', 'GASTO')
@@ -677,7 +922,7 @@ class SupplierPurchaseOrderController extends Controller
                     "ubicacion" => $ubicacion_id,
                     "departamento" => $department_id,
                     "clase" => $class_id,
-                    "concepto" => $description,
+                    "concepto" => $concepto,
                     "claveprodser" => $clave_prod_serv,
                     "Impuestos" => []
                 ]
@@ -691,7 +936,8 @@ class SupplierPurchaseOrderController extends Controller
 
         $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
 
-        // return $data_netsuite;
+        // return $data;
+        return $data_netsuite;
         // return $monto;
         // return $traslados;
 
