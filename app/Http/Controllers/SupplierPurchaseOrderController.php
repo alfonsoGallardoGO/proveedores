@@ -143,8 +143,9 @@ class SupplierPurchaseOrderController extends Controller
     public function storePurchaseOrder(Request $request)
     {
         $data = $request->all();
-        $supplier_purchase_order_id = $data['id'] ?? null;
         return $data;
+        $supplier_purchase_order_id = $data['id'] ?? null;
+        
         $jsonData = json_encode($data, JSON_PRETTY_PRINT);
         $jsonData = $jsonData . "\n"; 
         file_put_contents(storage_path('debug_input.json'), $jsonData);
