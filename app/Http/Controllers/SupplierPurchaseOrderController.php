@@ -193,9 +193,9 @@ class SupplierPurchaseOrderController extends Controller
                 'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
                 'purchase_order_id' => $data['id'] ?? null,
                 'purchase_order' => $data['tranid'] ?? null,
-                'total' => $data['total'] ?? null,
-                'subtotal' => $data['subtotal'] ?? null,
-                'impuesto' => $data['impuesto'] ?? null,
+                'total' => $data['total'],
+                'subtotal' => $data['subtotal'],
+                'impuesto' => $data['impuesto'],
             ]);
             $orderId = $supplierPurchaseOrder->first()->id;
         } else {
@@ -206,9 +206,9 @@ class SupplierPurchaseOrderController extends Controller
                 'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
                 'purchase_order_id' => $data['id'] ?? null,
                 'purchase_order' => $data['tranid'] ?? null,
-                'total' => $data['total'] ?? null,
-                'subtotal' => $data['subtotal'] ?? null,
-                'impuesto' => $data['impuesto'] ?? null,
+                'total' => $data['total'],
+                'subtotal' => $data['subtotal'],
+                'impuesto' => $data['impuesto'],
 
             ]);
             $orderId = SupplierPurchaseOrder::latest()->first()->id;
