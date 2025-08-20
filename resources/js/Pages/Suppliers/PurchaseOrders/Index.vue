@@ -40,17 +40,6 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
-const formatNumber = (rowData) => {
-    const value = rowData.total;
-    const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
-
-    return new Intl.NumberFormat('es-MX', {
-        style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(safeValue);
-};
-
 const getSeverity = (status) => {
     switch (status) {
         case "Recepción pendiente":
@@ -70,16 +59,31 @@ const getSeverity = (status) => {
     }
 };
 
+const processedOrders = computed(() => {
+    if (!props.orders) {
+        return [];
+    }
+    return props.orders.map(order => {
+        return {
+            ...order,
+            // Usar parseFloat para convertir a número con decimales
+            impuesto: parseFloat(order.impuesto) || 0,
+            subtotal: parseFloat(order.subtotal) || 0,
+            total: parseFloat(order.total) || 0
+        };
+    });
+});
+
 const formatNumber = (data, field) => {
     const value = data[field];
-    if (value !== null && value !== undefined) {
-        return Number(value).toLocaleString("es-MX", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        })
-    }
-    return value;
+
+    // Ahora que los valores ya han sido procesados, esta lógica es más simple
+    return Number(value).toLocaleString("es-MX", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
 };
+
 
 </script>
 
@@ -115,8 +119,8 @@ const formatNumber = (data, field) => {
                             </template>
                         </Toast>
 
-                        <DataTable ref="dt" :value="orders" dataKey="id" paginator :rows="10" :filters="filters"
-                            :rowsPerPageOptions="[5, 10, 25]"
+                        <DataTable ref="dt" :value="processedOrders" dataKey="id" paginator :rows="10"
+                            :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones"
                             sortField="id" :sortOrder="-1">
                             <template #header>
@@ -134,14 +138,31 @@ const formatNumber = (data, field) => {
                             <Column field="id" header="Id" sortable style="min-width: 2rem"></Column>
                             <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 8rem"
                                 bodyClass="ml-2"></Column>
-                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 8rem" bodyClass="ml-2"
-                                :body="formatNumber">
+                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 8rem"
+                                bodyClass="ml-2">
+                                <template #body="slotProps">
+                                    {{ Number(slotProps.data.impuesto).toLocaleString("es-MX", {
+                                        minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                    }) }}
+                                </template>
                             </Column>
-                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 8rem" bodyClass="ml-2"
-                                :body="formatNumber">
+                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 8rem"
+                                bodyClass="ml-2">
+                                <template #body="slotProps">
+                                    {{ Number(slotProps.data.subtotal).toLocaleString("es-MX", {
+                                        minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                    }) }}
+                                </template>
                             </Column>
-                            <Column field="total" header="Total" sortable style="min-width: 8rem" bodyClass="ml-2"
-                                :body="formatNumber">
+                            <Column field="total" header="Total" sortable style="min-width: 8rem" bodyClass="ml-2">
+                                <template #body="slotProps">
+                                    {{ Number(slotProps.data.total).toLocaleString("es-MX", {
+                                        minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                    }) }}
+                                </template>
                             </Column>
 
 
