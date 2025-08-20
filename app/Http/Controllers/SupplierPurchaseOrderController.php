@@ -324,8 +324,8 @@ class SupplierPurchaseOrderController extends Controller
         $purchase_order_id = 873;
         // $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
         // $xmlPath = storage_path('app/public/invoices/xml/prueba_xml_2.xml');
-        $pdfPath = public_path('invoices/pdf/prueba_3.pdf');
-        $xmlPath = public_path('invoices/xml/prueba_3.xml');
+        $pdfPath = public_path('suppliers/invoices/pdf/prueba_3.pdf');
+        $xmlPath = public_path('suppliers/invoices/xml/prueba_3.xml');
 
 
         if (!File::exists($xmlPath)) {
