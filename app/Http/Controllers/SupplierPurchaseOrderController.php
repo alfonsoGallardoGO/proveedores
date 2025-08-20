@@ -160,13 +160,9 @@ class SupplierPurchaseOrderController extends Controller
     {
         $data = $request->all();
         $supplier_purchase_order_id = $data['id'] ?? null;
-
-        // $inputRaw = file_get_contents('php://input');
-        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        // file_put_contents('debug_input.json', $jsonData);
-        file_put_contents(storage_path('debug_input.json'), $jsonData);
-        // file_put_contents(storage_path('app/logs/debug_input.json'), $jsonData);
-        // $input = json_decode($jsonData, true);
+        
+        // $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+        // file_put_contents(storage_path('debug_input.json'), $jsonData);
 
         if (empty($supplier_purchase_order_id)) {
             return response()->json([
@@ -325,11 +321,11 @@ class SupplierPurchaseOrderController extends Controller
     public function xml(Request $request)
     {
 
-        $purchase_order_id = 4;
+        $purchase_order_id = 873;
         // $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
         // $xmlPath = storage_path('app/public/invoices/xml/prueba_xml_2.xml');
-        $pdfPath = public_path('invoices/pdf/f6725ff5-9497-44ee-a7db-1e79257dcb7d.pdf');
-        $xmlPath = public_path('invoices/xml/prueba_xml_2.xml');
+        $pdfPath = public_path('invoices/pdf/prueba_3.pdf');
+        $xmlPath = public_path('invoices/xml/prueba_3.xml');
 
 
         if (!File::exists($xmlPath)) {
@@ -695,16 +691,16 @@ class SupplierPurchaseOrderController extends Controller
 
         $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
 
-        return $data_netsuite;
+        // return $data_netsuite;
         // return $monto;
         // return $traslados;
 
-        // $restletPath = "/restlet.nl?script=5141&deploy=1";
-        // try {
-        //     $response = $this->netSuiteRestService->request($restletPath, 'POST', $data_netsuite);
-        //     return response()->json(['ok' => true, 'response' => $response]);
-        // } catch (\Throwable $e) {
-        //     return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
-        // }
+        $restletPath = "/restlet.nl?script=5141&deploy=1";
+        try {
+            $response = $this->netSuiteRestService->request($restletPath, 'POST', $data_netsuite);
+            return response()->json(['ok' => true, 'response' => $response]);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+        }
     }
 }
