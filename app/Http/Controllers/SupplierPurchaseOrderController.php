@@ -84,24 +84,6 @@ class SupplierPurchaseOrderController extends Controller
         $pdfPath = null;
         $xmlPath = null;
 
-
-        // if ($request->hasFile('factura')) {
-
-        //     Storage::disk('public')->makeDirectory('invoices/pdf');
-        //     $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
-
-        //     $pdfContent = Storage::disk('public')->get($pdfPath);
-        //     $pdfBase64  = base64_encode($pdfContent);
-        // }
-
-        // if ($request->hasFile('xml')) {
-        //     Storage::disk('public')->makeDirectory('invoices/xml');
-        //     $xmlPath = $request->file('xml')->store('invoices/xml', 'public');
-
-        //     $xmlContent = Storage::disk('public')->get($xmlPath);
-        //     $xmlBase64  = base64_encode($xmlContent);
-        // }
-
         if ($request->hasFile('factura')) {
             $file = $request->file('factura');
             abort_unless($file->isValid(), 422, 'Archivo inválido');
@@ -164,6 +146,7 @@ class SupplierPurchaseOrderController extends Controller
         $supplier_purchase_order_id = $data['id'] ?? null;
         
         $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+        $jsonData = $jsonData . "\n"; 
         file_put_contents(storage_path('debug_input.json'), $jsonData);
 
         if (empty($supplier_purchase_order_id)) {
@@ -238,7 +221,6 @@ class SupplierPurchaseOrderController extends Controller
             $incomingItems[$uniqueKey] = $standardizedItem;
         }
 
-        // Procesar lineasGastos
         foreach (collect($data['lineasGastos'] ?? []) as $item) {
             $standardizedItem = [
                 'article_order_id' => $item['articuloId'],
@@ -259,14 +241,6 @@ class SupplierPurchaseOrderController extends Controller
             $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
             $incomingItems[$uniqueKey] = $standardizedItem;
         }
-
-        //$existingItems = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-        // ->get()
-        // ->keyBy(function($item) {
-        //     // Creamos la misma clave única para comparar
-        //     return $item->article_order_id . '_' . $item->type;
-        // });
-
 
         $itemsToKeepInDb = [];
 
@@ -324,8 +298,6 @@ class SupplierPurchaseOrderController extends Controller
     {
 
         $purchase_order_id = 873;
-        // $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
-        // $xmlPath = storage_path('app/public/invoices/xml/prueba_xml_2.xml');
         $pdfPath = public_path('suppliers/invoices/pdf/prueba_3.pdf');
         $xmlPath = public_path('suppliers/invoices/xml/prueba_3.xml');
 
@@ -403,106 +375,9 @@ class SupplierPurchaseOrderController extends Controller
             'pagos' => [],
         ];
 
-
-        // $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
-
-        // foreach ($pagoNodes as $pago) {
-        //     /** @var \DOMElement $pago */
-        //     $pagoData = [
-        //         'FechaPago'    => $pago->getAttribute('FechaPago'),
-        //         'FormaDePagoP' => $pago->getAttribute('FormaDePagoP'),
-        //         'MonedaP'      => $pago->getAttribute('MonedaP'),
-        //         'TipoCambioP'  => $pago->getAttribute('TipoCambioP'),
-        //         'Monto'        => $pago->getAttribute('Monto'),
-        //         'NumOperacion' => $pago->getAttribute('NumOperacion'),
-        //         'rfcEmisorCtaOrd' => $pago->getAttribute('RfcEmisorCtaOrd'),
-        //         'ctaOrdenante'    => $pago->getAttribute('CtaOrdenante'),
-        //         'rfcEmisorCtaBen' => $pago->getAttribute('RfcEmisorCtaBen'),
-        //         'ctaBeneficiario' => $pago->getAttribute('CtaBeneficiario'),
-        //         'doctos_relacionados' => [],
-        //         'impuestosP' => [
-        //             'retencionesP' => [],
-        //             'trasladosP'   => [],
-        //         ],
-        //     ];
-
-        //     $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
-        //     foreach ($doctoNodes as $doc) {
-        //         /** @var \DOMElement $doc */
-        //         $docto = [
-        //             'IdDocumento'      => $doc->getAttribute('IdDocumento'),
-        //             'Serie'            => $doc->getAttribute('Serie'),
-        //             'Folio'            => $doc->getAttribute('Folio'),
-        //             'MonedaDR'         => $doc->getAttribute('MonedaDR'),
-        //             'EquivalenciaDR'   => $doc->getAttribute('EquivalenciaDR'),
-        //             'NumParcialidad'   => $doc->getAttribute('NumParcialidad'),
-        //             'ImpPagado'        => $doc->getAttribute('ImpPagado'),
-        //             'ImpSaldoAnt'      => $doc->getAttribute('ImpSaldoAnt'),
-        //             'ImpSaldoInsoluto' => $doc->getAttribute('ImpSaldoInsoluto'),
-        //             'ObjetoImpDR'      => $doc->getAttribute('ObjetoImpDR'),
-        //             'impuestosDR' => [
-        //                 'trasladosDR'   => [],
-        //                 'retencionesDR' => [],
-        //             ],
-        //         ];
-
-        //         $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
-        //         foreach ($trasDRNodes as $t) {
-        //             /** @var \DOMElement $t */
-        //             $docto['impuestosDR']['trasladosDR'][] = [
-        //                 'BaseDR'       => $t->getAttribute('BaseDR'),
-        //                 'ImpuestoDR'   => $t->getAttribute('ImpuestoDR'),
-        //                 'TipoFactorDR' => $t->getAttribute('TipoFactorDR'),
-        //                 'TasaOCuotaDR' => $t->getAttribute('TasaOCuotaDR'),
-        //                 'ImporteDR'    => $t->getAttribute('ImporteDR'),
-        //             ];
-        //         }
-        //         $retDRNodes = $xp->query('pago20:ImpuestosDR/pago20:RetencionesDR/pago20:RetencionDR', $doc);
-        //         foreach ($retDRNodes as $r) {
-        //             /** @var \DOMElement $r */
-        //             $docto['impuestosDR']['retencionesDR'][] = [
-        //                 'BaseDR'       => $r->getAttribute('BaseDR'),
-        //                 'ImpuestoDR'   => $r->getAttribute('ImpuestoDR'),
-        //                 'TipoFactorDR' => $r->getAttribute('TipoFactorDR'),
-        //                 'TasaOCuotaDR' => $r->getAttribute('TasaOCuotaDR'),
-        //                 'ImporteDR'    => $r->getAttribute('ImporteDR'),
-        //             ];
-        //         }
-
-        //         $pagoData['doctos_relacionados'][] = $docto;
-        //     }
-
-        //     $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
-        //     foreach ($retPNodes as $rP) {
-        //         /** @var \DOMElement $rP */
-        //         $pagoData['impuestosP']['retencionesP'][] = [
-        //             'ImpuestoP' => $rP->getAttribute('ImpuestoP'),
-        //             'ImporteP'  => $rP->getAttribute('ImporteP'),
-        //         ];
-        //     }
-
-        //     $trasPNodes = $xp->query('pago20:ImpuestosP/pago20:TrasladosP/pago20:TrasladoP', $pago);
-        //     foreach ($trasPNodes as $tP) {
-        //         /** @var \DOMElement $tP */
-        //         $pagoData['impuestosP']['trasladosP'][] = [
-        //             'BaseP'       => $tP->getAttribute('BaseP'),
-        //             'ImpuestoP'   => $tP->getAttribute('ImpuestoP'),
-        //             'TipoFactorP' => $tP->getAttribute('TipoFactorP'),
-        //             'TasaOCuotaP' => $tP->getAttribute('TasaOCuotaP'),
-        //             'ImporteP'    => $tP->getAttribute('ImporteP'),
-        //         ];
-        //     }
-
-        //     $pagos20['pagos'][] = $pagoData;
-        // }
-
-
-
-        // Asegura el namespace de Pagos 2.0 (por si es tipo P)
         $xp->registerNamespace('pago20', 'http://www.sat.gob.mx/Pagos20');
 
-        // Detecta tipo de comprobante
-        $tipo = $xp->evaluate('string(//cfdi:Comprobante/@TipoDeComprobante)'); // "P", "I", "E", ...
+        $tipo = $xp->evaluate('string(//cfdi:Comprobante/@TipoDeComprobante)');
 
         $pagos20 = [
             'totales' => [
@@ -515,10 +390,8 @@ class SupplierPurchaseOrderController extends Controller
             'pagos' => [],
         ];
 
-        // ======== CASO 1: CFDI de Pago (P) -> uso de pago20 ========
         if ($tipo === 'P') {
 
-            // Totales del complemento pago20 (si existen)
             $pagos20['totales'] = [
                 'MontoTotalPagos'             => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@MontoTotalPagos)'),
                 'TotalRetencionesIVA'         => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalRetencionesIVA)'),
@@ -527,10 +400,8 @@ class SupplierPurchaseOrderController extends Controller
                 'TotalTrasladosImpuestoIVA16' => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalTrasladosImpuestoIVA16)'),
             ];
 
-            // Busca pagos por XPath
             $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
 
-            // Fallback: si XPath no devolvió, intenta por DOM NS (por si el prefijo cambia)
             if (!$pagoNodes || $pagoNodes->length === 0) {
                 $pagoNodes = $dom->getElementsByTagNameNS('http://www.sat.gob.mx/Pagos20', 'Pago');
             }
@@ -555,7 +426,6 @@ class SupplierPurchaseOrderController extends Controller
                     ],
                 ];
 
-                // Doctos Relacionados de ese pago
                 $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
                 foreach ($doctoNodes as $doc) {
                     /** @var \DOMElement $doc */
@@ -576,7 +446,6 @@ class SupplierPurchaseOrderController extends Controller
                         ],
                     ];
 
-                    // ImpuestosDR
                     $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
                     foreach ($trasDRNodes as $t) {
                         /** @var \DOMElement $t */
@@ -603,7 +472,6 @@ class SupplierPurchaseOrderController extends Controller
                     $pagoData['doctos_relacionados'][] = $docto;
                 }
 
-                // Impuestos a nivel Pago
                 $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
                 foreach ($retPNodes as $rP) {
                     /** @var \DOMElement $rP */
@@ -626,11 +494,8 @@ class SupplierPurchaseOrderController extends Controller
 
                 $pagos20['pagos'][] = $pagoData;
             }
-
-        // ======== CASO 2: CFDI Ingreso/Egreso (I/E) -> impuestos por CONCEPTO / GLOBALES ========
         } else {
 
-            // Conceptos con impuestos por concepto
             $conceptos = [];
             $conceptNodes = $xp->query('//cfdi:Comprobante/cfdi:Conceptos/cfdi:Concepto');
             foreach ($conceptNodes as $n) {
@@ -651,7 +516,6 @@ class SupplierPurchaseOrderController extends Controller
                     ],
                 ];
 
-                // Impuestos por concepto
                 $tNodes = $xp->query('cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', $n);
                 foreach ($tNodes as $t) {
                     /** @var \DOMElement $t */
@@ -677,8 +541,6 @@ class SupplierPurchaseOrderController extends Controller
 
                 $conceptos[] = $c;
             }
-
-            // Impuestos globales del comprobante
             $impuestosGlobales = [
                 'TotalImpuestosTrasladados' => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Impuestos/@TotalImpuestosTrasladados)'),
                 'TotalImpuestosRetenidos'   => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Impuestos/@TotalImpuestosRetenidos)'),
@@ -705,109 +567,42 @@ class SupplierPurchaseOrderController extends Controller
                     'Importe'  => $rg->getAttribute('Importe'),
                 ];
             }
-
-            // Puedes dejar estos arreglos listos en tu payload:
             $data['conceptos'] = $conceptos;
             $data['impuestos_globales'] = $impuestosGlobales;
         }
-
-        // Si usas $pagos20 en tu respuesta final:
         $data['complemento_pagos20'] = $pagos20;
-
-
-        // $data['complemento_pagos20'] = $pagos20;
-
-
         $pdfBase64 = base64_encode(file_get_contents($pdfPath));
         $xmlBase64 = base64_encode(file_get_contents($xmlPath));
-
-        // $data = [
-        //     "idproveedor" => "65424",
-        //     "iddoc" => "4414137",
-        //     "tipo_doc" => "PurchOrd",
-        //     "rfc" => "FIRA860812RX3",
-        //     "nfactura" => "74186",
-        //     "regimenfiscal" => "601",
-        //     "moneda" => "MXN",
-        //     "termino" => "4",
-        //     "departamento" => "105",
-        //     "clase" => "447",
-        //     "operacion" => "3",
-        //     "tipocambio" => 0,
-        //     "fecha" => "11/08/2025",
-        //     "ubicacion" => "314",
-        //     "idnetsuite" => "65424",
-        //     "modo_prueba" => true,
-        //     "uuid" => "729D0E96-CEDB-4C50-AAAD-13CB4A797065",
-        //     "gastos" => [
-        //         [
-        //             "categoria" => "112",
-        //             "costo" => "68.97",
-        //             "ubicacion" => "314",
-        //             "departamento" => "105",
-        //             "clase" => "447",
-        //             "concepto" => "Telefonia Telefonía Neg Ilim Plus Mensualidad Princ - Del 01/08/2025 al 31/08/2025",
-        //             "claveprodser" => "81161700",
-        //             "Impuestos" => [
-        //                 "Traslados" => [
-        //                     "Traslado" => [
-        //                         [
-        //                             "Base" => "68.970000",
-        //                             "Impuesto" => "002",
-        //                             "TipoFactor" => "Tasa",
-        //                             "TasaOCuota" => "0.160000",
-        //                             "Importe" => "11.03"
-        //                         ]
-        //                     ]
-        //                 ]
-        //             ]
-        //         ]
-        //     ],
-        //     "articulos" => [],
-        //     "nota" => "TELEFONIA NEG LLIUM PLUS MES DE AGOSTO",
-        //     "generico" => "8345",
-        //     "xml" =>$xmlBase64,
-        //     "pdf" =>$pdfBase64
-        // ];
-
         $nf6 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 6, '.', '');
         $nf2 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 2, '.', '');
 
-        // básicos
         $uuid       = Arr::get($data, 'timbre.uuid');
         $emisorRfc  = Arr::get($data, 'emisor.rfc');
         $receptRfc  = Arr::get($data, 'receptor.rfc');
         $regimen    = Arr::get($data, 'emisor.regimen');
         $folio      = Arr::get($data, 'folio');
-        $tipo       = Arr::get($data, 'tipo_de_comprobante'); // "P", "I", "E"
+        $tipo       = Arr::get($data, 'tipo_de_comprobante');
 
-        // MONEDA
         $moneda = $tipo === 'P'
             ? (Arr::get($data, 'complemento_pagos20.pagos.0.MonedaP') ?: Arr::get($data, 'moneda', 'MXN'))
             : Arr::get($data, 'moneda', 'MXN');
 
-        // TIPO CAMBIO
         $tipo_cambio = $tipo === 'P'
             ? (Arr::get($data, 'complemento_pagos20.pagos.0.TipoCambioP') ?: 1)
             : (Arr::get($data, 'tipo_cambio') ?: 1);
 
-        // MONTO (Pago: Monto; Ingreso/Egreso: Total)
         $monto_raw = $tipo === 'P'
             ? Arr::get($data, 'complemento_pagos20.pagos.0.Monto', 0)
             : Arr::get($data, 'total', 0);
         $monto = $nf2($monto_raw);
 
-        // FECHA (Pago: FechaPago; otros: Fecha del comprobante)
         $iso = $tipo === 'P'
             ? (Arr::get($data, 'complemento_pagos20.pagos.0.FechaPago') ?: Arr::get($data, 'fecha', '2025-08-11T00:00:00'))
             : Arr::get($data, 'fecha', '2025-08-11T00:00:00');
 
         $fecha = Carbon::parse($iso)->timezone('America/Mexico_City')->format('d/m/Y');
 
-        // CLAVE PROD/SERV Y CONCEPTO
-        $tipo = Arr::get($data, 'tipo_de_comprobante'); // 'I', 'E', 'P', etc.
-
-        // Primer concepto (maneja mayúsculas/minúsculas y fallback para CFDI de Pago)
+        $tipo = Arr::get($data, 'tipo_de_comprobante');
         $clave_prod_serv = Arr::get($data, 'conceptos.0.ClaveProdServ')
             ?: Arr::get($data, 'conceptos.0.clave_prod_serv')
             ?: ($tipo === 'P' ? '84111506' : null);
@@ -839,8 +634,8 @@ class SupplierPurchaseOrderController extends Controller
                     /** @var \DOMElement $tn */
                     $traslados[] = [
                         "Base"       => $nf6($tn->getAttribute('Base')),
-                        "Impuesto"   => (string)$tn->getAttribute('Impuesto'),     // 002 = IVA
-                        "TipoFactor" => (string)$tn->getAttribute('TipoFactor'),   // Tasa/Cuota/Exento
+                        "Impuesto"   => (string)$tn->getAttribute('Impuesto'),
+                        "TipoFactor" => (string)$tn->getAttribute('TipoFactor'),
                         "TasaOCuota" => $nf6($tn->getAttribute('TasaOCuota')),
                         "Importe"    => $nf2($tn->getAttribute('Importe')),
                     ];
@@ -939,13 +734,6 @@ class SupplierPurchaseOrderController extends Controller
         ];
 
         $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
-
-        // return $data;
-        // return $data_netsuite;
-        // return $monto;
-        // return $traslados;
-
-
 
         $restletPath = "/restlet.nl?script=5141&deploy=1";
         try {
