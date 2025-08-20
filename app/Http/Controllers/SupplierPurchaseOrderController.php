@@ -159,7 +159,7 @@ class SupplierPurchaseOrderController extends Controller
 
     public function storePurchaseOrder(Request $request)
     {
-        $data = $request->all();
+        $data = $request->json()->all();
         $supplier_purchase_order_id = $data['id'] ?? null;
         
         // $jsonData = json_encode($data, JSON_PRETTY_PRINT);
@@ -322,11 +322,11 @@ class SupplierPurchaseOrderController extends Controller
     public function xml(Request $request)
     {
 
-        $purchase_order_id = 4;
+        $purchase_order_id = 873;
         // $pdfPath = storage_path('app/public/invoices/pdf/3Lt5H7cPWRJCi7sQXCPaefhwgu0UnyLdzq6RBDDu.pdf');
         // $xmlPath = storage_path('app/public/invoices/xml/prueba_xml_2.xml');
-        $pdfPath = public_path('invoices/pdf/prueba_3.pdf');
-        $xmlPath = public_path('invoices/xml/prueba_3.xml');
+        $pdfPath = public_path('suppliers/invoices/pdf/prueba_3.pdf');
+        $xmlPath = public_path('suppliers/invoices/xml/prueba_3.xml');
 
 
         if (!File::exists($xmlPath)) {
@@ -877,19 +877,19 @@ class SupplierPurchaseOrderController extends Controller
 
         $departamentos = NetsuiteDepartments::where('name', $department_name)
             ->first();
-        $department_id = $departamentos?->external_id;
+        $department_id = $departamentos?->external_id ?? 146;
 
         $clases = NetsuiteClass::where('name', $class_name)
             ->first();
-        $class_id = $clases?->external_id;
+        $class_id = $clases?->external_id ?? 189 ;
 
         $ubicaciones = NetsuiteLocations::where('name', $location_name)
             ->first();
-        $ubicacion_id = $ubicaciones?->external_id;
+        $ubicacion_id = $ubicaciones?->external_id ?? 314;
 
         $categorias = NetsuiteExpenseCategories::where('name', $category_name)
             ->first();
-        $catergoria_id = $categorias?->external_id;
+        $catergoria_id = $categorias?->external_id ?? 118;
 
         $ordenes_compra = SupplierPurchaseOrder::where('id', $purchase_order_id)
             ->first();
