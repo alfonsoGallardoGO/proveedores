@@ -107,14 +107,11 @@ export default {
                         </Link>
                     </div>
                     <!-- <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion"></div> -->
-                    <div
+                    <!-- <div
                         data-kt-menu-trigger="click"
-                        class="menu-item menu-accordion"
+                        class="menu-item menu-accordion hidden"
                     >
-                        <Link
-                            :href="route('supplier.index')"
-                            class="menu-link"
-                        >
+                        <Link :href="route('supplier.index')" class="menu-link">
                             <span class="menu-icon">
                                 <i class="ki-solid ki-note-2 fs-2"></i>
                             </span>
@@ -122,7 +119,7 @@ export default {
                                 >Catálogo de Proveedores</span
                             >
                         </Link>
-                    </div>
+                    </div> -->
                     <div
                         data-kt-menu-trigger="click"
                         class="menu-item menu-accordion"
@@ -143,7 +140,10 @@ export default {
                         data-kt-menu-trigger="click"
                         class="menu-item menu-accordion"
                     >
-                        <Link :href="route('purchase-orders-invoices.index')" class="menu-link">
+                        <Link
+                            :href="route('purchase-orders-invoices.index')"
+                            class="menu-link"
+                        >
                             <span class="menu-icon">
                                 <i
                                     class="ki-solid ki-questionnaire-tablet fs-2"
@@ -154,7 +154,7 @@ export default {
                             >
                         </Link>
                     </div>
-                    <div
+                    <!-- <div
                         data-kt-menu-trigger="click"
                         class="menu-item menu-accordion"
                     >
@@ -164,7 +164,7 @@ export default {
                             </span>
                             <span class="menu-title">Usuarios</span>
                         </Link>
-                    </div>
+                    </div> -->
                     <div
                         data-kt-menu-trigger="click"
                         class="menu-item menu-accordion"
