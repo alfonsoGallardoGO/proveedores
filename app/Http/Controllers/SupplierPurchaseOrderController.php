@@ -163,7 +163,9 @@ class SupplierPurchaseOrderController extends Controller
 
         // $inputRaw = file_get_contents('php://input');
         $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        file_put_contents('debug_input.json', $jsonData);
+        // file_put_contents('debug_input.json', $jsonData);
+        file_put_contents(storage_path('debug_input.json'), $jsonData);
+        // file_put_contents(storage_path('app/logs/debug_input.json'), $jsonData);
         // $input = json_decode($jsonData, true);
 
         if (empty($supplier_purchase_order_id)) {

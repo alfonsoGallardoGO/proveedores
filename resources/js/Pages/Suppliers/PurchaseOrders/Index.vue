@@ -70,6 +70,17 @@ const getSeverity = (status) => {
     }
 };
 
+const formatNumber = (data, field) => {
+    const value = data[field];
+    if (value !== null && value !== undefined) {
+        return Number(value).toLocaleString("es-MX", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })
+    }
+    return value;
+};
+
 </script>
 
 <template>
@@ -104,8 +115,8 @@ const getSeverity = (status) => {
                             </template>
                         </Toast>
 
-                        <DataTable ref="dt"  :value="orders" dataKey="id" paginator
-                            :rows="10" :filters="filters" :rowsPerPageOptions="[5, 10, 25]"
+                        <DataTable ref="dt" :value="orders" dataKey="id" paginator :rows="10" :filters="filters"
+                            :rowsPerPageOptions="[5, 10, 25]"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones"
                             sortField="id" :sortOrder="-1">
                             <template #header>
@@ -119,15 +130,15 @@ const getSeverity = (status) => {
                                     </IconField>
                                 </div>
                             </template>
-                            
+
                             <Column field="id" header="Id" sortable style="min-width: 2rem"></Column>
                             <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 8rem"
                                 bodyClass="ml-2"></Column>
-                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 8rem"
-                                bodyClass="ml-2" :body="formatNumber">
+                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 8rem" bodyClass="ml-2"
+                                :body="formatNumber">
                             </Column>
-                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 8rem"
-                                bodyClass="ml-2" :body="formatNumber">
+                            <Column field="subtotal" header="Subtotal" sortable style="min-width: 8rem" bodyClass="ml-2"
+                                :body="formatNumber">
                             </Column>
                             <Column field="total" header="Total" sortable style="min-width: 8rem" bodyClass="ml-2"
                                 :body="formatNumber">
@@ -146,11 +157,7 @@ const getSeverity = (status) => {
                             <Column :exportable="false" header="Acciones" style="min-width: 4rem">
                                 <template #body="slotProps">
                                     <Link :href="route('purchase-orders.show', slotProps.data.id)">
-                                        <Button 
-                                            icon="pi pi-eye" 
-                                            outlined rounded severity="warn" 
-                                            class="mr-2"
-                                        />
+                                    <Button icon="pi pi-eye" outlined rounded severity="warn" class="mr-2" />
                                     </Link>
                                 </template>
                             </Column>
