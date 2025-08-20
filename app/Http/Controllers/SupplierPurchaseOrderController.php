@@ -162,8 +162,8 @@ class SupplierPurchaseOrderController extends Controller
         $data = $request->json()->all();
         $supplier_purchase_order_id = $data['id'] ?? null;
         
-        // $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        // file_put_contents(storage_path('debug_input.json'), $jsonData);
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+        file_put_contents(storage_path('debug_input.json'), $jsonData);
 
         if (empty($supplier_purchase_order_id)) {
             return response()->json([
