@@ -7,184 +7,184 @@ import { useToast } from "primevue/usetoast";
 import { useForm } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
 
-const props = defineProps({
-	orders: Array,
-});
+// const props = defineProps({
+// 	orders: Array,
+// });
 
-onMounted(() => {
-	console.log('Datos de las órdenes:', props.orders);
-});
+// onMounted(() => {
+// 	console.log('Datos de las órdenes:', props.orders);
+// });
 
-// Calcula el total de órdenes
-const totalOrders = computed(() => props.orders.length);
+// // Calcula el total de órdenes
+// const totalOrders = computed(() => props.orders.length);
 
-// Calcula las órdenes por estado usando 'filter' y 'length'
-const facturaPendienteCount = computed(() =>
-	props.orders.filter(o => o.status === 'Factura pendiente').length
-);
+// // Calcula las órdenes por estado usando 'filter' y 'length'
+// const facturaPendienteCount = computed(() =>
+// 	props.orders.filter(o => o.status === 'Factura pendiente').length
+// );
 
-const cerradaCount = computed(() =>
-	props.orders.filter(o => o.status === 'Cerrada').length
-);
+// const cerradaCount = computed(() =>
+// 	props.orders.filter(o => o.status === 'Cerrada').length
+// );
 
-const facturacionPendienteCount = computed(() =>
-	props.orders.filter(o => o.status === 'Facturación pendiente/Parcialmente recibido').length
-);
+// const facturacionPendienteCount = computed(() =>
+// 	props.orders.filter(o => o.status === 'Facturación pendiente/Parcialmente recibido').length
+// );
 
-const parcialmenteRecibidaCount = computed(() =>
-	props.orders.filter(o => o.status === 'Parcialmente recibida').length
-);
+// const parcialmenteRecibidaCount = computed(() =>
+// 	props.orders.filter(o => o.status === 'Parcialmente recibida').length
+// );
 
-const recepcionPendienteCount = computed(() =>
-	props.orders.filter(o => o.status === 'Recepción pendiente').length
-);
+// const recepcionPendienteCount = computed(() =>
+// 	props.orders.filter(o => o.status === 'Recepción pendiente').length
+// );
 
-const totalmenteFacturadaCount = computed(() =>
-	props.orders.filter(o => o.status === 'Totalmente facturada').length
-);
-//******************IMPUESTOS********************** */
-// Propiedad computada para sumar el total de todos los impuestos
-const totalImpuestos = computed(() => {
-	if (!props.orders || !Array.isArray(props.orders)) {
-		return 0;
-	}
-	return props.orders.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
-});
+// const totalmenteFacturadaCount = computed(() =>
+// 	props.orders.filter(o => o.status === 'Totalmente facturada').length
+// );
+// //******************IMPUESTOS********************** */
+// // Propiedad computada para sumar el total de todos los impuestos
+// const totalImpuestos = computed(() => {
+// 	if (!props.orders || !Array.isArray(props.orders)) {
+// 		return 0;
+// 	}
+// 	return props.orders.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
+// });
 
-// Suma de impuestos para cada estado
-const impuestosFacturaPendientes = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Factura pendiente')
-		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
-});
+// // Suma de impuestos para cada estado
+// const impuestosFacturaPendientes = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Factura pendiente')
+// 		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
+// });
 
-const impuestosCerrada = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Cerrada')
-		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
-});
+// const impuestosCerrada = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Cerrada')
+// 		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
+// });
 
-const impuestosFacturacionPendiente = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Facturación pendiente/Parcialmente recibido')
-		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
-});
+// const impuestosFacturacionPendiente = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Facturación pendiente/Parcialmente recibido')
+// 		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
+// });
 
-const impuestosParcialmenteRecibida = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Parcialmente recibida')
-		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
-});
+// const impuestosParcialmenteRecibida = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Parcialmente recibida')
+// 		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
+// });
 
-const impuestosRecepcionPendiente = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Recepción pendiente')
-		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
-});
+// const impuestosRecepcionPendiente = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Recepción pendiente')
+// 		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
+// });
 
-const impuestosTotalmenteFacturada = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Totalmente facturada')
-		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
-});
-//******************IMPUESTOS FIN********************** */
-//******************SUBTOTAL********************** */
-// Propiedad computada para sumar el total de todos los impuestos
-const totalSubtotal = computed(() => {
-	if (!props.orders || !Array.isArray(props.orders)) {
-		return 0;
-	}
-	return props.orders.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
-});
+// const impuestosTotalmenteFacturada = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Totalmente facturada')
+// 		.reduce((sum, order) => sum + parseFloat(order.impuesto || 0), 0);
+// });
+// //******************IMPUESTOS FIN********************** */
+// //******************SUBTOTAL********************** */
+// // Propiedad computada para sumar el total de todos los impuestos
+// const totalSubtotal = computed(() => {
+// 	if (!props.orders || !Array.isArray(props.orders)) {
+// 		return 0;
+// 	}
+// 	return props.orders.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
+// });
 
-// Suma de impuestos para cada estado
-const subtotalFacturaPendientes = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Factura pendiente')
-		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
-});
+// // Suma de impuestos para cada estado
+// const subtotalFacturaPendientes = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Factura pendiente')
+// 		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
+// });
 
-const subtotalCerrada = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Cerrada')
-		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
-});
+// const subtotalCerrada = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Cerrada')
+// 		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
+// });
 
-const subtotalFacturacionPendiente = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Facturación pendiente/Parcialmente recibido')
-		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
-});
+// const subtotalFacturacionPendiente = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Facturación pendiente/Parcialmente recibido')
+// 		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
+// });
 
-const subtotalParcialmenteRecibida = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Parcialmente recibida')
-		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
-});
+// const subtotalParcialmenteRecibida = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Parcialmente recibida')
+// 		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
+// });
 
-const subtotalRecepcionPendiente = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Recepción pendiente')
-		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
-});
+// const subtotalRecepcionPendiente = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Recepción pendiente')
+// 		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
+// });
 
-const subtotalTotalmenteFacturada = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Totalmente facturada')
-		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
-});
-//******************SUBTOTAL FIN********************** */
-//******************TOTAL********************** */
-const total = computed(() => {
-	if (!props.orders || !Array.isArray(props.orders)) {
-		return 0;
-	}
-	return props.orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-});
+// const subtotalTotalmenteFacturada = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Totalmente facturada')
+// 		.reduce((sum, order) => sum + parseFloat(order.subtotal || 0), 0);
+// });
+// //******************SUBTOTAL FIN********************** */
+// //******************TOTAL********************** */
+// const total = computed(() => {
+// 	if (!props.orders || !Array.isArray(props.orders)) {
+// 		return 0;
+// 	}
+// 	return props.orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+// });
 
-// Suma de impuestos para cada estado
-const totalFacturaPendientes = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Factura pendiente')
-		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-});
+// // Suma de impuestos para cada estado
+// const totalFacturaPendientes = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Factura pendiente')
+// 		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+// });
 
-const totalCerrada = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Cerrada')
-		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-});
+// const totalCerrada = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Cerrada')
+// 		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+// });
 
-const totalFacturacionPendiente = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Facturación pendiente/Parcialmente recibido')
-		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-});
+// const totalFacturacionPendiente = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Facturación pendiente/Parcialmente recibido')
+// 		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+// });
 
-const totalParcialmenteRecibida = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Parcialmente recibida')
-		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-});
+// const totalParcialmenteRecibida = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Parcialmente recibida')
+// 		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+// });
 
-const totalRecepcionPendiente = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Recepción pendiente')
-		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-});
+// const totalRecepcionPendiente = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Recepción pendiente')
+// 		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+// });
 
-const totalTotalmenteFacturada = computed(() => {
-	if (!props.orders) return 0;
-	return props.orders.filter(order => order.status === 'Totalmente facturada')
-		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-});
+// const totalTotalmenteFacturada = computed(() => {
+// 	if (!props.orders) return 0;
+// 	return props.orders.filter(order => order.status === 'Totalmente facturada')
+// 		.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+// });
 </script>
 
 <template>
 	<AppLayout title="Dashboard">
 		<div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
 			<Header :title="'Dashboard'" />
-			<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+			<!-- <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 				<div class="container-fluid" id="kt_content_container">
 					<div class="row g-5 g-lg-10">
 						<div class="col-xxl-4 col-md-4 mb-xxl-10">
@@ -666,7 +666,7 @@ const totalTotalmenteFacturada = computed(() => {
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			<div class="footer py-4 d-flex flex-lg-column" id="kt_footer">
 				<div class="container-fluid d-flex flex-column flex-md-row flex-stack">
 					<div class="text-gray-900 order-2 order-md-1">

@@ -84,7 +84,7 @@ class SupplierPurchaseOrderController extends Controller
 
 
         // if ($request->hasFile('factura')) {
-            
+
         //     Storage::disk('public')->makeDirectory('invoices/pdf');
         //     $pdfPath = $request->file('factura')->store('invoices/pdf', 'public');
 
@@ -104,20 +104,20 @@ class SupplierPurchaseOrderController extends Controller
             $file = $request->file('factura');
             abort_unless($file->isValid(), 422, 'Archivo inválido');
 
-            
+
             $folderPath = public_path('suppliers/invoices/pdf');
             File::ensureDirectoryExists($folderPath, 0755, true);
 
-            
+
             $ext = $file->getClientOriginalExtension() ?: 'pdf';
             $filename = 'receipt_' . (string) Str::uuid() . '.' . $ext;
 
-            
+
             $file->move($folderPath, $filename);
 
-            
+
             $pdfAbsolute = $folderPath . DIRECTORY_SEPARATOR . $filename;
-            $pdfPath      = asset('suppliers/invoices/pdf/' . $filename); 
+            $pdfPath      = asset('suppliers/invoices/pdf/' . $filename);
 
             $pdfBase64 = base64_encode(file_get_contents($pdfAbsolute));
         }
@@ -126,20 +126,20 @@ class SupplierPurchaseOrderController extends Controller
             $file = $request->file('xml');
             abort_unless($file->isValid(), 422, 'Archivo inválido');
 
-            
+
             $folderPath = public_path('suppliers/invoices/xml');
             File::ensureDirectoryExists($folderPath, 0755, true);
 
-            
+
             $ext = $file->getClientOriginalExtension() ?: 'xml';
             $filename = 'receipt_' . (string) Str::uuid() . '.' . $ext;
 
-            
+
             $file->move($folderPath, $filename);
 
-            
+
             $pdfAbsolute = $folderPath . DIRECTORY_SEPARATOR . $filename;
-            $xmlPath      = asset('suppliers/invoices/xml/' . $filename); 
+            $xmlPath      = asset('suppliers/invoices/xml/' . $filename);
 
             $xmlBase64 = base64_encode(file_get_contents($pdfAbsolute));
         }
@@ -160,6 +160,11 @@ class SupplierPurchaseOrderController extends Controller
     {
         $data = $request->all();
         $supplier_purchase_order_id = $data['id'] ?? null;
+
+        // $inputRaw = file_get_contents('php://input');
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+        file_put_contents('debug_input.json', $jsonData);
+        // $input = json_decode($jsonData, true);
 
         if (empty($supplier_purchase_order_id)) {
             return response()->json([
@@ -577,7 +582,7 @@ class SupplierPurchaseOrderController extends Controller
         //         ];
         //     }
 
-            
+
         // }
 
         $traslados = [];
@@ -594,23 +599,23 @@ class SupplierPurchaseOrderController extends Controller
             }
         }
 
-        
 
 
-        
+
+
         // foreach (($pago['doctos_relacionados'] ?? []) as $dr) {
-            //     foreach (($dr['impuestosDR']['trasladosDR'] ?? []) as $tdr) {
-            //         $traslados[] = [
-            //             "Traslado" => [
-            //                 "Base"       => $nf6($tdr['BaseDR']       ?? 0),
-            //                 "Impuesto"   => (string)($tdr['ImpuestoDR']   ?? ''),
-            //                 "TipoFactor" => (string)($tdr['TipoFactorDR'] ?? ''),
-            //                 "TasaOCuota" => $nf6($tdr['TasaOCuotaDR'] ?? 0),
-            //                 "Importe"    => $nf2($tdr['ImporteDR']    ?? 0),
-            //             ]
-            //         ];
-            //     }
-            // }
+        //     foreach (($dr['impuestosDR']['trasladosDR'] ?? []) as $tdr) {
+        //         $traslados[] = [
+        //             "Traslado" => [
+        //                 "Base"       => $nf6($tdr['BaseDR']       ?? 0),
+        //                 "Impuesto"   => (string)($tdr['ImpuestoDR']   ?? ''),
+        //                 "TipoFactor" => (string)($tdr['TipoFactorDR'] ?? ''),
+        //                 "TasaOCuota" => $nf6($tdr['TasaOCuotaDR'] ?? 0),
+        //                 "Importe"    => $nf2($tdr['ImporteDR']    ?? 0),
+        //             ]
+        //         ];
+        //     }
+        // }
 
 
         $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
@@ -618,7 +623,7 @@ class SupplierPurchaseOrderController extends Controller
             ->first();
 
         $department_name = $item?->department;
-        $class_name = $item?->class; 
+        $class_name = $item?->class;
         $location_name = Str::of($item->location ?? '')
             ->replaceMatches('/^.*:\s*/', '')
             ->squish()
@@ -642,7 +647,7 @@ class SupplierPurchaseOrderController extends Controller
         $categorias = NetsuiteExpenseCategories::where('name', $category_name)
             ->first();
         $catergoria_id = $categorias?->external_id;
-        
+
         $ordenes_compra = SupplierPurchaseOrder::where('id', $purchase_order_id)
             ->first();
         $purchase_order_id = $ordenes_compra?->purchase_order_id;
