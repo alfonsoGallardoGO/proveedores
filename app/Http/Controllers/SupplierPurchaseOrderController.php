@@ -144,154 +144,154 @@ class SupplierPurchaseOrderController extends Controller
     {
         $data = $request->all();
         return $data;
-        $supplier_purchase_order_id = $data['id'] ?? null;
+        // $supplier_purchase_order_id = $data['id'] ?? null;
         
-        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        $jsonData = $jsonData . "\n"; 
-        file_put_contents(storage_path('debug_input.json'), $jsonData);
+        // $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+        // $jsonData = $jsonData . "\n"; 
+        // file_put_contents(storage_path('debug_input.json'), $jsonData);
 
-        if (empty($supplier_purchase_order_id)) {
-            return response()->json([
-                'error' => 'El campo id es requerido.'
-            ], 400);
-        }
+        // if (empty($supplier_purchase_order_id)) {
+        //     return response()->json([
+        //         'error' => 'El campo id es requerido.'
+        //     ], 400);
+        // }
 
-        if (empty($data['estado'])) {
-            return response()->json([
-                'error' => 'El campo estado es requerido.'
-            ], 400);
-        }
+        // if (empty($data['estado'])) {
+        //     return response()->json([
+        //         'error' => 'El campo estado es requerido.'
+        //     ], 400);
+        // }
 
-        if (empty($data['tranid']) || strpos($data['tranid'], 'OC') !== 0) {
-            return response()->json([
-                'error' => 'El campo tranid no es valido.'
-            ], 400);
-        }
+        // if (empty($data['tranid']) || strpos($data['tranid'], 'OC') !== 0) {
+        //     return response()->json([
+        //         'error' => 'El campo tranid no es valido.'
+        //     ], 400);
+        // }
 
-        $orderId = 0;
-        $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
-        if ($supplierPurchaseOrder->exists()) {
-            $supplierPurchaseOrder->update([
-                'supplier_external_id' => $data['proveedor']['id'] ?? null,
-                'rfc' => $data['proveedor']['rfc'] ?? null,
-                'status' => $data['estado'] ?? null,
-                'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
-                'purchase_order_id' => $data['id'] ?? null,
-                'purchase_order' => $data['tranid'] ?? null,
-                'total' => $data['total'],
-                'subtotal' => $data['subtotal'],
-                'impuesto' => $data['impuesto'],
-            ]);
-            $orderId = $supplierPurchaseOrder->first()->id;
-        } else {
-            SupplierPurchaseOrder::create([
-                'supplier_external_id' => $data['proveedor']['id'] ?? null,
-                'rfc' => $data['proveedor']['rfc'] ?? null,
-                'status' => $data['estado'] ?? null,
-                'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
-                'purchase_order_id' => $data['id'] ?? null,
-                'purchase_order' => $data['tranid'] ?? null,
-                'total' => $data['total'],
-                'subtotal' => $data['subtotal'],
-                'impuesto' => $data['impuesto'],
+        // $orderId = 0;
+        // $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
+        // if ($supplierPurchaseOrder->exists()) {
+        //     $supplierPurchaseOrder->update([
+        //         'supplier_external_id' => $data['proveedor']['id'] ?? null,
+        //         'rfc' => $data['proveedor']['rfc'] ?? null,
+        //         'status' => $data['estado'] ?? null,
+        //         'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+        //         'purchase_order_id' => $data['id'] ?? null,
+        //         'purchase_order' => $data['tranid'] ?? null,
+        //         'total' => $data['total'],
+        //         'subtotal' => $data['subtotal'],
+        //         'impuesto' => $data['impuesto'],
+        //     ]);
+        //     $orderId = $supplierPurchaseOrder->first()->id;
+        // } else {
+        //     SupplierPurchaseOrder::create([
+        //         'supplier_external_id' => $data['proveedor']['id'] ?? null,
+        //         'rfc' => $data['proveedor']['rfc'] ?? null,
+        //         'status' => $data['estado'] ?? null,
+        //         'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+        //         'purchase_order_id' => $data['id'] ?? null,
+        //         'purchase_order' => $data['tranid'] ?? null,
+        //         'total' => $data['total'],
+        //         'subtotal' => $data['subtotal'],
+        //         'impuesto' => $data['impuesto'],
 
-            ]);
-            $orderId = SupplierPurchaseOrder::latest()->first()->id;
-        }
+        //     ]);
+        //     $orderId = SupplierPurchaseOrder::latest()->first()->id;
+        // }
 
-        $incomingItems = [];
+        // $incomingItems = [];
 
-        // Procesar lineasArticulos
-        foreach (collect($data['lineasArticulos'] ?? []) as $item) {
-            $standardizedItem = [
-                'article_order_id' => $item['articuloId'],
-                'description'      => $item['descripcion'],
-                'quantity'         => $item['cantidad'],
-                'amount'           => $item['importe'],
-                'rate_tax'         => $item['tasaImpuesto'],
-                'class'            => $item['clase'],
-                'department'       => $item['departamento'],
-                'location'         => $item['ubicacion'],
-                'account'          => $item['cuenta'],
-                'categoria'        => $item['categoria'],
-                'memo'             => $item['memo'] ?? null,
-                'type'             => 'ARTICULO',
-                'supplier_purchase_order_id' => $orderId,
-            ];
-            $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
-            $incomingItems[$uniqueKey] = $standardizedItem;
-        }
+        // // Procesar lineasArticulos
+        // foreach (collect($data['lineasArticulos'] ?? []) as $item) {
+        //     $standardizedItem = [
+        //         'article_order_id' => $item['articuloId'],
+        //         'description'      => $item['descripcion'],
+        //         'quantity'         => $item['cantidad'],
+        //         'amount'           => $item['importe'],
+        //         'rate_tax'         => $item['tasaImpuesto'],
+        //         'class'            => $item['clase'],
+        //         'department'       => $item['departamento'],
+        //         'location'         => $item['ubicacion'],
+        //         'account'          => $item['cuenta'],
+        //         'categoria'        => $item['categoria'],
+        //         'memo'             => $item['memo'] ?? null,
+        //         'type'             => 'ARTICULO',
+        //         'supplier_purchase_order_id' => $orderId,
+        //     ];
+        //     $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
+        //     $incomingItems[$uniqueKey] = $standardizedItem;
+        // }
 
-        foreach (collect($data['lineasGastos'] ?? []) as $item) {
-            $standardizedItem = [
-                'article_order_id' => $item['articuloId'],
-                'description'      => $item['memo'],
-                'quantity'         => $item['cantidad'],
-                'amount'           => $item['importe'],
-                'rate_tax'         => $item['tasaImpuesto'],
-                'class'            => $item['clase'],
-                'department'       => $item['departamento'],
-                'location'         => $item['ubicacion'],
-                'account'          => $item['cuenta'],
-                'categoria'        => $item['categoria'],
-                'memo'             => $item['memo'] ?? null,
-                'type'             => 'GASTO',
-                'supplier_purchase_order_id' => $orderId,
-            ];
+        // foreach (collect($data['lineasGastos'] ?? []) as $item) {
+        //     $standardizedItem = [
+        //         'article_order_id' => $item['articuloId'],
+        //         'description'      => $item['memo'],
+        //         'quantity'         => $item['cantidad'],
+        //         'amount'           => $item['importe'],
+        //         'rate_tax'         => $item['tasaImpuesto'],
+        //         'class'            => $item['clase'],
+        //         'department'       => $item['departamento'],
+        //         'location'         => $item['ubicacion'],
+        //         'account'          => $item['cuenta'],
+        //         'categoria'        => $item['categoria'],
+        //         'memo'             => $item['memo'] ?? null,
+        //         'type'             => 'GASTO',
+        //         'supplier_purchase_order_id' => $orderId,
+        //     ];
 
-            $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
-            $incomingItems[$uniqueKey] = $standardizedItem;
-        }
+        //     $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
+        //     $incomingItems[$uniqueKey] = $standardizedItem;
+        // }
 
-        $itemsToKeepInDb = [];
+        // $itemsToKeepInDb = [];
 
-        DB::beginTransaction();
-        try {
-            foreach ($incomingItems as $uniqueKey => $incomingItemData) {
-                $existingItem = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-                    ->where('article_order_id', $incomingItemData['article_order_id'])
-                    ->where('type', $incomingItemData['type'])
-                    ->withTrashed()
-                    ->first();
+        // DB::beginTransaction();
+        // try {
+        //     foreach ($incomingItems as $uniqueKey => $incomingItemData) {
+        //         $existingItem = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
+        //             ->where('article_order_id', $incomingItemData['article_order_id'])
+        //             ->where('type', $incomingItemData['type'])
+        //             ->withTrashed()
+        //             ->first();
 
-                if ($existingItem) {
-                    if ($existingItem->trashed()) {
-                        $existingItem->restore();
-                    }
+        //         if ($existingItem) {
+        //             if ($existingItem->trashed()) {
+        //                 $existingItem->restore();
+        //             }
 
-                    $existingItem->update($incomingItemData);
-                    $itemsToKeepInDb[] = $existingItem->id;
-                } else {
+        //             $existingItem->update($incomingItemData);
+        //             $itemsToKeepInDb[] = $existingItem->id;
+        //         } else {
 
-                    $newItem = SupplierPurchaseOrderItem::create($incomingItemData);
-                    $itemsToKeepInDb[] = $newItem->id;
-                }
-            }
-
-
-            $idsToDelete = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-                ->whereNotIn('id', $itemsToKeepInDb)
-                ->pluck('id')
-                ->all();
-
-            if (!empty($idsToDelete)) {
-                SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete();
-            }
+        //             $newItem = SupplierPurchaseOrderItem::create($incomingItemData);
+        //             $itemsToKeepInDb[] = $newItem->id;
+        //         }
+        //     }
 
 
+        //     $idsToDelete = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
+        //         ->whereNotIn('id', $itemsToKeepInDb)
+        //         ->pluck('id')
+        //         ->all();
 
-            DB::commit();
-            return response()->json([
-                'message' => 'Orden de compra y sus ítems sincronizados correctamente.',
-                'supplier_purchase_order_id' => $supplier_purchase_order_id
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => 'Ocurrió un error al procesar la orden de compra.',
-                'details' => $e->getMessage()
-            ], 500);
-        }
+        //     if (!empty($idsToDelete)) {
+        //         SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete();
+        //     }
+
+
+
+        //     DB::commit();
+        //     return response()->json([
+        //         'message' => 'Orden de compra y sus ítems sincronizados correctamente.',
+        //         'supplier_purchase_order_id' => $supplier_purchase_order_id
+        //     ], 200);
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json([
+        //         'error' => 'Ocurrió un error al procesar la orden de compra.',
+        //         'details' => $e->getMessage()
+        //     ], 500);
+        // }
     }
 
 
