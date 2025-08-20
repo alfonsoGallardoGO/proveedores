@@ -941,12 +941,14 @@ class SupplierPurchaseOrderController extends Controller
         // return $monto;
         // return $traslados;
 
+
+
         $restletPath = "/restlet.nl?script=5141&deploy=1";
         try {
             $response = $this->netSuiteRestService->request($restletPath, 'POST', $data_netsuite);
-            return response()->json(['ok' => true, 'response' => $response]);
+            return response()->json(['ok' => true, 'response' => $response,"data" => $data_netsuite]);
         } catch (\Throwable $e) {
-            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+            return response()->json(['ok' => false, 'error' => $e->getMessage(),"data" => $data_netsuite], 500);
         }
     }
 }
