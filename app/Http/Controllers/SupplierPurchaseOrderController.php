@@ -937,7 +937,7 @@ class SupplierPurchaseOrderController extends Controller
         $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
 
         // return $data;
-        return $data_netsuite;
+        // return $data_netsuite;
         // return $monto;
         // return $traslados;
 
