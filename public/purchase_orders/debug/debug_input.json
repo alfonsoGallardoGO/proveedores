@@ -1,0 +1,39 @@
+[
+    {
+        "id": 4452785,
+        "tranid": "OCSCQ0204",
+        "fecha": "2025-08-20T07:00:00.000Z",
+        "estado": "Recepci\u00f3n pendiente",
+        "total": 4529,
+        "subtotal": 3904.31,
+        "impuesto": 624.69,
+        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
+        "moneda": "Mexican Peso",
+        "proveedor": {
+            "id": "65424",
+            "nombre": null,
+            "rfc": "FIRA860812RX3",
+            "correo": "afr.figueroa@gmail.com",
+            "telefono": null,
+            "tipoEntidad": "individual"
+        },
+        "evento": "create",
+        "lineasArticulos": [
+            {
+                "tipo": "articulo",
+                "articuloId": "141818",
+                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
+                "cantidad": 1,
+                "importe": 3904.31,
+                "tasaImpuesto": "T.IVA16%:C.IVA16%",
+                "clase": "REFACCIONES : ELECTRICO-ELECTRONICO",
+                "departamento": "TI : Desarrollo",
+                "ubicacion": "CORPORATIVO",
+                "cuenta": null,
+                "categoria": null,
+                "memo": null
+            }
+        ],
+        "lineasGastos": []
+    }
+]
