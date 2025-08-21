@@ -9,7 +9,6 @@ use App\Models\SupplierPurchaseOrder;
 use App\Models\SupplierPurchaseOrderItem;
 use App\Models\SupplierPurchaseOrdersItemsDelivery;
 use App\Models\SupplierInvoice;
-use App\Models\Supplier;
 use App\Models\NetsuiteAccountingAccounts;
 use App\Models\NetsuiteClass;
 use App\Models\NetsuiteDepartments;
@@ -23,7 +22,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use App\Services\CfdiParser;
 use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 
 
 class SupplierPurchaseOrderController extends Controller
@@ -51,15 +49,11 @@ class SupplierPurchaseOrderController extends Controller
 
     public function show($id)
     {
-        // dd($id);
         $items = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $id)
             ->withSum('deliveries', 'amount')
             ->get();
-        // dd($items);
 
         $invoices = SupplierInvoice::where('supplier_purchase_order_id', $id)->get();
-
-        // dd($invoices);
 
         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,
@@ -143,155 +137,163 @@ class SupplierPurchaseOrderController extends Controller
     public function storePurchaseOrder(Request $request)
     {
         $data = $request->all();
-        return $data;
-        // $supplier_purchase_order_id = $data['id'] ?? null;
-        
-        // $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        // $jsonData = $jsonData . "\n"; 
-        // file_put_contents(storage_path('debug_input.json'), $jsonData);
+        $supplier_purchase_order_id = $data['id'] ?? null;
 
-        // if (empty($supplier_purchase_order_id)) {
-        //     return response()->json([
-        //         'error' => 'El campo id es requerido.'
-        //     ], 400);
-        // }
+        // Almacenar el JSON en carpeta Public del storage****
+        $filePath = 'debug_input.json';
+        $existingContent = Storage::disk('public')->exists($filePath) ? Storage::disk('public')->get($filePath) : '[]';
+        $dataArray = json_decode($existingContent, true);
+        if (!is_array($dataArray)) {
+            $dataArray = [];
+        }
+        $dataArray[] = $data;
+        $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
+        Storage::disk('public')->put($filePath, $newJsonData);
+        // ****************************************************
 
-        // if (empty($data['estado'])) {
-        //     return response()->json([
-        //         'error' => 'El campo estado es requerido.'
-        //     ], 400);
-        // }
+        if (empty($supplier_purchase_order_id)) {
+            return response()->json([
+                'error' => 'El campo id es requerido.'
+            ], 400);
+        }
 
-        // if (empty($data['tranid']) || strpos($data['tranid'], 'OC') !== 0) {
-        //     return response()->json([
-        //         'error' => 'El campo tranid no es valido.'
-        //     ], 400);
-        // }
+        if (empty($data['estado'])) {
+            return response()->json([
+                'error' => 'El campo estado es requerido.'
+            ], 400);
+        }
 
-        // $orderId = 0;
-        // $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
-        // if ($supplierPurchaseOrder->exists()) {
-        //     $supplierPurchaseOrder->update([
-        //         'supplier_external_id' => $data['proveedor']['id'] ?? null,
-        //         'rfc' => $data['proveedor']['rfc'] ?? null,
-        //         'status' => $data['estado'] ?? null,
-        //         'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
-        //         'purchase_order_id' => $data['id'] ?? null,
-        //         'purchase_order' => $data['tranid'] ?? null,
-        //         'total' => $data['total'],
-        //         'subtotal' => $data['subtotal'],
-        //         'impuesto' => $data['impuesto'],
-        //     ]);
-        //     $orderId = $supplierPurchaseOrder->first()->id;
-        // } else {
-        //     SupplierPurchaseOrder::create([
-        //         'supplier_external_id' => $data['proveedor']['id'] ?? null,
-        //         'rfc' => $data['proveedor']['rfc'] ?? null,
-        //         'status' => $data['estado'] ?? null,
-        //         'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
-        //         'purchase_order_id' => $data['id'] ?? null,
-        //         'purchase_order' => $data['tranid'] ?? null,
-        //         'total' => $data['total'],
-        //         'subtotal' => $data['subtotal'],
-        //         'impuesto' => $data['impuesto'],
+        if (empty($data['tranid']) || strpos($data['tranid'], 'OC') !== 0) {
+            return response()->json([
+                'error' => 'El campo tranid no es valido.'
+            ], 400);
+        }
 
-        //     ]);
-        //     $orderId = SupplierPurchaseOrder::latest()->first()->id;
-        // }
+        $orderId = 0;
+        $supplierPurchaseOrder = SupplierPurchaseOrder::where('purchase_order_id', $supplier_purchase_order_id);
+        if ($supplierPurchaseOrder->exists()) {
+            $supplierPurchaseOrder->update([
+                'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                'rfc' => $data['proveedor']['rfc'] ?? null,
+                'status' => $data['estado'] ?? null,
+                'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                'purchase_order_id' => $data['id'] ?? null,
+                'purchase_order' => $data['tranid'] ?? null,
+                'total' => $data['total'] ?? null,
+                'subtotal' => $data['subtotal'] ?? null,
+                'impuesto' => $data['impuesto'] ?? null,
+            ]);
+            $orderId = $supplierPurchaseOrder->first()->id;
+        } else {
+            SupplierPurchaseOrder::create([
+                'supplier_external_id' => $data['proveedor']['id'] ?? null,
+                'rfc' => $data['proveedor']['rfc'] ?? null,
+                'status' => $data['estado'] ?? null,
+                'date' => isset($data['fecha']) ? date('Y-m-d', strtotime($data['fecha'])) : null,
+                'purchase_order_id' => $data['id'] ?? null,
+                'purchase_order' => $data['tranid'] ?? null,
+                'total' => $data['total'] ?? null,
+                'subtotal' => $data['subtotal'] ?? null,
+                'impuesto' => $data['impuesto'] ?? null,
 
-        // $incomingItems = [];
+            ]);
+            $orderId = SupplierPurchaseOrder::latest()->first()->id;
+        }
 
-        // // Procesar lineasArticulos
-        // foreach (collect($data['lineasArticulos'] ?? []) as $item) {
-        //     $standardizedItem = [
-        //         'article_order_id' => $item['articuloId'],
-        //         'description'      => $item['descripcion'],
-        //         'quantity'         => $item['cantidad'],
-        //         'amount'           => $item['importe'],
-        //         'rate_tax'         => $item['tasaImpuesto'],
-        //         'class'            => $item['clase'],
-        //         'department'       => $item['departamento'],
-        //         'location'         => $item['ubicacion'],
-        //         'account'          => $item['cuenta'],
-        //         'categoria'        => $item['categoria'],
-        //         'memo'             => $item['memo'] ?? null,
-        //         'type'             => 'ARTICULO',
-        //         'supplier_purchase_order_id' => $orderId,
-        //     ];
-        //     $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
-        //     $incomingItems[$uniqueKey] = $standardizedItem;
-        // }
+        $incomingItems = [];
 
-        // foreach (collect($data['lineasGastos'] ?? []) as $item) {
-        //     $standardizedItem = [
-        //         'article_order_id' => $item['articuloId'],
-        //         'description'      => $item['memo'],
-        //         'quantity'         => $item['cantidad'],
-        //         'amount'           => $item['importe'],
-        //         'rate_tax'         => $item['tasaImpuesto'],
-        //         'class'            => $item['clase'],
-        //         'department'       => $item['departamento'],
-        //         'location'         => $item['ubicacion'],
-        //         'account'          => $item['cuenta'],
-        //         'categoria'        => $item['categoria'],
-        //         'memo'             => $item['memo'] ?? null,
-        //         'type'             => 'GASTO',
-        //         'supplier_purchase_order_id' => $orderId,
-        //     ];
+        // Procesar lineasArticulos
+        foreach (collect($data['lineasArticulos'] ?? []) as $item) {
+            $standardizedItem = [
+                'article_order_id' => $item['articuloId'],
+                'description'      => $item['descripcion'],
+                'quantity'         => $item['cantidad'],
+                'amount'           => $item['importe'],
+                'rate_tax'         => $item['tasaImpuesto'],
+                'class'            => $item['clase'],
+                'department'       => $item['departamento'],
+                'location'         => $item['ubicacion'],
+                'account'          => $item['cuenta'],
+                'categoria'        => $item['categoria'],
+                'memo'             => $item['memo'] ?? null,
+                'type'             => 'ARTICULO',
+                'supplier_purchase_order_id' => $orderId,
+            ];
+            $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
+            $incomingItems[$uniqueKey] = $standardizedItem;
+        }
 
-        //     $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
-        //     $incomingItems[$uniqueKey] = $standardizedItem;
-        // }
+        // Procesar lineasGastos
+        foreach (collect($data['lineasGastos'] ?? []) as $item) {
+            $standardizedItem = [
+                'article_order_id' => $item['articuloId'],
+                'description'      => $item['memo'],
+                'quantity'         => $item['cantidad'],
+                'amount'           => $item['importe'],
+                'rate_tax'         => $item['tasaImpuesto'],
+                'class'            => $item['clase'],
+                'department'       => $item['departamento'],
+                'location'         => $item['ubicacion'],
+                'account'          => $item['cuenta'],
+                'categoria'        => $item['categoria'],
+                'memo'             => $item['memo'] ?? null,
+                'type'             => 'GASTO',
+                'supplier_purchase_order_id' => $orderId,
+            ];
 
-        // $itemsToKeepInDb = [];
+            $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
+            $incomingItems[$uniqueKey] = $standardizedItem;
+        }
 
-        // DB::beginTransaction();
-        // try {
-        //     foreach ($incomingItems as $uniqueKey => $incomingItemData) {
-        //         $existingItem = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-        //             ->where('article_order_id', $incomingItemData['article_order_id'])
-        //             ->where('type', $incomingItemData['type'])
-        //             ->withTrashed()
-        //             ->first();
+        $itemsToKeepInDb = [];
 
-        //         if ($existingItem) {
-        //             if ($existingItem->trashed()) {
-        //                 $existingItem->restore();
-        //             }
+        DB::beginTransaction();
+        try {
+            foreach ($incomingItems as $uniqueKey => $incomingItemData) {
+                $existingItem = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
+                    ->where('article_order_id', $incomingItemData['article_order_id'])
+                    ->where('type', $incomingItemData['type'])
+                    ->withTrashed()
+                    ->first();
 
-        //             $existingItem->update($incomingItemData);
-        //             $itemsToKeepInDb[] = $existingItem->id;
-        //         } else {
+                if ($existingItem) {
+                    if ($existingItem->trashed()) {
+                        $existingItem->restore();
+                    }
 
-        //             $newItem = SupplierPurchaseOrderItem::create($incomingItemData);
-        //             $itemsToKeepInDb[] = $newItem->id;
-        //         }
-        //     }
+                    $existingItem->update($incomingItemData);
+                    $itemsToKeepInDb[] = $existingItem->id;
+                } else {
 
-
-        //     $idsToDelete = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
-        //         ->whereNotIn('id', $itemsToKeepInDb)
-        //         ->pluck('id')
-        //         ->all();
-
-        //     if (!empty($idsToDelete)) {
-        //         SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete();
-        //     }
+                    $newItem = SupplierPurchaseOrderItem::create($incomingItemData);
+                    $itemsToKeepInDb[] = $newItem->id;
+                }
+            }
 
 
+            $idsToDelete = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $supplier_purchase_order_id)
+                ->whereNotIn('id', $itemsToKeepInDb)
+                ->pluck('id')
+                ->all();
 
-        //     DB::commit();
-        //     return response()->json([
-        //         'message' => 'Orden de compra y sus ítems sincronizados correctamente.',
-        //         'supplier_purchase_order_id' => $supplier_purchase_order_id
-        //     ], 200);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json([
-        //         'error' => 'Ocurrió un error al procesar la orden de compra.',
-        //         'details' => $e->getMessage()
-        //     ], 500);
-        // }
+            if (!empty($idsToDelete)) {
+                SupplierPurchaseOrderItem::whereIn('id', $idsToDelete)->delete();
+            }
+
+
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Orden de compra y sus ítems sincronizados correctamente.',
+                'supplier_purchase_order_id' => $supplier_purchase_order_id
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Ocurrió un error al procesar la orden de compra.',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
@@ -376,241 +378,119 @@ class SupplierPurchaseOrderController extends Controller
             'pagos' => [],
         ];
 
-        $xp->registerNamespace('pago20', 'http://www.sat.gob.mx/Pagos20');
 
-        $tipo = $xp->evaluate('string(//cfdi:Comprobante/@TipoDeComprobante)');
+        $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
 
-        $pagos20 = [
-            'totales' => [
-                'MontoTotalPagos'             => null,
-                'TotalRetencionesIVA'         => null,
-                'TotalRetencionesISR'         => null,
-                'TotalTrasladosBaseIVA16'     => null,
-                'TotalTrasladosImpuestoIVA16' => null,
-            ],
-            'pagos' => [],
-        ];
-
-        if ($tipo === 'P') {
-
-            $pagos20['totales'] = [
-                'MontoTotalPagos'             => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@MontoTotalPagos)'),
-                'TotalRetencionesIVA'         => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalRetencionesIVA)'),
-                'TotalRetencionesISR'         => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalRetencionesISR)'),
-                'TotalTrasladosBaseIVA16'     => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalTrasladosBaseIVA16)'),
-                'TotalTrasladosImpuestoIVA16' => $xp->evaluate('string(//cfdi:Complemento/pago20:Pagos/pago20:Totales/@TotalTrasladosImpuestoIVA16)'),
+        foreach ($pagoNodes as $pago) {
+            /** @var \DOMElement $pago */
+            $pagoData = [
+                'FechaPago'    => $pago->getAttribute('FechaPago'),
+                'FormaDePagoP' => $pago->getAttribute('FormaDePagoP'),
+                'MonedaP'      => $pago->getAttribute('MonedaP'),
+                'TipoCambioP'  => $pago->getAttribute('TipoCambioP'),
+                'Monto'        => $pago->getAttribute('Monto'),
+                'NumOperacion' => $pago->getAttribute('NumOperacion'),
+                'rfcEmisorCtaOrd' => $pago->getAttribute('RfcEmisorCtaOrd'),
+                'ctaOrdenante'    => $pago->getAttribute('CtaOrdenante'),
+                'rfcEmisorCtaBen' => $pago->getAttribute('RfcEmisorCtaBen'),
+                'ctaBeneficiario' => $pago->getAttribute('CtaBeneficiario'),
+                'doctos_relacionados' => [],
+                'impuestosP' => [
+                    'retencionesP' => [],
+                    'trasladosP'   => [],
+                ],
             ];
 
-            $pagoNodes = $xp->query('//cfdi:Comprobante/cfdi:Complemento/pago20:Pagos/pago20:Pago');
-
-            if (!$pagoNodes || $pagoNodes->length === 0) {
-                $pagoNodes = $dom->getElementsByTagNameNS('http://www.sat.gob.mx/Pagos20', 'Pago');
-            }
-
-            foreach ($pagoNodes as $pago) {
-                /** @var \DOMElement $pago */
-                $pagoData = [
-                    'FechaPago'    => $pago->getAttribute('FechaPago'),
-                    'FormaDePagoP' => $pago->getAttribute('FormaDePagoP'),
-                    'MonedaP'      => $pago->getAttribute('MonedaP'),
-                    'TipoCambioP'  => $pago->getAttribute('TipoCambioP'),
-                    'Monto'        => $pago->getAttribute('Monto'),
-                    'NumOperacion' => $pago->getAttribute('NumOperacion'),
-                    'rfcEmisorCtaOrd' => $pago->getAttribute('RfcEmisorCtaOrd'),
-                    'ctaOrdenante'    => $pago->getAttribute('CtaOrdenante'),
-                    'rfcEmisorCtaBen' => $pago->getAttribute('RfcEmisorCtaBen'),
-                    'ctaBeneficiario' => $pago->getAttribute('CtaBeneficiario'),
-                    'doctos_relacionados' => [],
-                    'impuestosP' => [
-                        'retencionesP' => [],
-                        'trasladosP'   => [],
+            $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
+            foreach ($doctoNodes as $doc) {
+                /** @var \DOMElement $doc */
+                $docto = [
+                    'IdDocumento'      => $doc->getAttribute('IdDocumento'),
+                    'Serie'            => $doc->getAttribute('Serie'),
+                    'Folio'            => $doc->getAttribute('Folio'),
+                    'MonedaDR'         => $doc->getAttribute('MonedaDR'),
+                    'EquivalenciaDR'   => $doc->getAttribute('EquivalenciaDR'),
+                    'NumParcialidad'   => $doc->getAttribute('NumParcialidad'),
+                    'ImpPagado'        => $doc->getAttribute('ImpPagado'),
+                    'ImpSaldoAnt'      => $doc->getAttribute('ImpSaldoAnt'),
+                    'ImpSaldoInsoluto' => $doc->getAttribute('ImpSaldoInsoluto'),
+                    'ObjetoImpDR'      => $doc->getAttribute('ObjetoImpDR'),
+                    'impuestosDR' => [
+                        'trasladosDR'   => [],
+                        'retencionesDR' => [],
                     ],
                 ];
 
-                $doctoNodes = $xp->query('pago20:DoctoRelacionado', $pago);
-                foreach ($doctoNodes as $doc) {
-                    /** @var \DOMElement $doc */
-                    $docto = [
-                        'IdDocumento'      => $doc->getAttribute('IdDocumento'),
-                        'Serie'            => $doc->getAttribute('Serie'),
-                        'Folio'            => $doc->getAttribute('Folio'),
-                        'MonedaDR'         => $doc->getAttribute('MonedaDR'),
-                        'EquivalenciaDR'   => $doc->getAttribute('EquivalenciaDR'),
-                        'NumParcialidad'   => $doc->getAttribute('NumParcialidad'),
-                        'ImpPagado'        => $doc->getAttribute('ImpPagado'),
-                        'ImpSaldoAnt'      => $doc->getAttribute('ImpSaldoAnt'),
-                        'ImpSaldoInsoluto' => $doc->getAttribute('ImpSaldoInsoluto'),
-                        'ObjetoImpDR'      => $doc->getAttribute('ObjetoImpDR'),
-                        'impuestosDR' => [
-                            'trasladosDR'   => [],
-                            'retencionesDR' => [],
-                        ],
-                    ];
-
-                    $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
-                    foreach ($trasDRNodes as $t) {
-                        /** @var \DOMElement $t */
-                        $docto['impuestosDR']['trasladosDR'][] = [
-                            'BaseDR'       => $t->getAttribute('BaseDR'),
-                            'ImpuestoDR'   => $t->getAttribute('ImpuestoDR'),
-                            'TipoFactorDR' => $t->getAttribute('TipoFactorDR'),
-                            'TasaOCuotaDR' => $t->getAttribute('TasaOCuotaDR'),
-                            'ImporteDR'    => $t->getAttribute('ImporteDR'),
-                        ];
-                    }
-                    $retDRNodes = $xp->query('pago20:ImpuestosDR/pago20:RetencionesDR/pago20:RetencionDR', $doc);
-                    foreach ($retDRNodes as $r) {
-                        /** @var \DOMElement $r */
-                        $docto['impuestosDR']['retencionesDR'][] = [
-                            'BaseDR'       => $r->getAttribute('BaseDR'),
-                            'ImpuestoDR'   => $r->getAttribute('ImpuestoDR'),
-                            'TipoFactorDR' => $r->getAttribute('TipoFactorDR'),
-                            'TasaOCuotaDR' => $r->getAttribute('TasaOCuotaDR'),
-                            'ImporteDR'    => $r->getAttribute('ImporteDR'),
-                        ];
-                    }
-
-                    $pagoData['doctos_relacionados'][] = $docto;
-                }
-
-                $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
-                foreach ($retPNodes as $rP) {
-                    /** @var \DOMElement $rP */
-                    $pagoData['impuestosP']['retencionesP'][] = [
-                        'ImpuestoP' => $rP->getAttribute('ImpuestoP'),
-                        'ImporteP'  => $rP->getAttribute('ImporteP'),
-                    ];
-                }
-                $trasPNodes = $xp->query('pago20:ImpuestosP/pago20:TrasladosP/pago20:TrasladoP', $pago);
-                foreach ($trasPNodes as $tP) {
-                    /** @var \DOMElement $tP */
-                    $pagoData['impuestosP']['trasladosP'][] = [
-                        'BaseP'       => $tP->getAttribute('BaseP'),
-                        'ImpuestoP'   => $tP->getAttribute('ImpuestoP'),
-                        'TipoFactorP' => $tP->getAttribute('TipoFactorP'),
-                        'TasaOCuotaP' => $tP->getAttribute('TasaOCuotaP'),
-                        'ImporteP'    => $tP->getAttribute('ImporteP'),
-                    ];
-                }
-
-                $pagos20['pagos'][] = $pagoData;
-            }
-        } else {
-
-            $conceptos = [];
-            $conceptNodes = $xp->query('//cfdi:Comprobante/cfdi:Conceptos/cfdi:Concepto');
-            foreach ($conceptNodes as $n) {
-                /** @var \DOMElement $n */
-                $c = [
-                    'ClaveProdServ'  => $n->getAttribute('ClaveProdServ'),
-                    'NoIdentificacion'=> $n->getAttribute('NoIdentificacion'),
-                    'Cantidad'       => $n->getAttribute('Cantidad'),
-                    'ClaveUnidad'    => $n->getAttribute('ClaveUnidad'),
-                    'Unidad'         => $n->getAttribute('Unidad'),
-                    'Descripcion'    => $n->getAttribute('Descripcion'),
-                    'ValorUnitario'  => $n->getAttribute('ValorUnitario'),
-                    'Importe'        => $n->getAttribute('Importe'),
-                    'Descuento'      => $n->getAttribute('Descuento'),
-                    'Impuestos'      => [
-                        'Traslados'   => [],
-                        'Retenciones' => [],
-                    ],
-                ];
-
-                $tNodes = $xp->query('cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', $n);
-                foreach ($tNodes as $t) {
+                $trasDRNodes = $xp->query('pago20:ImpuestosDR/pago20:TrasladosDR/pago20:TrasladoDR', $doc);
+                foreach ($trasDRNodes as $t) {
                     /** @var \DOMElement $t */
-                    $c['Impuestos']['Traslados'][] = [
-                        'Base'       => $t->getAttribute('Base'),
-                        'Impuesto'   => $t->getAttribute('Impuesto'),
-                        'TipoFactor' => $t->getAttribute('TipoFactor'),
-                        'TasaOCuota' => $t->getAttribute('TasaOCuota'),
-                        'Importe'    => $t->getAttribute('Importe'),
+                    $docto['impuestosDR']['trasladosDR'][] = [
+                        'BaseDR'       => $t->getAttribute('BaseDR'),
+                        'ImpuestoDR'   => $t->getAttribute('ImpuestoDR'),
+                        'TipoFactorDR' => $t->getAttribute('TipoFactorDR'),
+                        'TasaOCuotaDR' => $t->getAttribute('TasaOCuotaDR'),
+                        'ImporteDR'    => $t->getAttribute('ImporteDR'),
                     ];
                 }
-                $rNodes = $xp->query('cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion', $n);
-                foreach ($rNodes as $r) {
+                $retDRNodes = $xp->query('pago20:ImpuestosDR/pago20:RetencionesDR/pago20:RetencionDR', $doc);
+                foreach ($retDRNodes as $r) {
                     /** @var \DOMElement $r */
-                    $c['Impuestos']['Retenciones'][] = [
-                        'Base'       => $r->getAttribute('Base'),
-                        'Impuesto'   => $r->getAttribute('Impuesto'),
-                        'TipoFactor' => $r->getAttribute('TipoFactor'),
-                        'TasaOCuota' => $r->getAttribute('TasaOCuota'),
-                        'Importe'    => $r->getAttribute('Importe'),
+                    $docto['impuestosDR']['retencionesDR'][] = [
+                        'BaseDR'       => $r->getAttribute('BaseDR'),
+                        'ImpuestoDR'   => $r->getAttribute('ImpuestoDR'),
+                        'TipoFactorDR' => $r->getAttribute('TipoFactorDR'),
+                        'TasaOCuotaDR' => $r->getAttribute('TasaOCuotaDR'),
+                        'ImporteDR'    => $r->getAttribute('ImporteDR'),
                     ];
                 }
 
-                $conceptos[] = $c;
+                $pagoData['doctos_relacionados'][] = $docto;
             }
-            $impuestosGlobales = [
-                'TotalImpuestosTrasladados' => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Impuestos/@TotalImpuestosTrasladados)'),
-                'TotalImpuestosRetenidos'   => $xp->evaluate('string(//cfdi:Comprobante/cfdi:Impuestos/@TotalImpuestosRetenidos)'),
-                'Traslados'   => [],
-                'Retenciones' => [],
-            ];
 
-            $tgNodes = $xp->query('//cfdi:Comprobante/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
-            foreach ($tgNodes as $tg) {
-                /** @var \DOMElement $tg */
-                $impuestosGlobales['Traslados'][] = [
-                    'Impuesto'   => $tg->getAttribute('Impuesto'),
-                    'TipoFactor' => $tg->getAttribute('TipoFactor'),
-                    'TasaOCuota' => $tg->getAttribute('TasaOCuota'),
-                    'Importe'    => $tg->getAttribute('Importe'),
-                    'Base'       => $tg->getAttribute('Base'),
+            $retPNodes = $xp->query('pago20:ImpuestosP/pago20:RetencionesP/pago20:RetencionP', $pago);
+            foreach ($retPNodes as $rP) {
+                /** @var \DOMElement $rP */
+                $pagoData['impuestosP']['retencionesP'][] = [
+                    'ImpuestoP' => $rP->getAttribute('ImpuestoP'),
+                    'ImporteP'  => $rP->getAttribute('ImporteP'),
                 ];
             }
-            $rgNodes = $xp->query('//cfdi:Comprobante/cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion');
-            foreach ($rgNodes as $rg) {
-                /** @var \DOMElement $rg */
-                $impuestosGlobales['Retenciones'][] = [
-                    'Impuesto' => $rg->getAttribute('Impuesto'),
-                    'Importe'  => $rg->getAttribute('Importe'),
+
+            $trasPNodes = $xp->query('pago20:ImpuestosP/pago20:TrasladosP/pago20:TrasladoP', $pago);
+            foreach ($trasPNodes as $tP) {
+                /** @var \DOMElement $tP */
+                $pagoData['impuestosP']['trasladosP'][] = [
+                    'BaseP'       => $tP->getAttribute('BaseP'),
+                    'ImpuestoP'   => $tP->getAttribute('ImpuestoP'),
+                    'TipoFactorP' => $tP->getAttribute('TipoFactorP'),
+                    'TasaOCuotaP' => $tP->getAttribute('TasaOCuotaP'),
+                    'ImporteP'    => $tP->getAttribute('ImporteP'),
                 ];
             }
-            $data['conceptos'] = $conceptos;
-            $data['impuestos_globales'] = $impuestosGlobales;
+
+            $pagos20['pagos'][] = $pagoData;
         }
         $data['complemento_pagos20'] = $pagos20;
+
         $pdfBase64 = base64_encode(file_get_contents($pdfPath));
         $xmlBase64 = base64_encode(file_get_contents($xmlPath));
+
         $nf6 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 6, '.', '');
         $nf2 = fn($v) => number_format((float)str_replace(',', '', ($v ?? 0)), 2, '.', '');
+        $uuid      = $data['timbre']['uuid'] ?? null;
+        $emisorRfc = $data['emisor']['rfc'] ?? null;
+        $receptRfc = $data['receptor']['rfc'] ?? null;
+        $moneda =  $data['complemento_pagos20']['pagos'][0]['MonedaP'] ?? null;
+        $regimen =  $data['emisor']['regimen'] ?? null;
+        $folio =  $data['folio'] ?? null;
+        $tipo_cambio =  $data['complemento_pagos20']['pagos'][0]['TipoCambioP'] ?? null;
+        $clave_prod_serv =  $data['emisor']['clave_prod_serv'] ?? null;
+        $monto =  $data['complemento_pagos20']['pagos'][0]['Monto'] ?? null;
 
-        $uuid       = Arr::get($data, 'timbre.uuid');
-        $emisorRfc  = Arr::get($data, 'emisor.rfc');
-        $receptRfc  = Arr::get($data, 'receptor.rfc');
-        $regimen    = Arr::get($data, 'emisor.regimen');
-        $folio      = Arr::get($data, 'folio');
-        $tipo       = Arr::get($data, 'tipo_de_comprobante');
-
-        $moneda = $tipo === 'P'
-            ? (Arr::get($data, 'complemento_pagos20.pagos.0.MonedaP') ?: Arr::get($data, 'moneda', 'MXN'))
-            : Arr::get($data, 'moneda', 'MXN');
-
-        $tipo_cambio = $tipo === 'P'
-            ? (Arr::get($data, 'complemento_pagos20.pagos.0.TipoCambioP') ?: 1)
-            : (Arr::get($data, 'tipo_cambio') ?: 1);
-
-        $monto_raw = $tipo === 'P'
-            ? Arr::get($data, 'complemento_pagos20.pagos.0.Monto', 0)
-            : Arr::get($data, 'total', 0);
-        $monto = $nf2($monto_raw);
-
-        $iso = $tipo === 'P'
-            ? (Arr::get($data, 'complemento_pagos20.pagos.0.FechaPago') ?: Arr::get($data, 'fecha', '2025-08-11T00:00:00'))
-            : Arr::get($data, 'fecha', '2025-08-11T00:00:00');
-
-        $fecha = Carbon::parse($iso)->timezone('America/Mexico_City')->format('d/m/Y');
-
-        $tipo = Arr::get($data, 'tipo_de_comprobante');
-        $clave_prod_serv = Arr::get($data, 'conceptos.0.ClaveProdServ')
-            ?: Arr::get($data, 'conceptos.0.clave_prod_serv')
-            ?: ($tipo === 'P' ? '84111506' : null);
-
-        $concepto = Arr::get($data, 'conceptos.0.Descripcion')
-            ?: Arr::get($data, 'conceptos.0.descripcion')
-            ?: ($tipo === 'P' ? 'Pago' : null);
+        $iso = $data['fecha'] ?? '2025-08-11T00:00:00';
+        $fecha = Carbon::parse($iso)
+            ->timezone('America/Mexico_City')
+            ->format('d/m/Y');
 
         $traslados = [];
 
@@ -626,39 +506,8 @@ class SupplierPurchaseOrderController extends Controller
             }
         }
 
-
-        if (empty($traslados)) {
-            $conceptNodes = $xp->query('//cfdi:Comprobante/cfdi:Conceptos/cfdi:Concepto');
-            foreach ($conceptNodes as $n) {
-                $tNodes = $xp->query('cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', $n);
-                foreach ($tNodes as $tn) {
-                    /** @var \DOMElement $tn */
-                    $traslados[] = [
-                        "Base"       => $nf6($tn->getAttribute('Base')),
-                        "Impuesto"   => (string)$tn->getAttribute('Impuesto'),
-                        "TipoFactor" => (string)$tn->getAttribute('TipoFactor'),
-                        "TasaOCuota" => $nf6($tn->getAttribute('TasaOCuota')),
-                        "Importe"    => $nf2($tn->getAttribute('Importe')),
-                    ];
-                }
-            }
-
-            if (empty($traslados)) {
-                $tGlobal = $xp->query('//cfdi:Comprobante/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado');
-                foreach ($tGlobal as $tg) {
-                    /** @var \DOMElement $tg */
-                    $traslados[] = [
-                        "Base"       => $nf6($tg->getAttribute('Base')),
-                        "Impuesto"   => (string)$tg->getAttribute('Impuesto'),
-                        "TipoFactor" => (string)$tg->getAttribute('TipoFactor'),
-                        "TasaOCuota" => $nf6($tg->getAttribute('TasaOCuota')),
-                        "Importe"    => $nf2($tg->getAttribute('Importe')),
-                    ];
-                }
-            }
-        }
-
         $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
+            ->where('type', 'GASTO')
             ->first();
 
         $department_name = $item?->department;
@@ -673,35 +522,31 @@ class SupplierPurchaseOrderController extends Controller
 
         $departamentos = NetsuiteDepartments::where('name', $department_name)
             ->first();
-        $department_id = $departamentos?->external_id ?? 146;
+        $department_id = $departamentos?->external_id;
 
         $clases = NetsuiteClass::where('name', $class_name)
             ->first();
-        $class_id = $clases?->external_id ?? 189 ;
+        $class_id = $clases?->external_id;
 
         $ubicaciones = NetsuiteLocations::where('name', $location_name)
             ->first();
-        $ubicacion_id = $ubicaciones?->external_id ?? 314;
+        $ubicacion_id = $ubicaciones?->external_id;
 
         $categorias = NetsuiteExpenseCategories::where('name', $category_name)
             ->first();
-        $catergoria_id = $categorias?->external_id ?? 118;
+        $catergoria_id = $categorias?->external_id;
 
         $ordenes_compra = SupplierPurchaseOrder::where('id', $purchase_order_id)
             ->first();
         $purchase_order_id = $ordenes_compra?->purchase_order_id;
         $supplier_external_id = $ordenes_compra?->supplier_external_id;
 
-        $suppliers= Supplier::where('external_id', $supplier_external_id)
-            ->first();
-        $supplier_rfc = $suppliers?->tax;
-
 
         $data_netsuite = [
             "idproveedor" => $supplier_external_id,
             "iddoc" => $purchase_order_id,
             "tipo_doc" => "PurchOrd",
-            "rfc" => $supplier_rfc,
+            "rfc" => $emisorRfc,
             "nfactura" => $folio,
             "regimenfiscal" => $regimen,
             "moneda" => $moneda,
@@ -710,7 +555,7 @@ class SupplierPurchaseOrderController extends Controller
             "clase" => $class_id,
             "operacion" => "",
             "tipocambio" => $tipo_cambio,
-            "fecha" => "20/08/2025",
+            "fecha" => $fecha,
             "ubicacion" => $ubicacion_id,
             "idnetsuite" => "",
             "modo_prueba" => true,
@@ -739,9 +584,9 @@ class SupplierPurchaseOrderController extends Controller
         $restletPath = "/restlet.nl?script=5141&deploy=1";
         try {
             $response = $this->netSuiteRestService->request($restletPath, 'POST', $data_netsuite);
-            return response()->json(['ok' => true, 'response' => $response,"data" => $data_netsuite]);
+            return response()->json(['ok' => true, 'response' => $response]);
         } catch (\Throwable $e) {
-            return response()->json(['ok' => false, 'error' => $e->getMessage(),"data" => $data_netsuite], 500);
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
         }
     }
 }
