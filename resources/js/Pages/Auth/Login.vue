@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useForm, Link as InertiaLink, Head } from "@inertiajs/vue3";
+import bg from "@/assets/bg_login.png";
+import logo from "@/assets/logo_prob.png";
 
 defineProps({
     status: String,
@@ -151,7 +153,7 @@ body,
         <div class="d-flex flex-column flex-lg-row flex-column-fluid">
             <div
                 class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-y-center bgi-position-x-start bgi-no-repeat breathing"
-                style="background-image: url(/assets/media/auth/bg_login.png)"
+                :style="{ backgroundImage: `url(${bg})` }"
             >
                 <!-- <div
                     class="d-flex flex-column flex-center pb-0 pb-lg-10 p-10 w-100"
@@ -183,11 +185,7 @@ body,
                         <div
                             class="d-flex flex-column flex-center pb-0 pb-lg-3 p-3 w-100"
                         >
-                            <img
-                                class="mx-auto h-100px"
-                                src="/assets/media/auth//logo_prob.png"
-                                alt=""
-                            />
+                            <img class="mx-auto h-100px" :src="logo" alt="" />
                         </div>
                     </div>
                     <div
