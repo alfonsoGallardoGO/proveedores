@@ -139,24 +139,9 @@ class SupplierPurchaseOrderController extends Controller
         $data = $request->all();
         $supplier_purchase_order_id = $data['id'] ?? null;
 
-        // Almacenar el JSON en carpeta Public del storage****
-        $folderPath = public_path('purchase_orders/debug');
-        $fileName = 'debug_input.json';
-        $filePath = $folderPath . '/' . $fileName;
-
-        $existingContent = file_exists($filePath) ? file_get_contents($filePath) : '[]';
-
-        $dataArray = json_decode($existingContent, true);
-
-        if (!is_array($dataArray)) {
-            $dataArray = [];
-        }
-
-        $dataArray[] = $data;
-
-        $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
-        
-        file_put_contents($filePath, $newJsonData);
+        $folderPath = __DIR__ . '/../public/purchase_orders/debug';
+        echo "Ruta absoluta construida: " . $folderPath;
+        exit;
         // ****************************************************
 
         if (empty($supplier_purchase_order_id)) {
