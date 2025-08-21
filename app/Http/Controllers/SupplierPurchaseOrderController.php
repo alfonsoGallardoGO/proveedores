@@ -139,56 +139,9 @@ class SupplierPurchaseOrderController extends Controller
         $data = $request->all();
         $supplier_purchase_order_id = $data['id'] ?? null;
 
-        // Almacenar el JSON en carpeta Public del storage****
         $folderPath = __DIR__ . '/../public/purchase_orders/debug';
-
-        // 1. Confirma que la ruta es correcta
-        echo 'Ruta de la carpeta: ' . $folderPath . '<br>';
-
-        // 2. Verifica si la carpeta ya existe
-        if (!file_exists($folderPath)) {
-            echo 'La carpeta no existe. Intentando crearla...<br>';
-            if (mkdir($folderPath, 0755, true)) {
-                echo 'Carpeta creada exitosamente.<br>';
-            } else {
-                echo 'Error: No se pudo crear la carpeta. Problema de permisos.<br>';
-                exit; // Detiene el script aquí
-            }
-        } else {
-            echo 'La carpeta ya existe.<br>';
-        }
-
-        // 3. Verifica si tienes permisos de escritura en la carpeta
-        if (!is_writable($folderPath)) {
-            echo 'Error: La carpeta no tiene permisos de escritura (chmod 755 o 777).<br>';
-            exit; // Detiene el script aquí
-        } else {
-            echo 'Permisos de escritura OK.<br>';
-        }
-
-        // 4. Intenta crear un archivo de prueba
-        $testFile = $folderPath . '/test.txt';
-        if (file_put_contents($testFile, 'Prueba de escritura') !== false) {
-            echo 'Archivo de prueba creado exitosamente.<br>';
-            unlink($testFile); // Borra el archivo de prueba
-        } else {
-            echo 'Error: No se pudo escribir en la carpeta.<br>';
-            exit; // Detiene el script aquí
-        }
-
-        // A partir de aquí, el código de tu archivo debería funcionar
-        $fileName = 'debug_input.json';
-        $filePath = $folderPath . '/' . $fileName;
-
-        // El resto de tu código para escribir el archivo
-        $existingContent = file_exists($filePath) ? file_get_contents($filePath) : '[]';
-        $dataArray = json_decode($existingContent, true);
-        if (!is_array($dataArray)) {
-            $dataArray = [];
-        }
-        $dataArray[] = $data;
-        $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
-        file_put_contents($filePath, $newJsonData);
+        echo "Ruta absoluta construida: " . $folderPath;
+        exit;
         // ****************************************************
 
         if (empty($supplier_purchase_order_id)) {
