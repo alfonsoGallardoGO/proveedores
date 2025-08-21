@@ -141,9 +141,7 @@ class SupplierPurchaseOrderController extends Controller
 
         // Almacenar el JSON en carpeta Public del storage****
         $folderPath = public_path('whatsapp/receipts');
-        $fileName = 'purchase_orders_json.json';
-        $filePath = $folderPath . '/' . $fileName;
-
+        $filePath = 'whatsapp/receipts/purchase_orders_json.json';
         // Asegúrate de que la carpeta exista. Si no, créala.
         if (!file_exists($folderPath)) {
             mkdir($folderPath, 0777, true);
@@ -167,7 +165,8 @@ class SupplierPurchaseOrderController extends Controller
         $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
 
         // 5. Guardar el contenido actualizado en el archivo
-        file_put_contents($filePath, $newJsonData);
+        // file_put_contents($filePath, $newJsonData);
+        Storage::disk('local')->put($filePath, $newJsonData);
         // ****************************************************
 
         if (empty($supplier_purchase_order_id)) {
