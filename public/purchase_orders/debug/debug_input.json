@@ -109,5 +109,79 @@
             }
         ],
         "lineasGastos": []
+    },
+    {
+        "id": 4458440,
+        "tranid": "OCSCQ0214",
+        "fecha": "2025-08-21T07:00:00.000Z",
+        "estado": "Recepci\u00f3n pendiente",
+        "total": 238281.4,
+        "subtotal": 205415,
+        "impuesto": 32866.4,
+        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
+        "moneda": "Mexican Peso",
+        "proveedor": {
+            "id": "65424",
+            "nombre": null,
+            "rfc": "FIRA860812RX3",
+            "correo": "afr.figueroa@gmail.com",
+            "telefono": null,
+            "tipoEntidad": "individual"
+        },
+        "evento": "create",
+        "lineasArticulos": [],
+        "lineasGastos": [
+            {
+                "tipo": "gasto",
+                "articuloId": null,
+                "descripcion": null,
+                "cantidad": null,
+                "importe": 205415,
+                "tasaImpuesto": null,
+                "clase": "GASTOS",
+                "departamento": "TI : Desarrollo",
+                "ubicacion": "CORPORATIVO",
+                "cuenta": "6100-0000-0006 GASTOS DE OPERACI\u00d3N : GASTOS GENERALES ARTICULOS PARA TALLER",
+                "categoria": "ARTICULOS PARA TALLER-G",
+                "memo": "LAPTOP DE REPOSICION DE JORGITA"
+            }
+        ]
+    },
+    {
+        "id": 4458440,
+        "tranid": "OCSCQ0214",
+        "fecha": "2025-08-21T07:00:00.000Z",
+        "estado": "Recepci\u00f3n pendiente",
+        "total": 238281.4,
+        "subtotal": 205415,
+        "impuesto": 32866.4,
+        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
+        "moneda": "Mexican Peso",
+        "proveedor": {
+            "id": "65424",
+            "nombre": null,
+            "rfc": "FIRA860812RX3",
+            "correo": "afr.figueroa@gmail.com",
+            "telefono": null,
+            "tipoEntidad": "individual"
+        },
+        "evento": "create",
+        "lineasArticulos": [],
+        "lineasGastos": [
+            {
+                "tipo": "gasto",
+                "articuloId": null,
+                "descripcion": null,
+                "cantidad": null,
+                "importe": 205415,
+                "tasaImpuesto": null,
+                "clase": "GASTOS",
+                "departamento": "TI : Desarrollo",
+                "ubicacion": "CORPORATIVO",
+                "cuenta": "6100-0000-0006 GASTOS DE OPERACI\u00d3N : GASTOS GENERALES ARTICULOS PARA TALLER",
+                "categoria": "ARTICULOS PARA TALLER-G",
+                "memo": "LAPTOP DE REPOSICION DE JORGITA"
+            }
+        ]
     }
 ]
