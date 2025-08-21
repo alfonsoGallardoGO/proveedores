@@ -144,10 +144,6 @@ class SupplierPurchaseOrderController extends Controller
         $fileName = 'debug_input.json';
         $filePath = $folderPath . '/' . $fileName;
 
-        if (!file_exists($folderPath)) {
-            mkdir($folderPath, 0777, true);
-        }
-
         $existingContent = file_exists($filePath) ? file_get_contents($filePath) : '[]';
 
         $dataArray = json_decode($existingContent, true);
