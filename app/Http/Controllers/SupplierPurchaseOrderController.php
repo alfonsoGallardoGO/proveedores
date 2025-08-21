@@ -140,15 +140,27 @@ class SupplierPurchaseOrderController extends Controller
         $supplier_purchase_order_id = $data['id'] ?? null;
 
         // Almacenar el JSON en carpeta Public del storage****
-        $filePath = 'debug_input.json';
-        $existingContent = Storage::disk('public')->exists($filePath) ? Storage::disk('public')->get($filePath) : '[]';
+        $folderPath = public_path('purchase_orders/debug');
+        $fileName = 'debug_input.json';
+        $filePath = $folderPath . '/' . $fileName;
+
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath, 0777, true);
+        }
+
+        $existingContent = file_exists($filePath) ? file_get_contents($filePath) : '[]';
+
         $dataArray = json_decode($existingContent, true);
+
         if (!is_array($dataArray)) {
             $dataArray = [];
         }
+
         $dataArray[] = $data;
+
         $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
-        Storage::disk('public')->put($filePath, $newJsonData);
+        
+        file_put_contents($filePath, $newJsonData);
         // ****************************************************
 
         if (empty($supplier_purchase_order_id)) {
