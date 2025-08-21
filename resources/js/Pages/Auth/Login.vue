@@ -115,6 +115,20 @@ body,
 #kt_auth_lang_menu {
     position: absolute;
 }
+
+@keyframes breathing {
+    0%,
+    100% {
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.breathing {
+    animation: breathing 2s ease-in-out infinite;
+}
 </style>
 
 <template>
@@ -122,10 +136,10 @@ body,
     <div class="d-flex flex-column flex-fluid">
         <div class="d-flex flex-column flex-lg-row flex-column-fluid">
             <div
-                class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-y-center bgi-position-x-start bgi-no-repeat"
-                style="background-image: url(/assets/media/auth/bg10.jpeg)"
+                class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-y-center bgi-position-x-start bgi-no-repeat breathing"
+                style="background-image: url(/assets/media/auth/bg_login.png)"
             >
-                <div
+                <!-- <div
                     class="d-flex flex-column flex-center pb-0 pb-lg-10 p-10 w-100"
                 >
                     <img
@@ -138,18 +152,29 @@ body,
                         src="@assets/media/logos/logo.png"
                         alt=""
                     />
-                </div>
+                </div> -->
             </div>
             <div
                 class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12"
             >
                 <div
-                    class="bg-body d-flex flex-column flex-center rounded-4 w-md-600px p-10"
+                    class="bg-body d-flex flex-column flex-center rounded-4 w-md-600px p-10 shadow"
                 >
                     <div class="">
-                        <p class="text-gray-400 fw-bolder mb-3 text-lg">
+                        <p
+                            class="text-gray-400 text-center fw-bolder mb-3 text-lg"
+                        >
                             Portal Proveedores
                         </p>
+                        <div
+                            class="d-flex flex-column flex-center pb-0 pb-lg-3 p-3 w-100"
+                        >
+                            <img
+                                class="mx-auto h-100px"
+                                src="/assets/media/auth//logo_prob.png"
+                                alt=""
+                            />
+                        </div>
                     </div>
                     <div
                         class="d-flex flex-center flex-column align-items-stretch h-lg-100 w-md-400px"
@@ -165,7 +190,7 @@ body,
                                     <h1
                                         class="text-gray-900 fw-bolder mb-3 text-4xl"
                                     >
-                                        Iniciar Sesion
+                                        ¡Bienvenido de vuelta! 👋
                                     </h1>
                                     <div class="text-gray-500 fw-semibold fs-6">
                                         <p>
@@ -217,7 +242,7 @@ body,
                                 <div class="fv-row mb-8">
                                     <input
                                         type="text"
-                                        placeholder="Usuario o Email"
+                                        placeholder="Email"
                                         name="email"
                                         v-model="form.email"
                                         autocomplete="off"
@@ -263,7 +288,7 @@ body,
                                     <button
                                         type="submit"
                                         id="kt_sign_in_submit"
-                                        class="btn bg-[#ed6c23] disabled:bg-[#ed6c23] text-white fw-bolder py-3 hover:bg-[#ed6c23] shadow-md"
+                                        class="btn bg-gradient-to-r from-[#ed6c23] to-[#f9a825] disabled:opacity-70 text-white fw-bolder py-3 hover:from-[#e55a10] hover:to-[#f57f17] shadow-md"
                                         :disabled="form.processing"
                                     >
                                         <span
