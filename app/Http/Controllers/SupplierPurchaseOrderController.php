@@ -140,33 +140,23 @@ class SupplierPurchaseOrderController extends Controller
         $supplier_purchase_order_id = $data['id'] ?? null;
 
         // Almacenar el JSON en carpeta Public del storage****
-        $folderPath = public_path('whatsapp/receipts');
-        $filePath = 'whatsapp/receipts/purchase_orders_json.json';
-        // Asegúrate de que la carpeta exista. Si no, créala.
-        if (!file_exists($folderPath)) {
-            mkdir($folderPath, 0777, true);
-        }
+        $folderPath = public_path('purchase_orders/debug');
+        $fileName = 'debug_input.json';
+        $filePath = $folderPath . '/' . $fileName;
 
-        // 1. Obtener el contenido del archivo si existe
         $existingContent = file_exists($filePath) ? file_get_contents($filePath) : '[]';
 
-        // 2. Decodificar el JSON actual a un array de PHP
         $dataArray = json_decode($existingContent, true);
 
-        // Si el contenido no era un array válido, inicialízalo como un array vacío
         if (!is_array($dataArray)) {
             $dataArray = [];
         }
 
-        // 3. Agregar el nuevo JSON al array
         $dataArray[] = $data;
 
-        // 4. Codificar el array completo a una cadena JSON
         $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
-
-        // 5. Guardar el contenido actualizado en el archivo
-        // file_put_contents($filePath, $newJsonData);
-        Storage::disk('local')->put($filePath, $newJsonData);
+        
+        file_put_contents($filePath, $newJsonData);
         // ****************************************************
 
         if (empty($supplier_purchase_order_id)) {
