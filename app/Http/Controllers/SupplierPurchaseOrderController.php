@@ -138,6 +138,7 @@ class SupplierPurchaseOrderController extends Controller
     {
         $data = $request->all();
         $supplier_purchase_order_id = $data['id'] ?? null;
+        //cambios
 
         // Almacenar el JSON en carpeta Public del storage
         $folderPath = public_path('purchase_orders/debug');
