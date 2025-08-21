@@ -11,7 +11,7 @@ const emit = defineEmits(["confirmed"]);
 defineProps({
     title: {
         type: String,
-        default: "cONFIRMAR CONTRASEÑA",
+        default: "CONFIRMAR CONTRASEÑA",
     },
     content: {
         type: String,

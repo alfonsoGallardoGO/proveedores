@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
-import ActionSection from "@/Components/ActionSection.vue";
+import ActionSectionCard from "@/Components/ActionSectionCard.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import InputError from "@/Components/InputError.vue";
@@ -38,7 +38,7 @@ const closeModal = () => {
 </script>
 
 <template>
-    <ActionSection>
+    <ActionSectionCard>
         <template #title> Eliminar Cuenta </template>
 
         <template #description> Elimina permanentemente tu cuenta. </template>
@@ -102,5 +102,5 @@ const closeModal = () => {
                 </template>
             </DialogModal>
         </template>
-    </ActionSection>
+    </ActionSectionCard>
 </template>

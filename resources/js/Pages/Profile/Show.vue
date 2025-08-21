@@ -31,7 +31,7 @@ defineProps({
                     </div>
 
                     <div v-if="$page.props.jetstream.canUpdatePassword">
-                        <UpdatePasswordForm class="mt-10 sm:mt-0" />
+                        <UpdatePasswordForm class="sm:mt-0" />
 
                         <SectionBorder />
                     </div>
@@ -46,7 +46,7 @@ defineProps({
                             :requires-confirmation="
                                 confirmsTwoFactorAuthentication
                             "
-                            class="mt-10 sm:mt-0"
+                            class="sm:mt-0"
                         />
 
                         <SectionBorder />
@@ -54,16 +54,8 @@ defineProps({
 
                     <LogoutOtherBrowserSessionsForm
                         :sessions="sessions"
-                        class="mt-10 sm:mt-0"
+                        class="sm:mt-0"
                     />
-
-                    <template
-                        v-if="$page.props.jetstream.hasAccountDeletionFeatures"
-                    >
-                        <SectionBorder />
-
-                        <DeleteUserForm class="mt-10 sm:mt-0" />
-                    </template>
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
-import ActionSection from "@/Components/ActionSection.vue";
+import ActionSectionCard from "@/Components/ActionSectionCard.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -43,7 +43,7 @@ const closeModal = () => {
 </script>
 
 <template>
-    <ActionSection>
+    <ActionSectionCard>
         <template #title> Sesiones de Navegador </template>
 
         <template #description>
@@ -190,5 +190,5 @@ const closeModal = () => {
                 </template>
             </DialogModal>
         </template>
-    </ActionSection>
+    </ActionSectionCard>
 </template>
