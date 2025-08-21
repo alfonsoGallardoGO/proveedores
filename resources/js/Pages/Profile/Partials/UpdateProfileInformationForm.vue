@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { Link, router, useForm } from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
-import FormSection from "@/Components/FormSection.vue";
+import FormSectionCard from "@/Components/FormSectionCard.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -76,7 +76,7 @@ const clearPhotoFileInput = () => {
 </script>
 
 <template>
-    <FormSection @submitted="updateProfileInformation">
+    <FormSectionCard @submitted="updateProfileInformation">
         <template #title> Informacion del Perfil </template>
 
         <template #description>
@@ -141,7 +141,7 @@ const clearPhotoFileInput = () => {
             </div>
 
             <!-- Name -->
-            <div class="col-span-6 sm:col-span-4">
+            <div class="col-span-6 sm:col-span-3">
                 <InputLabel for="name" value="Name" />
                 <InputText
                     id="name"
@@ -155,7 +155,7 @@ const clearPhotoFileInput = () => {
             </div>
 
             <!-- Email -->
-            <div class="col-span-6 sm:col-span-4">
+            <div class="col-span-6 sm:col-span-3">
                 <InputLabel for="email" value="Email" />
                 <InputText
                     id="email"
@@ -205,11 +205,11 @@ const clearPhotoFileInput = () => {
             </ActionMessage>
 
             <PrimaryButton
-                :class="{ 'opacity-25': form.processing }"
+                :class="['m-1', { 'opacity-25': form.processing }]"
                 :disabled="form.processing"
             >
                 Guardar
             </PrimaryButton>
         </template>
-    </FormSection>
+    </FormSectionCard>
 </template>

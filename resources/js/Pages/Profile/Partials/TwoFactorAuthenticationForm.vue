@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { router, useForm, usePage } from "@inertiajs/vue3";
-import ActionSection from "@/Components/ActionSection.vue";
+import ActionSectionCard from "@/Components/ActionSectionCard.vue";
 import ConfirmsPassword from "@/Components/ConfirmsPassword.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import InputError from "@/Components/InputError.vue";
@@ -110,7 +110,7 @@ const disableTwoFactorAuthentication = () => {
 </script>
 
 <template>
-    <ActionSection>
+    <ActionSectionCard>
         <template #title> Autenticador de Dos Factores </template>
 
         <template #description>
@@ -298,5 +298,5 @@ const disableTwoFactorAuthentication = () => {
                 </div>
             </div>
         </template>
-    </ActionSection>
+    </ActionSectionCard>
 </template>

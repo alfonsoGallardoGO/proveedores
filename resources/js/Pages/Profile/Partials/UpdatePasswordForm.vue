@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
-import FormSection from "@/Components/FormSection.vue";
+import FormSectionCard from "@/Components/FormSectionCard.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -38,7 +38,7 @@ const updatePassword = () => {
 </script>
 
 <template>
-    <FormSection @submitted="updatePassword">
+    <FormSectionCard @submitted="updatePassword">
         <template #title> Cambiar Contraseña </template>
 
         <template #description>
@@ -63,7 +63,7 @@ const updatePassword = () => {
                 />
             </div>
 
-            <div class="col-span-6 sm:col-span-4">
+            <div class="col-span-6 sm:col-span-3">
                 <InputLabel for="password" value="Nueva Contraseña" />
                 <InputText
                     id="password"
@@ -76,7 +76,7 @@ const updatePassword = () => {
                 <InputError :message="form.errors.password" class="mt-2" />
             </div>
 
-            <div class="col-span-6 sm:col-span-4">
+            <div class="col-span-6 sm:col-span-3">
                 <InputLabel
                     for="password_confirmation"
                     value="Confirmar Contraseña"
@@ -107,5 +107,5 @@ const updatePassword = () => {
                 Guardar
             </PrimaryButton>
         </template>
-    </FormSection>
+    </FormSectionCard>
 </template>

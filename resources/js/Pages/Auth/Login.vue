@@ -129,6 +129,20 @@ body,
 .breathing {
     animation: breathing 2s ease-in-out infinite;
 }
+
+@keyframes breathing {
+    0%,
+    100% {
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.breathing {
+    animation: breathing 2s ease-in-out infinite;
+}
 </style>
 
 <template>
