@@ -140,8 +140,7 @@ class SupplierPurchaseOrderController extends Controller
         $supplier_purchase_order_id = $data['id'] ?? null;
 
         $folderPath = __DIR__ . '/../public/purchase_orders/debug';
-        echo "Ruta absoluta construida: " . $folderPath;
-        exit;
+        return $folderPath;
         // ****************************************************
 
         if (empty($supplier_purchase_order_id)) {
