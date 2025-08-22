@@ -98,6 +98,8 @@ class SupplierPurchaseOrderReceiptController extends Controller
 
     public function store(Request $request)
     {
+
+        return $request;
         $data = $request->validate([
             'external_id'    => 'nullable|integer',
             'internalid'     => 'nullable|integer',     // fallback
