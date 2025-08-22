@@ -230,5 +230,77 @@
                 "memo": "LAPTOP DE REPOSICION DE JORGITA"
             }
         ]
+    },
+    {
+        "id": 4458440,
+        "tranid": "OCSCQ0214",
+        "fecha": "00.000Z",
+        "estado": "Recepción pendiente",
+        "total": 238281.4,
+        "subtotal": 205415,
+        "impuesto": 32866.4,
+        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
+        "moneda": "Mexican Peso",
+        "proveedor": {
+            "id": "65424",
+            "nombre": null,
+            "rfc": "FIRA860812RX3",
+            "correo": "afr.figueroa@gmail.com",
+            "telefono": null,
+            "tipoEntidad": "individual"
+        },
+        "evento": "create",
+        "lineasArticulos": [
+            {
+                "tipo": "articulo",
+                "articuloId": "141818",
+                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
+                "cantidad": 1,
+                "importe": 3904.31,
+                "tasaImpuesto": "C.IVA16%",
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoria": "MANTENIMIENTO DE MAQUINARIA-C",
+                "memo": null
+            }
+        ],
+        "lineasGastos": [
+            {
+                "tipo": "gasto",
+                "articuloId": null,
+                "descripcion": null,
+                "cantidad": null,
+                "importe": 205415,
+                "tasaImpuesto": null,
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoria": "MANTENIMIENTO DE MAQUINARIA-C",
+                "memo": "LAPTOP DE REPOSICION DE JORGITA"
+            }
+        ]
     }
 ]
