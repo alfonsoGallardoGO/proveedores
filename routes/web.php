@@ -9,6 +9,7 @@ use App\Http\Controllers\SuplierUserController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierInvoicesController;
 use App\Http\Controllers\SupplierWhatsappController;
+use App\Http\Controllers\SupplierPurchaseOrderReceiptController;
 use App\Http\Controllers\DashboardController;
 
 
@@ -17,6 +18,7 @@ use App\Http\Controllers\DashboardController;
 Route::prefix('suppliers')->group(function () {
     Route::resource('purchase-orders', SupplierPurchaseOrderController::class);
     Route::resource('purchase-orders-invoices', SupplierInvoicesController::class);
+    Route::resource('purchase-orders-receipt', SupplierPurchaseOrderReceiptController::class);
     //Route::resource('supplier', SupplierController::class);
 });
 

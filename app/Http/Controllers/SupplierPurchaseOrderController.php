@@ -14,6 +14,7 @@ use App\Models\NetsuiteClass;
 use App\Models\NetsuiteDepartments;
 use App\Models\NetsuiteExpenseCategories;
 use App\Models\NetsuiteLocations;
+use App\Models\SupplierPurchaseOrdersReceipt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -49,15 +50,21 @@ class SupplierPurchaseOrderController extends Controller
 
     public function show($id)
     {
+        $order = SupplierPurchaseOrder::findOrFail($id);
+        $purchase_order   = $order->purchase_order;
+
         $items = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $id)
             ->withSum('deliveries', 'amount')
             ->get();
 
         $invoices = SupplierInvoice::where('supplier_purchase_order_id', $id)->get();
 
+        $receipt = SupplierInvoice::where('purchase_order', $purchase_order)->get();
+
         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,
             'invoices' => $invoices,
+            'receipt' => $receipt
         ]);
     }
 
