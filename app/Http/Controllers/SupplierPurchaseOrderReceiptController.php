@@ -98,77 +98,67 @@ class SupplierPurchaseOrderReceiptController extends Controller
 
     public function store(Request $request)
     {
+        // El payload llega anidado, pero solo extraemos lo que sí existe en la tabla
+        $input = $request->all();
 
-        return $request;
-        $data = $request->validate([
-            'external_id'    => 'nullable|integer',
-            'internalid'     => 'nullable|integer',     // fallback
-            'tranid'         => 'nullable|string|max:100',
-            'date'           => 'required|string',      // la convertimos abajo
-            'vendor'         => 'nullable|string|max:255',
-            'purchase_order' => 'nullable|string|max:100',
-            'po'             => 'nullable|string|max:100', // fallback
-            'status'         => 'nullable|string|max:100',
-            'quantity'       => 'nullable',
-            'url'            => 'nullable|url|max:255',
-        ]);
-
-        // 2) Tomar external_id y purchase_order con fallback
-        $externalId    = $data['external_id'] ?? $data['internalid'] ?? null;
-        $purchaseOrder = $data['purchase_order'] ?? $data['po'] ?? null;
-
-        if (is_null($externalId)) {
-            return response()->json([
-                'ok' => false,
-                'error' => 'external_id (o internalid) es requerido'
-            ], 422);
+        // Requerimos solo lo mínimo para guardar
+        $externalId = (int) data_get($input, 'receipt.id');
+        if (!$externalId) {
+            return response()->json(['ok' => false, 'error' => 'receipt.id es requerido'], 422);
         }
 
-        
-        $dateStr = $data['date'];
-        $date    = null;
-        try {
-            
-            $date = Carbon::createFromFormat('d/m/Y', $dateStr)->toDateString();
-        } catch (\Throwable $e) {
-            try {
-                $date = Carbon::parse($dateStr)->toDateString();
-            } catch (\Throwable $e2) {
-                return response()->json([
-                    'ok' => false,
-                    'error' => 'Formato de fecha inválido'
-                ], 422);
+        // Mapear a columnas reales
+        $tranid        = data_get($input, 'receipt.number');                           // varchar(100)
+        $dateStr       = data_get($input, 'receipt.date');                             // string -> date
+        $vendor        = data_get($input, 'vendor.name');                              // varchar(255)
+        $purchaseOrder = data_get($input, 'purchaseOrder.number')                      // varchar(100)
+                        ?? data_get($input, 'purchaseOrder.id');
+        $status        = data_get($input, 'receipt.status');                           // varchar(100)
+        $quantity      = data_get($input, 'totalQuantity');                            // varchar(100) en tu tabla
+        $url           = data_get($input, 'receipt.url');                              // varchar(255)
+
+        // Parseo de fecha (acepta 22/8/2025, 22/08/2025, 2025-08-22, etc.)
+        $date = null;
+        foreach (['d/m/Y', 'j/n/Y', 'Y-m-d'] as $fmt) {
+            try { $date = Carbon::createFromFormat($fmt, (string) $dateStr)->toDateString(); break; }
+            catch (\Throwable $e) { /* intenta el siguiente formato */ }
+        }
+        if (!$date) {
+            try { $date = Carbon::parse((string) $dateStr)->toDateString(); }
+            catch (\Throwable $e) {
+                return response()->json(['ok' => false, 'error' => 'Formato de fecha inválido'], 422);
             }
         }
+
+        // Upsert SOLO con columnas de tu tabla
+        $payload = [
+            'tranid'         => $tranid,
+            'date'           => $date,
+            'vendor'         => $vendor,
+            'purchase_order' => $purchaseOrder,
+            'status'         => $status,
+            'quantity'       => isset($quantity) ? (string) $quantity : null,
+            'url'            => $url,
+        ];
+
         try {
-            DB::transaction(function () use ($externalId, $data, $purchaseOrder, $date) {
+            DB::transaction(function () use ($externalId, $payload) {
                 SupplierPurchaseOrdersReceipt::updateOrCreate(
-                    ['external_id' => (int) $externalId],
-                    [
-                        'tranid'         => $data['tranid'] ?? null,
-                        'date'           => $date,                // YYYY-MM-DD
-                        'vendor'         => $data['vendor'] ?? null,
-                        'purchase_order' => $purchaseOrder,
-                        'status'         => $data['status'] ?? null,
-                        'quantity'       => isset($data['quantity']) ? (string)$data['quantity'] : null,
-                        'url'            => $data['url'] ?? null,
-                        'updated_at'     => now(),
-                    ]
+                    ['external_id' => $externalId],
+                    $payload
                 );
             });
 
             $model = SupplierPurchaseOrdersReceipt::where('external_id', $externalId)->first();
 
             return response()->json([
-                'ok'    => true,
-                'data'  => $model,
-                'msg'   => 'recepcion guardado correctamente (upsert).'
+                'ok'   => true,
+                'data' => $model,
+                'msg'  => 'Recepción guardada.'
             ], 201);
+
         } catch (\Throwable $e) {
-            return response()->json([
-                'ok' => false,
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
         }
     }
 

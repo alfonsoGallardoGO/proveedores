@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierPurchaseOrderController;
+use App\Http\Controllers\SupplierPurchaseOrderReceiptController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TwilioController;
@@ -13,6 +14,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->post('/purchase-orders', [SupplierPurchaseOrderController::class, 'storePurchaseOrder']);
+Route::middleware('auth:sanctum')->post('/purchase-orders-receipt', [SupplierPurchaseOrderReceiptController::class, 'store']);
 // Route::middleware('auth:sanctum')->post('/purchase-orders-xml', [SupplierPurchaseOrderController::class, 'xml'])->name('purchase-orders.xml');
 // Route::middleware('auth:sanctum')->post('/suppliers/create', [SupplierController::class, 'storeSupliers'])->name('suppliers.storeSupliers');
 Route::middleware('auth:sanctum')->post('/purchase-orders-xml', [SupplierPurchaseOrderController::class, 'xml']);
