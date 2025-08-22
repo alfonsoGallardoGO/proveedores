@@ -66,7 +66,7 @@ class SupplierPurchaseOrderController extends Controller
         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,
             'invoices' => $invoices,
-            'orders' => $orders
+            'orders' => $orders,
             'receipt' => $receipt
         ]);
     }
