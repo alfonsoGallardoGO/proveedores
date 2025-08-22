@@ -55,9 +55,12 @@ class SupplierPurchaseOrderController extends Controller
 
         $invoices = SupplierInvoice::where('supplier_purchase_order_id', $id)->get();
 
+        $orders = SupplierPurchaseOrder::findOrFail($id); 
+
         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,
             'invoices' => $invoices,
+            'orders' => $orders
         ]);
     }
 

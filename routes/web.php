@@ -10,9 +10,9 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierInvoicesController;
 use App\Http\Controllers\SupplierWhatsappController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PdfController;
 
-
-
+Route::get('/generate-invoice/{id}', [PdfController::class, 'generateInvoice'])->name('generate.invoice');
 
 Route::prefix('suppliers')->group(function () {
     Route::resource('purchase-orders', SupplierPurchaseOrderController::class);
