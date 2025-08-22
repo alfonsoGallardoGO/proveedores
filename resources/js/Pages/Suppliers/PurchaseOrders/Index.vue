@@ -138,7 +138,7 @@ const formatNumber = (data, field) => {
                             <Column field="id" header="Id" sortable style="min-width: 2rem"></Column>
                             <Column field="purchase_order" header="Orden de compra" sortable style="min-width: 8rem"
                                 bodyClass="ml-2"></Column>
-                            <Column field="impuesto" header="Impuesto" sortable style="min-width: 8rem"
+                            <!-- <Column field="impuesto" header="Impuesto" sortable style="min-width: 8rem"
                                 bodyClass="ml-2">
                                 <template #body="slotProps">
                                     {{ Number(slotProps.data.impuesto).toLocaleString("es-MX", {
@@ -155,7 +155,7 @@ const formatNumber = (data, field) => {
                                     maximumFractionDigits: 2,
                                     }) }}
                                 </template>
-                            </Column>
+                            </Column> -->
                             <Column field="total" header="Total" sortable style="min-width: 8rem" bodyClass="ml-2">
                                 <template #body="slotProps">
                                     {{ Number(slotProps.data.total).toLocaleString("es-MX", {

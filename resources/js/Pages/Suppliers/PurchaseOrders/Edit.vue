@@ -16,17 +16,21 @@ import Ripple from 'primevue/ripple';
 const props = defineProps({
     invoices: Array,
     items: Array,
+    orders: Object,
 });
 
-// onMounted(() => {
-//     console.log('Datos de invoices:', props.invoices);
-//     console.log('Datos de items:', props.items);
-// });
+onMounted(() => {
+    console.log('Datos de invoices:', props.invoices);
+    console.log('Datos de items:', props.items);
+    console.log('Datos de orders:', props.orders);
+});
 
 
 const toast = useToast();
 const dtItems = ref();
 const loading = ref(false);
+
+const visible = ref(false);
 
 const form = useForm({
     cantidades: {},
@@ -35,17 +39,17 @@ const form = useForm({
     supplier_purchase_order_id: null,
 });
 
-onMounted(() => {
-    if (props.items && props.items.length > 0) {
-        form.supplier_purchase_order_id = props.items[0].supplier_purchase_order_id;
+// onMounted(() => {
+//     if (props.items && props.items.length > 0) {
+//         form.supplier_purchase_order_id = props.items[0].supplier_purchase_order_id;
 
-        props.items.forEach(item => {
-            if (!form.cantidades[item.id]) {
-                form.cantidades[item.id] = 0;
-            }
-        });
-    }
-});
+//         props.items.forEach(item => {
+//             if (!form.cantidades[item.id]) {
+//                 form.cantidades[item.id] = 0;
+//             }
+//         });
+//     }
+// });
 
 const buttonLabelPdf = ref('Seleccionar Factura');
 const buttonLabelXml = ref('Seleccionar XML');
@@ -86,7 +90,7 @@ const store = async () => {
 
     try {
 
-        const hasEmptyFields = Object.values(form.cantidades).some(amount => amount === null || amount === '');
+        // const hasEmptyFields = ;
         if (hasEmptyFields) {
             setTimeout(() => {
                 loading.value = false;
@@ -200,11 +204,11 @@ const formatCurrency = (value) => {
     }).format(Number(value));
 };
 
-const activeTab = ref('Subir Archivos');
+const activeTab = ref('Lista de Recepciones');
 
 const tabsItems = ref([
-    { label: 'Subir Archivos', icon: 'pi pi-upload' },
-    { label: 'Lista de Documentos', icon: 'pi pi-list' }
+    // { label: 'Subir Archivos', icon: 'pi pi-upload' },
+    { label: 'Lista de Recepciones', icon: 'pi pi-list' }
 ]);
 
 const dialogVisible = ref(false);
@@ -228,6 +232,56 @@ const formatDate = (dateString) => {
     return `${day}-${month}-${year}`;
 };
 
+const receptionData = ref([]);
+
+onMounted(() => {
+    const purchaseOrder = props.orders.purchase_order;
+    receptionData.value = [
+        {
+            // number: { order: purchaseOrder },
+            receipt_number: '000125',
+            status: 'Pendiente de Factura'
+        },
+        {
+            // number: { order: purchaseOrder },
+            receipt_number: '111245',
+            status: 'Factura Cargada'
+        },
+        {
+            // number: { order: purchaseOrder },
+            receipt_number: '222458',
+            status: 'Pendiente de Factura'
+        }
+    ];
+});
+
+const getSeverity = (status) => {
+    switch (status) {
+        case 'Pendiente de Factura':
+            return 'danger';
+        case 'Factura Cargada':
+            return 'success';
+        default:
+            return null;
+    }
+};
+
+// const showOrder = () => {
+//     window.open(route('generate.invoice'), '_blank');
+// };
+
+// const showOrder = () => {
+//     window.location.href = route('generate.invoice');
+// };
+
+const showOrder = () => {
+    window.open(route('generate.invoice', { id: props.orders.id }), '_blank');
+};
+
+// const showOrder = () => {
+//     window.open(route('generate.invoice', { id: props.orders.id }));
+// };
+
 </script>
 
 <template>
@@ -246,12 +300,66 @@ const formatDate = (dateString) => {
                                     </Link>
                                 </template>
                             </Toolbar>
+                            <!-- <div class="mt-4 flex items-center">
+                                <Message severity="info" icon="pi pi-file" class="mr-2">Orden de compra: {{
+                                    props.orders.purchase_order }}</Message>
+                                <Message severity="success" icon="pi pi-hashtag" class="mr-2">Número de recepción: {{
+                                    props.orders.purchase_order }}</Message>
+                                <Button icon="pi pi-arrow-circle-up" label="Agregar Número de Recepción" severity="help"
+                                    raised @click="visible = true" />
+                            </div> -->
+                            <div class="card">
+                                <DataTable :value="receptionData" rowGroupMode="rowspan" groupRowsBy="number.order"
+                                    sortMode="single" sortField="number.order" :sortOrder="1"
+                                    tableStyle="min-width: 50rem" scrollable scrollHeight="200px">
+                                    <template #header>
+                                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                                            <!-- <h4 class="m-0">Articulos de la orden de compra</h4> -->
+                                            <Message severity="info" icon="pi pi-file" class="mr-2">
+                                                <span class="text-lg font-bold">Orden de compra: {{
+                                                    props.orders.purchase_order
+                                                    }}</span>
+                                            </Message>
+                                            <IconField>
+                                                <InputIcon>
+                                                    <i class="pi pi-search" />
+                                                </InputIcon>
+                                                <InputText v-model="filtersItems['global'].value"
+                                                    placeholder="Buscar..." />
+                                            </IconField>
+                                        </div>
+                                    </template>
+                                    <Column field="receipt_number" header="N. Recepción" style="min-width: 200px">
+                                    </Column>
+
+                                    <Column field="status" header="Status" style="min-width: 100px">
+                                        <template #body="slotProps">
+                                            <Tag :value="slotProps.data.status"
+                                                :severity="getSeverity(slotProps.data.status)" />
+                                        </template>
+                                    </Column>
+
+                                    <Column header="Acciones" style="min-width: 200px">
+                                        <template #body="slotProps">
+                                            <Button v-if="slotProps.data.status === 'Pendiente de Factura'"
+                                                icon="pi pi-plus-circle" label="Agregar" severity="help" raised
+                                                @click="visible = true" />
+
+                                            <Button v-else-if="slotProps.data.status === 'Factura Cargada'"
+                                                icon="pi pi-check" label="Completado" severity="success" raised disabled
+                                                @click="visible = true" />
+                                        </template>
+                                    </Column>
+                                </DataTable>
+                            </div>
                             <DataTable ref="dtItems" :value="items" dataKey="id" paginator :rows="10"
                                 :filters="filtersItems" :rowsPerPageOptions="[5, 10, 25]"
                                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} prestaciones">
                                 <template #header>
                                     <div class="flex flex-wrap gap-2 items-center justify-between">
-                                        <h4 class="m-0">Articulos de la orden de compra</h4>
+                                        <h4 class="m-0 text-1xl font-bold">Articulos de la orden de compra</h4>
+                                        <Button label="Ver orden" icon="pi pi-file-pdf" severity="danger" class="ml-2"
+                                            @click="showOrder" />
                                         <IconField>
                                             <InputIcon>
                                                 <i class="pi pi-search" />
@@ -296,16 +404,13 @@ const formatDate = (dateString) => {
                                         }}</span>
                                     </template>
                                 </Column>
-                                <Column header="Entrega" style="min-width: 12rem">
+                                <!-- <Column header="Entrega" style="min-width: 12rem">
                                     <template #body="{ data }">
-                                        <!-- <InputNumber v-model="form.cantidades[data.id]" :min="0"
-                                            :max="data.quantity - (data.deliveries_sum_amount ?? 0)" showButtons
-                                            inputClass="w-20 text-center" class="w-full" /> -->
                                         <InputNumber v-model="form.cantidades[data.id]" :min="0"
                                             :max="Math.max(0, data.quantity - (data.deliveries_sum_amount ?? 0))"
                                             showButtons inputClass="w-20 text-center" class="w-full" />
                                     </template>
-                                </Column>
+                                </Column> -->
                             </DataTable>
                             <div class="card">
                                 <div class="card">
@@ -323,62 +428,8 @@ const formatDate = (dateString) => {
                                 </div>
 
                                 <div class="tab-content0 mt-4">
-                                    <div v-if="activeTab === 'Subir Archivos'" class="flex gap-4">
-                                        <div class="card w-1/2 p-4 border rounded-lg shadow-sm">
-                                            <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
-                                                <i class="pi pi-file-pdf text-red-500"></i>
-                                                Subir Factura (PDF)
-                                            </h4>
-                                            <FileUpload name="factura" ref="facturaFileUpload" accept=".pdf"
-                                                :auto="false" @select="onFacturaUpload" @remove="onFacturaRemove"
-                                                :customUpload="true">
-                                                <template #header="{ chooseCallback }">
-                                                    <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
-                                                        @click="chooseCallback()" severity="danger"
-                                                        class="p-button-sm p-button-rounded" outlined />
-                                                </template>
+                                    <!-- <div v-if="activeTab === 'Subir Archivos'" class="flex gap-4">
 
-                                                <template #content="{ files, removeFileCallback }">
-                                                    <div v-for="(file, index) of files" :key="file.name"
-                                                        class="p-4 flex items-center justify-between">
-                                                        <span class="flex items-center gap-2">
-                                                            <i class="pi pi-check-circle text-green-500" />
-                                                            {{ file.name }}
-                                                        </span>
-
-                                                        <Button icon="pi pi-times" severity="danger" outlined rounded
-                                                            class="p-button-sm" @click="removeFileCallback(index)" />
-                                                    </div>
-                                                </template>
-                                            </FileUpload>
-                                        </div>
-                                        <div class="card w-1/2 p-4 border rounded-lg shadow-sm">
-                                            <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
-                                                <i class="pi pi-code text-green-600"></i>
-                                                Subir XML
-                                            </h4>
-                                            <FileUpload name="xml" ref="xmlFileUpload" accept=".xml" :auto="false"
-                                                @select="onXmlUpload" @remove="onXmlRemove" :customUpload="true">
-                                                <template #header="{ chooseCallback }">
-                                                    <Button :label="buttonLabelXml" icon="pi pi-file-excel"
-                                                        @click="chooseCallback()" severity="success"
-                                                        class="p-button-sm p-button-rounded" outlined />
-                                                </template>
-
-                                                <template #content="{ files, removeFileCallback }">
-                                                    <div v-for="(file, index) of files" :key="file.name"
-                                                        class="p-4 flex items-center justify-between">
-                                                        <span class="flex items-center gap-2">
-                                                            <i class="pi pi-check-circle text-green-500" />
-                                                            {{ file.name }}
-                                                        </span>
-
-                                                        <Button icon="pi pi-times" severity="danger" outlined rounded
-                                                            class="p-button-sm" @click="removeFileCallback(index)" />
-                                                    </div>
-                                                </template>
-                                            </FileUpload>
-                                        </div>
                                     </div>
                                     <div v-if="activeTab === 'Subir Archivos'" class="flex flex-col gap-4">
                                         <div class="flex gap-4">
@@ -391,8 +442,8 @@ const formatDate = (dateString) => {
                                                     class="w-80" />
                                             </div>
                                         </div>
-                                    </div>
-                                    <div v-if="activeTab === 'Lista de Documentos'">
+                                    </div> -->
+                                    <div v-if="activeTab === 'Lista de Recepciones'">
                                         <div class="card">
                                             <DataTable :value="invoices" stripedRows paginator :rows="10"
                                                 :rowsPerPageOptions="[5, 10, 25]"
@@ -400,7 +451,7 @@ const formatDate = (dateString) => {
                                                 :filters="filtersInvoices">
                                                 <template #header>
                                                     <div class="flex flex-wrap gap-2 items-center justify-between">
-                                                        <h4 class="m-0">Documentos Cargados</h4>
+                                                        <h4 class="m-0">Recepciones Cargadas</h4>
                                                         <IconField>
                                                             <InputIcon>
                                                                 <i class="pi pi-search" />
@@ -411,7 +462,8 @@ const formatDate = (dateString) => {
                                                     </div>
                                                 </template>
 
-                                                <Column field="id" header="Factura #" sortable style="min-width: 12rem">
+                                                <Column field="id" header="#Recepción" sortable
+                                                    style="min-width: 12rem">
                                                     <template #body="slotProps">
                                                         <span class="font-semibold">#{{ slotProps.data.id }}</span>
                                                     </template>
@@ -442,17 +494,54 @@ const formatDate = (dateString) => {
                                     </div>
                                 </div>
                             </div>
-                            <!-- <Dialog v-model:visible="dialogVisible" modal :style="{ width: '80vw' }"
-                                header="Visualización de Factura">
-                                <div v-if="currentDocumentUrl" class="h-[80vh] w-full">
-                                    <iframe :src="currentDocumentUrl" class="w-full h-full border-none"
-                                        title="Documento"></iframe>
+                            <Dialog v-model:visible="visible" modal header="Agregar Número de Recepción"
+                                :style="{ width: '50rem' }" position="top">
+                                <span class="text-surface-500 dark:text-surface-400 block mb-8"></span>
+                                <div class="flex flex-col items-center gap-4 mb-4">
+                                    <label for="receipt_number" class="font-semibold">Número de Recepción</label>
+                                    <InputText id="receipt_number" class="w-80" autocomplete="off" />
                                 </div>
-                                <div v-else class="text-center text-gray-500">
-                                    <Message severity="error" variant="outlined">No se ha seleccionado ningún documento
-                                        para ver.</Message>
+                                <div class="flex flex-row gap-4">
+                                    <div class="card p-4 border rounded-lg shadow-sm flex-1">
+                                        <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
+                                            <i class="pi pi-file-pdf text-red-500"></i>
+                                            Subir Factura (PDF)
+                                        </h4>
+                                        <FileUpload name="factura" ref="facturaFileUpload" accept=".pdf" :auto="false"
+                                            @select="onFacturaUpload" @remove="onFacturaRemove" :customUpload="true">
+                                            <template #header="{ chooseCallback }">
+                                                <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
+                                                    @click="chooseCallback()" severity="danger"
+                                                    class="p-button-sm p-button-rounded" outlined />
+                                            </template>
+                                        </FileUpload>
+                                    </div>
+
+                                    <div class="card p-4 border rounded-lg shadow-sm flex-1">
+                                        <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
+                                            <i class="pi pi-code text-green-600"></i>
+                                            Subir XML
+                                        </h4>
+                                        <FileUpload name="xml" ref="xmlFileUpload" accept=".xml" :auto="false"
+                                            @select="onXmlUpload" @remove="onXmlRemove" :customUpload="true">
+                                            <template #header="{ chooseCallback }">
+                                                <Button :label="buttonLabelXml" icon="pi pi-file-excel"
+                                                    @click="chooseCallback()" severity="success"
+                                                    class="p-button-sm p-button-rounded" outlined />
+                                            </template>
+                                        </FileUpload>
+                                    </div>
                                 </div>
-                            </Dialog> -->
+                                <div class="flex justify-end gap-2 mt-4">
+                                    <Button type="button" label="Cancelar" severity="danger" @click="visible = false"
+                                        icon="pi pi-times-circle"></Button>
+                                    <Button label="Subir Documentos" icon="pi pi-cloud-upload" severity="info"
+                                        :loading="loading" @click="store()"></Button>
+                                    <!-- <Button label="Subir Documentos" icon="pi pi-cloud-upload"
+                                                severity="help" :loading="loading" @click="store()" outlined
+                                                class="w-80" /> -->
+                                </div>
+                            </Dialog>
                         </div>
                     </div>
                 </div>
