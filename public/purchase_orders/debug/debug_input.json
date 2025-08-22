@@ -1,120 +1,9 @@
 [
     {
-        "id": 4452785,
-        "tranid": "OCSCQ0204",
-        "fecha": "2025-08-20T07:00:00.000Z",
-        "estado": "Recepci\u00f3n pendiente",
-        "total": 4529,
-        "subtotal": 3904.31,
-        "impuesto": 624.69,
-        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
-        "moneda": "Mexican Peso",
-        "proveedor": {
-            "id": "65424",
-            "nombre": null,
-            "rfc": "FIRA860812RX3",
-            "correo": "afr.figueroa@gmail.com",
-            "telefono": null,
-            "tipoEntidad": "individual"
-        },
-        "evento": "create",
-        "lineasArticulos": [
-            {
-                "tipo": "articulo",
-                "articuloId": "141818",
-                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
-                "cantidad": 1,
-                "importe": 3904.31,
-                "tasaImpuesto": "T.IVA16%:C.IVA16%",
-                "clase": "REFACCIONES : ELECTRICO-ELECTRONICO",
-                "departamento": "TI : Desarrollo",
-                "ubicacion": "CORPORATIVO",
-                "cuenta": null,
-                "categoria": null,
-                "memo": null
-            }
-        ],
-        "lineasGastos": []
-    },
-    {
-        "id": 4452785,
-        "tranid": "OCSCQ0204",
-        "fecha": "2025-08-20T07:00:00.000Z",
-        "estado": "Recepci\u00f3n pendiente",
-        "total": 4529,
-        "subtotal": 3904.31,
-        "impuesto": 624.69,
-        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
-        "moneda": "Mexican Peso",
-        "proveedor": {
-            "id": "65424",
-            "nombre": null,
-            "rfc": "FIRA860812RX3",
-            "correo": "afr.figueroa@gmail.com",
-            "telefono": null,
-            "tipoEntidad": "individual"
-        },
-        "evento": "create",
-        "lineasArticulos": [
-            {
-                "tipo": "articulo",
-                "articuloId": "141818",
-                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
-                "cantidad": 1,
-                "importe": 3904.31,
-                "tasaImpuesto": "T.IVA16%:C.IVA16%",
-                "clase": "REFACCIONES : ELECTRICO-ELECTRONICO",
-                "departamento": "TI : Desarrollo",
-                "ubicacion": "CORPORATIVO",
-                "cuenta": null,
-                "categoria": null,
-                "memo": null
-            }
-        ],
-        "lineasGastos": []
-    },
-    {
-        "id": 4452785,
-        "tranid": "OCSCQ0204",
-        "fecha": "2025-08-20T07:00:00.000Z",
-        "estado": "Recepci\u00f3n pendiente",
-        "total": 4529,
-        "subtotal": 3904.31,
-        "impuesto": 624.69,
-        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
-        "moneda": "Mexican Peso",
-        "proveedor": {
-            "id": "65424",
-            "nombre": null,
-            "rfc": "FIRA860812RX3",
-            "correo": "afr.figueroa@gmail.com",
-            "telefono": null,
-            "tipoEntidad": "individual"
-        },
-        "evento": "create",
-        "lineasArticulos": [
-            {
-                "tipo": "articulo",
-                "articuloId": "141818",
-                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
-                "cantidad": 1,
-                "importe": 3904.31,
-                "tasaImpuesto": "T.IVA16%:C.IVA16%",
-                "clase": "REFACCIONES : ELECTRICO-ELECTRONICO",
-                "departamento": "TI : Desarrollo",
-                "ubicacion": "CORPORATIVO",
-                "cuenta": null,
-                "categoria": null,
-                "memo": null
-            }
-        ],
-        "lineasGastos": []
-    },
-    {
         "id": 4458440,
         "tranid": "OCSCQ0214",
-        "fecha": "2025-08-21T07:00:00.000Z",
-        "estado": "Recepci\u00f3n pendiente",
+        "fecha": "00.000Z",
+        "estado": "Recepción pendiente",
         "total": 238281.4,
         "subtotal": 205415,
         "impuesto": 32866.4,
@@ -129,7 +18,40 @@
             "tipoEntidad": "individual"
         },
         "evento": "create",
-        "lineasArticulos": [],
+        "lineasArticulos": [
+            {
+                "tipo": "articulo",
+                "articuloId": "141818",
+                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
+                "cantidad": 1,
+                "importe": 3904.31,
+                "tasaImpuesto": "C.IVA16%",
+                "claseP": {
+                    "claseP2": {
+                        "clase": "ELECTRICO-ELECTRONICO"
+                    }
+                },
+                "departamentoP": {
+                    "departamento": "Desarrollo"
+                },
+                "ubicacionP": {
+                    "ubicacionP2": {
+                        "ubicacion": "CORPORATIVO"
+                    }
+                },
+                "cuentaP": {
+                    "cuentaP2": {
+                        "cuentaP3": {
+                            "cuenta": "GASTOS GENERALES ARTICULOS PARA TALLER"
+                        }
+                    }
+                },
+                "categoriaP": {
+                    "categoria": "ARTICULOS PARA TALLER-G"
+                },
+                "memo": null
+            }
+        ],
         "lineasGastos": [
             {
                 "tipo": "gasto",
@@ -138,11 +60,29 @@
                 "cantidad": null,
                 "importe": 205415,
                 "tasaImpuesto": null,
-                "clase": "GASTOS",
-                "departamento": "TI : Desarrollo",
-                "ubicacion": "CORPORATIVO",
-                "cuenta": "6100-0000-0006 GASTOS DE OPERACI\u00d3N : GASTOS GENERALES ARTICULOS PARA TALLER",
-                "categoria": "ARTICULOS PARA TALLER-G",
+                "claseP": {
+                    "claseP2": {
+                        "clase": "GASTOS"
+                    }
+                },
+                "departamentoP": {
+                    "departamento": "Desarrollo"
+                },
+                "ubicacionP": {
+                    "ubicacionP2": {
+                        "ubicacion": "CORPORATIVO"
+                    }
+                },
+                "cuentaP": {
+                    "cuentaP2": {
+                        "cuentaP3": {
+                            "cuenta": "GASTOS GENERALES ARTICULOS PARA TALLER"
+                        }
+                    }
+                },
+                "categoriaP": {
+                    "categoria": "ARTICULOS PARA TALLER-G"
+                },
                 "memo": "LAPTOP DE REPOSICION DE JORGITA"
             }
         ]
@@ -150,8 +90,8 @@
     {
         "id": 4458440,
         "tranid": "OCSCQ0214",
-        "fecha": "2025-08-21T07:00:00.000Z",
-        "estado": "Recepci\u00f3n pendiente",
+        "fecha": "00.000Z",
+        "estado": "Recepción pendiente",
         "total": 238281.4,
         "subtotal": 205415,
         "impuesto": 32866.4,
@@ -166,7 +106,32 @@
             "tipoEntidad": "individual"
         },
         "evento": "create",
-        "lineasArticulos": [],
+        "lineasArticulos": [
+            {
+                "tipo": "articulo",
+                "articuloId": "141818",
+                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
+                "cantidad": 1,
+                "importe": 3904.31,
+                "tasaImpuesto": "C.IVA16%",
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoriaP": "MANTENIMIENTO DE MAQUINARIA-C",
+                "memo": null
+            }
+        ],
         "lineasGastos": [
             {
                 "tipo": "gasto",
@@ -175,11 +140,165 @@
                 "cantidad": null,
                 "importe": 205415,
                 "tasaImpuesto": null,
-                "clase": "GASTOS",
-                "departamento": "TI : Desarrollo",
-                "ubicacion": "CORPORATIVO",
-                "cuenta": "6100-0000-0006 GASTOS DE OPERACI\u00d3N : GASTOS GENERALES ARTICULOS PARA TALLER",
-                "categoria": "ARTICULOS PARA TALLER-G",
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoriaP": "MANTENIMIENTO DE MAQUINARIA-C",
+                "memo": "LAPTOP DE REPOSICION DE JORGITA"
+            }
+        ]
+    },
+    {
+        "id": 4458440,
+        "tranid": "OCSCQ0214",
+        "fecha": "00.000Z",
+        "estado": "Recepción pendiente",
+        "total": 238281.4,
+        "subtotal": 205415,
+        "impuesto": 32866.4,
+        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
+        "moneda": "Mexican Peso",
+        "proveedor": {
+            "id": "65424",
+            "nombre": null,
+            "rfc": "FIRA860812RX3",
+            "correo": "afr.figueroa@gmail.com",
+            "telefono": null,
+            "tipoEntidad": "individual"
+        },
+        "evento": "create",
+        "lineasArticulos": [
+            {
+                "tipo": "articulo",
+                "articuloId": "141818",
+                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
+                "cantidad": 1,
+                "importe": 3904.31,
+                "tasaImpuesto": "C.IVA16%",
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoriaP": "MANTENIMIENTO DE MAQUINARIA-C",
+                "memo": null
+            }
+        ],
+        "lineasGastos": [
+            {
+                "tipo": "gasto",
+                "articuloId": null,
+                "descripcion": null,
+                "cantidad": null,
+                "importe": 205415,
+                "tasaImpuesto": null,
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoriaP": "MANTENIMIENTO DE MAQUINARIA-C",
+                "memo": "LAPTOP DE REPOSICION DE JORGITA"
+            }
+        ]
+    },
+    {
+        "id": 4458440,
+        "tranid": "OCSCQ0214",
+        "fecha": "00.000Z",
+        "estado": "Recepción pendiente",
+        "total": 238281.4,
+        "subtotal": 205415,
+        "impuesto": 32866.4,
+        "subsidiaria": "SERVICIOS CORPORATIVOS QUANTUM DE OCCIDENTE",
+        "moneda": "Mexican Peso",
+        "proveedor": {
+            "id": "65424",
+            "nombre": null,
+            "rfc": "FIRA860812RX3",
+            "correo": "afr.figueroa@gmail.com",
+            "telefono": null,
+            "tipoEntidad": "individual"
+        },
+        "evento": "create",
+        "lineasArticulos": [
+            {
+                "tipo": "articulo",
+                "articuloId": "141818",
+                "descripcion": "BATERIA LTH L-34-\/78-750 El tepas es inocente",
+                "cantidad": 1,
+                "importe": 3904.31,
+                "tasaImpuesto": "C.IVA16%",
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoria": "MANTENIMIENTO DE MAQUINARIA-C",
+                "memo": null
+            }
+        ],
+        "lineasGastos": [
+            {
+                "tipo": "gasto",
+                "articuloId": null,
+                "descripcion": null,
+                "cantidad": null,
+                "importe": 205415,
+                "tasaImpuesto": null,
+                "clase": {
+                    "MATERIA PRIMA": "POLIPROPILENO"
+                },
+                "departamento": {
+                    "Compras": "Compras de Materias Primas"
+                },
+                "ubicacion": {
+                    "SAPIESA": {
+                        "SAPIESA SUCURSAL": "SAPIESA SUCURSAL MATERIA PRIMA"
+                    }
+                },
+                "cuenta": {
+                    "5400-0000-0026 GASTOS DE FABRICACIÓN": "GASTOS DE FABRICACIÓN MANTENIMIENTO DEL EDIFICIO"
+                },
+                "categoria": "MANTENIMIENTO DE MAQUINARIA-C",
                 "memo": "LAPTOP DE REPOSICION DE JORGITA"
             }
         ]

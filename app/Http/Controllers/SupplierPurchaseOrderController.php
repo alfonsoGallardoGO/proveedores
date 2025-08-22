@@ -134,12 +134,47 @@ class SupplierPurchaseOrderController extends Controller
             ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
     }
 
+    private function extractLastPart($value)
+    {
+        if (is_string($value)) {
+            $last_colon_pos = strrpos($value, ':');
+            if ($last_colon_pos !== false) {
+                return trim(substr($value, $last_colon_pos + 1));
+            }
+            return $value;
+        }
+        else if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->extractLastPart($item);
+            }
+            return $value;
+        }
+        return $value;
+    }
+
+    private function getDeepestStringValue($data)
+    {
+        if (is_string($data)) {
+            return $data;
+        }
+        if (is_array($data)) {
+            foreach ($data as $value) {
+                $result = $this->getDeepestStringValue($value);
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+        }
+        return null;
+    }
+
     public function storePurchaseOrder(Request $request)
     {
         $data = $request->all();
-        $supplier_purchase_order_id = $data['id'] ?? null;
 
-        // Almacenar el JSON en carpeta Public del storage
+        $data = $this->extractLastPart($data);
+
+        $supplier_purchase_order_id = $data['id'] ?? null;
         $folderPath = public_path('purchase_orders/debug');
         $fileName = 'debug_input.json';
         $filePath = $folderPath . '/' . $fileName;
@@ -147,18 +182,15 @@ class SupplierPurchaseOrderController extends Controller
         if (!file_exists($folderPath)) {
             mkdir($folderPath, 0755, true); 
         }
-
-        // El resto de tu código para escribir el archivo
         $existingContent = file_exists($filePath) ? file_get_contents($filePath) : '[]';
         $dataArray = json_decode($existingContent, true);
         if (!is_array($dataArray)) {
             $dataArray = [];
         }
         $dataArray[] = $data;
-        $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
+        $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         file_put_contents($filePath, $newJsonData);
-        
 
         if (empty($supplier_purchase_order_id)) {
             return response()->json([
@@ -219,11 +251,11 @@ class SupplierPurchaseOrderController extends Controller
                 'quantity'         => $item['cantidad'],
                 'amount'           => $item['importe'],
                 'rate_tax'         => $item['tasaImpuesto'],
-                'class'            => $item['clase'],
-                'department'       => $item['departamento'],
-                'location'         => $item['ubicacion'],
-                'account'          => $item['cuenta'],
-                'categoria'        => $item['categoria'],
+                'class'            => $this->getDeepestStringValue($item['clase'] ?? null),
+                'department'       => $this->getDeepestStringValue($item['departamento'] ?? null),
+                'location'         => $this->getDeepestStringValue($item['ubicacion'] ?? null),
+                'account'          => $this->getDeepestStringValue($item['cuenta'] ?? null),
+                'categoria'        => $this->getDeepestStringValue($item['categoria'] ?? null),
                 'memo'             => $item['memo'] ?? null,
                 'type'             => 'ARTICULO',
                 'supplier_purchase_order_id' => $orderId,
@@ -235,22 +267,22 @@ class SupplierPurchaseOrderController extends Controller
         // Procesar lineasGastos
         foreach (collect($data['lineasGastos'] ?? []) as $item) {
             $standardizedItem = [
-                'article_order_id' => $item['articuloId'],
-                'description'      => $item['memo'],
-                'quantity'         => $item['cantidad'],
-                'amount'           => $item['importe'],
-                'rate_tax'         => $item['tasaImpuesto'],
-                'class'            => $item['clase'],
-                'department'       => $item['departamento'],
-                'location'         => $item['ubicacion'],
-                'account'          => $item['cuenta'],
-                'categoria'        => $item['categoria'],
+                'article_order_id' => $item['articuloId'] ?? null,
+                'description'      => $item['memo'] ?? null,
+                'quantity'         => $item['cantidad'] ?? null,
+                'amount'           => $item['importe'] ?? null,
+                'rate_tax'         => $item['tasaImpuesto'] ?? null,
+                'class'            => $this->getDeepestStringValue($item['clase'] ?? null),
+                'department'       => $this->getDeepestStringValue($item['departamento'] ?? null),
+                'location'         => $this->getDeepestStringValue($item['ubicacion'] ?? null),
+                'account'          => $this->getDeepestStringValue($item['cuenta'] ?? null),
+                'categoria'        => $this->getDeepestStringValue($item['categoria'] ?? null),
                 'memo'             => $item['memo'] ?? null,
                 'type'             => 'GASTO',
                 'supplier_purchase_order_id' => $orderId,
             ];
 
-            $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
+            $uniqueKey = ($standardizedItem['article_order_id'] ?? uniqid('gast_')) . '_' . $standardizedItem['type'];
             $incomingItems[$uniqueKey] = $standardizedItem;
         }
 
