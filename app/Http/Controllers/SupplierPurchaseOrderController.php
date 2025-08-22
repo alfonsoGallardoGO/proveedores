@@ -134,9 +134,54 @@ class SupplierPurchaseOrderController extends Controller
             ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
     }
 
+    private function extractLastPart($value)
+    {
+        // Si el valor es un string, busca el último ':' y devuelve la parte posterior.
+        if (is_string($value)) {
+            $last_colon_pos = strrpos($value, ':');
+            if ($last_colon_pos !== false) {
+                return trim(substr($value, $last_colon_pos + 1));
+            }
+            return $value; // Si no hay ':', devuelve el string original
+        }
+        // Si el valor es un array, itera sobre sus elementos y los procesa recursivamente.
+        else if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->extractLastPart($item);
+            }
+            return $value;
+        }
+        // Para cualquier otro tipo de valor (números, booleanos, null), devuelve el valor original.
+        // json_decode(..., true) ya convierte los objetos a arrays asociativos, por lo que no necesitamos is_object() aquí.
+        return $value;
+    }
+
+    private function getDeepestStringValue($data)
+    {
+        // Si el dato es un string, lo devuelve directamente
+        if (is_string($data)) {
+            return $data;
+        }
+        // Si el dato es un array, itera sobre sus valores recursivamente
+        if (is_array($data)) {
+            foreach ($data as $value) {
+                $result = $this->getDeepestStringValue($value);
+                // Si se encuentra un string en algún nivel más profundo, lo devuelve
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+        }
+        // Si no se encuentra ningún string, o el valor no es un string ni un array, devuelve null
+        return null;
+    }
+
     public function storePurchaseOrder(Request $request)
     {
         $data = $request->all();
+
+        $data = $this->extractLastPart($data);
+
         $supplier_purchase_order_id = $data['id'] ?? null;
         $folderPath = public_path('purchase_orders/debug');
         $fileName = 'debug_input.json';
@@ -153,7 +198,7 @@ class SupplierPurchaseOrderController extends Controller
             $dataArray = [];
         }
         $dataArray[] = $data;
-        $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT);
+        $newJsonData = json_encode($dataArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         file_put_contents($filePath, $newJsonData);
         ////////////////////////////////////////////////////
@@ -217,11 +262,11 @@ class SupplierPurchaseOrderController extends Controller
                 'quantity'         => $item['cantidad'],
                 'amount'           => $item['importe'],
                 'rate_tax'         => $item['tasaImpuesto'],
-                'class'            => $item['clase'],
-                'department'       => $item['departamento'],
-                'location'         => $item['ubicacion'],
-                'account'          => $item['cuenta'],
-                'categoria'        => $item['categoria'],
+                'class'            => $this->getDeepestStringValue($item['clase'] ?? null),
+                'department'       => $this->getDeepestStringValue($item['departamento'] ?? null),
+                'location'         => $this->getDeepestStringValue($item['ubicacion'] ?? null),
+                'account'          => $this->getDeepestStringValue($item['cuenta'] ?? null),
+                'categoria'        => $item['categoriaP'] ?? null, // Ahora es 'categoriaP' y es un string directo
                 'memo'             => $item['memo'] ?? null,
                 'type'             => 'ARTICULO',
                 'supplier_purchase_order_id' => $orderId,
@@ -233,22 +278,22 @@ class SupplierPurchaseOrderController extends Controller
         // Procesar lineasGastos
         foreach (collect($data['lineasGastos'] ?? []) as $item) {
             $standardizedItem = [
-                'article_order_id' => $item['articuloId'],
-                'description'      => $item['memo'],
-                'quantity'         => $item['cantidad'],
-                'amount'           => $item['importe'],
-                'rate_tax'         => $item['tasaImpuesto'],
-                'class'            => $item['clase'],
-                'department'       => $item['departamento'],
-                'location'         => $item['ubicacion'],
-                'account'          => $item['cuenta'],
-                'categoria'        => $item['categoria'],
+                'article_order_id' => $item['articuloId'] ?? null,
+                'description'      => $item['memo'] ?? null,
+                'quantity'         => $item['cantidad'] ?? null,
+                'amount'           => $item['importe'] ?? null,
+                'rate_tax'         => $item['tasaImpuesto'] ?? null,
+                'class'            => $this->getDeepestStringValue($item['clase'] ?? null), // Ajustado de claseP a clase
+                'department'       => $this->getDeepestStringValue($item['departamento'] ?? null),
+                'location'         => $this->getDeepestStringValue($item['ubicacion'] ?? null),
+                'account'          => $this->getDeepestStringValue($item['cuenta'] ?? null),
+                'categoria'        => $this->getDeepestStringValue($item['categoriaP'] ?? null), // Categoria sigue siendo categoriaP y puede ser un string directo o anidado
                 'memo'             => $item['memo'] ?? null,
                 'type'             => 'GASTO',
                 'supplier_purchase_order_id' => $orderId,
             ];
 
-            $uniqueKey = $standardizedItem['article_order_id'] . '_' . $standardizedItem['type'];
+            $uniqueKey = ($standardizedItem['article_order_id'] ?? uniqid('gast_')) . '_' . $standardizedItem['type'];
             $incomingItems[$uniqueKey] = $standardizedItem;
         }
 
