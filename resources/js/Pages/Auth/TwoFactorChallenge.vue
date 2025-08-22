@@ -45,6 +45,12 @@ const submit = () => {
             <AuthenticationCardLogo />
         </template>
 
+        <h1
+            class="text-gray-900 fw-bolder mb-3 text-3xl"
+        >
+                Confirmacion de dos pasos
+        </h1>
+
         <div class="mb-4 text-sm text-gray-600">
             <template v-if="!recovery">
                 Por favor confirma el acceso a tu cuenta ingresando el código de
@@ -110,5 +116,15 @@ const submit = () => {
                 </PrimaryButton>
             </div>
         </form>
+
+        <div class="flex justify-end w-full mt-4">
+            <Button 
+                label="Volver al login"
+                icon="pi pi-arrow-left" 
+                severity="secondary" 
+                @click="$inertia.visit('/')"
+                :class="{ 'opacity-25': form.processing }"
+            />
+        </div>
     </AuthenticationCard>
 </template>

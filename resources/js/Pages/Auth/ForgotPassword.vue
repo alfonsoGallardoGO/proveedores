@@ -28,7 +28,13 @@ const submit = () => {
             <AuthenticationCardLogo />
         </template>
 
-        <div class="mb-4 text-sm text-gray-600">
+        <h1
+            class="text-gray-900 fw-bolder mb-3 text-3xl"
+        >
+                Recuperar contraseña
+        </h1>
+
+        <div class="mb-4 text-sm text-gray-600 text-center">
             Olvidaste tu contraseña? No hay problema. Simplemente ingresa tu
             dirección de correo electrónico y te enviaremos un enlace para
             restablecer tu contraseña que te permitirá elegir una nueva.
@@ -62,5 +68,16 @@ const submit = () => {
                 </PrimaryButton>
             </div>
         </form>
+
+        <div class="flex justify-end w-full mt-4">
+            <Button 
+                label="Volver al login"
+                icon="pi pi-arrow-left" 
+                severity="secondary" 
+                @click="$inertia.visit('/')"
+                :class="{ 'opacity-25': form.processing }"
+            />
+        </div>
+
     </AuthenticationCard>
 </template>
