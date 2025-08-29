@@ -352,7 +352,7 @@ class SupplierPurchaseOrderController extends Controller
 
         $purchase_order_id = 873;
         $pdfPath = public_path('suppliers/invoices/pdf/prueba_3.pdf');
-        $xmlPath = public_path('suppliers/invoices/xml/prueba_3.xml');
+        $xmlPath = public_path('suppliers/invoices/xml/prueba_xml_2.xml');
 
 
         if (!File::exists($xmlPath)) {
@@ -557,11 +557,14 @@ class SupplierPurchaseOrderController extends Controller
         }
 
         $item = SupplierPurchaseOrderItem::where('supplier_purchase_order_id', $purchase_order_id)
-            ->where('type', 'GASTO')
             ->first();
 
         $department_name = $item?->department;
+        $department_name_row = Str::of($department_name)->afterLast(':')->trim();
+
         $class_name = $item?->class;
+        $class_name_row = Str::of($class_name)->afterLast(':')->trim();
+
         $location_name = Str::of($item->location ?? '')
             ->replaceMatches('/^.*:\s*/', '')
             ->squish()
@@ -570,11 +573,11 @@ class SupplierPurchaseOrderController extends Controller
         $category_name = $item?->categoria;
         $description = $item?->description;
 
-        $departamentos = NetsuiteDepartments::where('name', $department_name)
+        $departamentos = NetsuiteDepartments::where('name', $department_name_row)
             ->first();
         $department_id = $departamentos?->external_id ?? 146;
 
-        $clases = NetsuiteClass::where('name', $class_name)
+        $clases = NetsuiteClass::where('name', $class_name_row)
             ->first();
         $class_id = $clases?->external_id ?? 460;
 
@@ -599,9 +602,9 @@ class SupplierPurchaseOrderController extends Controller
             "rfc" => $emisorRfc,
             "nfactura" => $folio,
             "regimenfiscal" => $regimen,
-            "moneda" => $moneda,
+            "moneda" => $moneda ?? 'MXN',
             "termino" => "",
-            "departamento" => $department_id,
+            "departamento" => $department_id ?? 146,
             "clase" => $class_id,
             "operacion" => "",
             "tipocambio" => $tipo_cambio,
@@ -612,10 +615,10 @@ class SupplierPurchaseOrderController extends Controller
             "uuid" => $uuid,
             "gastos" => [
                 [
-                    "categoria" => $catergoria_id,
+                    "categoria" => $catergoria_id ?? 212,
                     "costo" => $monto,
                     "ubicacion" => $ubicacion_id,
-                    "departamento" => $department_id,
+                    "departamento" => $department_id ?? 146,
                     "clase" => $class_id,
                     "concepto" => $description,
                     "claveprodser" => $clave_prod_serv,
@@ -630,7 +633,8 @@ class SupplierPurchaseOrderController extends Controller
         ];
 
         $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
-        return $data_netsuite;
+        // return $data;
+        // return $data_netsuite;
         $restletPath = "/restlet.nl?script=5141&deploy=1";
         try {
             $response = $this->netSuiteRestService->request($restletPath, 'POST', $data_netsuite);
