@@ -15,9 +15,9 @@ const props = defineProps({
     orders: Array,
 });
 
-onMounted(() => {
-    console.log(props.orders);
-});
+// onMounted(() => {
+//     console.log(props.orders);
+// });
 
 const form = useForm({
     cantidades: {},

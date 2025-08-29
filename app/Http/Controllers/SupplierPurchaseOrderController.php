@@ -9,6 +9,7 @@ use App\Models\SupplierPurchaseOrder;
 use App\Models\SupplierPurchaseOrderItem;
 use App\Models\SupplierPurchaseOrdersItemsDelivery;
 use App\Models\SupplierInvoice;
+use App\Models\Supplier;
 use App\Models\NetsuiteAccountingAccounts;
 use App\Models\NetsuiteClass;
 use App\Models\NetsuiteDepartments;
@@ -59,29 +60,28 @@ class SupplierPurchaseOrderController extends Controller
 
         $invoices = SupplierInvoice::where('supplier_purchase_order_id', $id)->get();
 
-        $orders = SupplierPurchaseOrder::findOrFail($id); 
+        $receipt = SupplierPurchaseOrdersReceipt::where('purchase_order', $purchase_order)->get();
 
-        $receipt = SupplierInvoice::where('purchase_order', $purchase_order)->get();
+        $supplierId = Auth::user()->supplier_id;
+        $supplier = Supplier::where('external_id', $supplierId)->first();
 
         return Inertia::render('Suppliers/PurchaseOrders/Edit', [
             'items' => $items,
             'invoices' => $invoices,
-            'orders' => $orders,
-            'receipt' => $receipt
+            'orders' => $order,
+            'receipt' => $receipt,
+            'supplier' => $supplier,
         ]);
     }
 
     public function store(Request $request)
     {
-        $data = $request;
+        // dd($request);
+        $receipt_number = $request->input('receipt_number');
+        $supplier_purchase_order_id = $request->input('supplier_purchase_order_id');
 
-        $gastos = [];
-        $articulos = [];
-        foreach ($data['cantidades'] as $itemId => $amount) {
-            SupplierPurchaseOrdersItemsDelivery::create([
-                'supplier_purchase_orders_item_id' => $itemId,
-                'amount' => $amount ?? 0,
-            ]);
+        if (!$receipt_number || !$supplier_purchase_order_id) {
+            return redirect()->back()->with('error', 'Faltan datos de la recepción o la orden de compra.');
         }
 
         $supplierId = Auth::user()->supplier_id ?? 1;
@@ -137,8 +137,8 @@ class SupplierPurchaseOrderController extends Controller
             'supplier_purchase_order_id' => $request->supplier_purchase_order_id ?? 0,
             'pdf_route' => $pdfPath,
             'xml_route' => $xmlPath,
+            'receipt' => $receipt_number,
         ]);
-
 
         return redirect()->route('purchase-orders.index')
             ->with('success', 'Cantidades entregadas e invoices guardados correctamente.');
@@ -152,8 +152,7 @@ class SupplierPurchaseOrderController extends Controller
                 return trim(substr($value, $last_colon_pos + 1));
             }
             return $value;
-        }
-        else if (is_array($value)) {
+        } else if (is_array($value)) {
             foreach ($value as $key => $item) {
                 $value[$key] = $this->extractLastPart($item);
             }
@@ -190,7 +189,7 @@ class SupplierPurchaseOrderController extends Controller
         $filePath = $folderPath . '/' . $fileName;
 
         if (!file_exists($folderPath)) {
-            mkdir($folderPath, 0755, true); 
+            mkdir($folderPath, 0755, true);
         }
         $existingContent = file_exists($filePath) ? file_get_contents($filePath) : '[]';
         $dataArray = json_decode($existingContent, true);
@@ -573,11 +572,11 @@ class SupplierPurchaseOrderController extends Controller
 
         $departamentos = NetsuiteDepartments::where('name', $department_name)
             ->first();
-        $department_id = $departamentos?->external_id;
+        $department_id = $departamentos?->external_id ?? 146;
 
         $clases = NetsuiteClass::where('name', $class_name)
             ->first();
-        $class_id = $clases?->external_id;
+        $class_id = $clases?->external_id ?? 460;
 
         $ubicaciones = NetsuiteLocations::where('name', $location_name)
             ->first();
@@ -585,7 +584,7 @@ class SupplierPurchaseOrderController extends Controller
 
         $categorias = NetsuiteExpenseCategories::where('name', $category_name)
             ->first();
-        $catergoria_id = $categorias?->external_id;
+        $catergoria_id = $categorias?->external_id ?? 212;
 
         $ordenes_compra = SupplierPurchaseOrder::where('id', $purchase_order_id)
             ->first();
@@ -631,7 +630,7 @@ class SupplierPurchaseOrderController extends Controller
         ];
 
         $data_netsuite['gastos'][0]['Impuestos']['Traslados']['Traslado'] = $traslados;
-
+        return $data_netsuite;
         $restletPath = "/restlet.nl?script=5141&deploy=1";
         try {
             $response = $this->netSuiteRestService->request($restletPath, 'POST', $data_netsuite);

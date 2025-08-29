@@ -23,7 +23,7 @@ class SupplierPurchaseOrder extends Model
         'purchase_order',
         'total',
         'subtotal',
-        'impuesto'
+        'impuesto',
     ];
 
     protected $dates = ['deleted_at'];

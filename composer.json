@@ -16,6 +16,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "league/oauth1-client": "^1.11",
+        "milon/barcode": "^12.0",
         "netsuitephp/netsuite-laravel": "^1.0",
         "spatie/laravel-permission": "^6.21",
         "tightenco/ziggy": "^2.0",

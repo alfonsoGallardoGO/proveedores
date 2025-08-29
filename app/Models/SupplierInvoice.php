@@ -16,6 +16,7 @@ class SupplierInvoice extends Model
         'supplier_purchase_order_id',
         'pdf_route',
         'xml_route',
+        'receipt',
     ];
 
 
