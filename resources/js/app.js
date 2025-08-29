@@ -39,6 +39,7 @@ import Tab from 'primevue/tab';
 import Message from 'primevue/message';
 import DatePicker from 'primevue/datepicker';
 import Ripple from 'primevue/ripple';
+import Tooltip from 'primevue/tooltip';
 
 
 
@@ -157,6 +158,7 @@ createInertiaApp({
         app.component("Tab", Tab);
         app.component("Message", Message);
         app.component("DatePicker", DatePicker);
+        app.component('Tooltip', Tooltip);
         app.mount(el);
 
         if (typeof KTApp !== "undefined" && KTApp.init) {

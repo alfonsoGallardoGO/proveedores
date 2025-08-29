@@ -5,21 +5,24 @@ import { ref, onMounted, computed } from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import { useToast } from "primevue/usetoast";
 import { useForm } from "@inertiajs/vue3";
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
 import FileUpload from "primevue/fileupload";
 import Message from 'primevue/message';
 import Toast from 'primevue/toast';
-import Ripple from 'primevue/ripple';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Tooltip from 'primevue/tooltip';
+import ayuda from "@/assets/numero_recepcion_ayuda.png";
 
 const props = defineProps({
     invoices: Array,
     items: Array,
     orders: Object,
     receipt: Array,
-    supplier: Array,
+    supplier: Object,
 });
+
+const vTooltip = Tooltip;
 
 onMounted(() => {
     console.log('Datos de invoices:', props.invoices);
@@ -33,8 +36,8 @@ onMounted(() => {
 const toast = useToast();
 const dtItems = ref();
 const loading = ref(false);
-
 const visible = ref(false);
+const mostrarPopupAyuda = ref(false);
 
 const form = useForm({
     receipt_number: null,
@@ -77,12 +80,18 @@ const onXmlRemove = () => {
     buttonLabelXml.value = 'Seleccionar XML';
 };
 
+const selectedExternalId = ref(null);
+
+const openDialogAndSetId = (externalId) => {
+    selectedExternalId.value = externalId;
+    visible.value = true;
+    console.log('ID enviado:', selectedExternalId.value);
+};
+
 const store = async () => {
     loading.value = true;
 
     try {
-
-        // const hasEmptyFields = ;
         if (!form.receipt_number) {
             setTimeout(() => {
                 loading.value = false;
@@ -92,6 +101,20 @@ const store = async () => {
                     detail: "Agrega el número de recepción asignado.",
                     life: 4000,
                 });
+            }, 1000);
+            return;
+        }
+
+        if (form.receipt_number != selectedExternalId) {
+            setTimeout(() => {
+                loading.value = false;
+                toast.add({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "El número de recepción es incorrecto, si deseas consultar cual es el número de recepción da click en el botón de ayuda.",
+                    life: 8000,
+                });
+                form.receipt_number = null; 
             }, 1000);
             return;
         }
@@ -189,20 +212,10 @@ const formatCurrency = (value) => {
     }).format(Number(value));
 };
 
-// const activeTab = ref('Lista de Recepciones');
-
-// const tabsItems = ref([
-//     // { label: 'Subir Archivos', icon: 'pi pi-upload' },
-//     { label: 'Lista de Recepciones', icon: 'pi pi-list' }
-// ]);
-
 const dialogVisible = ref(false);
-// const currentDocumentUrl = ref('');
 
 const showDocument = (url) => {
-    // currentDocumentUrl.value = url;
     window.open(url, '_blank');
-    // dialogVisible.value = true;
 };
 
 const formatDate = (dateString) => {
@@ -217,14 +230,10 @@ const formatDate = (dateString) => {
     return `${day}-${month}-${year}`;
 };
 
-
-// const receptionData = ref([]);
-
 const filtersReception = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
-// Lógica para determinar la severidad de la etiqueta
 const getSeverity = (status) => {
     switch (status) {
         case 'Factura Cargada':
@@ -235,31 +244,6 @@ const getSeverity = (status) => {
             return null;
     }
 };
-
-// onMounted(() => {
-//     const data = [];
-//     if (props.receipt && props.receipt.length > 0) {
-//         props.receipt.forEach(receiptItem => {
-//             if (receiptItem && receiptItem.tranid) {
-//                 const tranidFromReceipt = receiptItem.tranid;
-
-//                 // Buscar la factura correspondiente en el array de invoices
-//                 const invoiceExists = props.invoices.some(invoiceItem =>
-//                     invoiceItem.receipt == tranidFromReceipt
-//                 );
-
-//                 // Determinar el estado
-//                 const status = invoiceExists ? 'Factura Cargada' : 'Pendiente de Factura';
-
-//                 data.push({
-//                     tranid: tranidFromReceipt,
-//                     status: status
-//                 });
-//             }
-//         });
-//     }
-//     receptionData.value = data;
-// });
 
 const mergedReceptionData = computed(() => {
     if (!props.receipt || props.receipt.length === 0) {
@@ -289,11 +273,6 @@ const mergedReceptionData = computed(() => {
 });
 
 const showOrder = () => {
-    // console.log('ID de la orden:', props.orders.id);
-    // console.log('ID del proveedor:', props.supplier.id);
-    // console.log('Nombre del proveedor:', props.supplier.name);
-    // console.log('Todos los props de la orden:', props.orders);
-    // console.log('Todos los props del proveedor:', props.supplier);
     if (props.orders && props.orders.id && props.supplier) {
         const url = route('generate.invoice', {
             id: props.orders.id,
@@ -316,10 +295,6 @@ const showOrder = () => {
     }
 };
 
-// const showOrder = () => {
-//     window.open(route('generate.invoice', { id: props.orders.id }));
-// };
-
 </script>
 
 <template>
@@ -339,9 +314,10 @@ const showOrder = () => {
                                 </template>
                             </Toolbar>
                             <div class="card">
-                                <DataTable :value="receptionData" rowGroupMode="rowspan" groupRowsBy="number.order"
-                                    :filters="filtersReception" sortMode="single" sortField="number.order"
-                                    :sortOrder="1" tableStyle="min-width: 50rem" scrollable scrollHeight="200px">
+                                <DataTable :value="mergedReceptionData" rowGroupMode="rowspan"
+                                    groupRowsBy="number.order" :filters="filtersReception" sortMode="single"
+                                    sortField="number.order" :sortOrder="1" tableStyle="min-width: 50rem" scrollable
+                                    scrollHeight="200px">
                                     <template #header>
                                         <div class="flex flex-wrap gap-2 items-center justify-between">
                                             <Message severity="info" icon="pi pi-file" class="mr-2">
@@ -358,7 +334,23 @@ const showOrder = () => {
                                             </IconField>
                                         </div>
                                     </template>
-                                    <Column field="tranid" header="N. Recepción" style="min-width: 200px">
+
+                                    <Column field="tranid" header="N. Recepción" style="min-width: 200px"></Column>
+
+                                    <Column field="invoice_id" header="N. Factura" style="min-width: 150px">
+                                        <template #body="slotProps">
+                                            <span v-if="slotProps.data.invoice_id">{{ slotProps.data.invoice_id
+                                                }}</span>
+                                            <span v-else class="text-gray-400">N/A</span>
+                                        </template>
+                                    </Column>
+
+                                    <Column field="invoice_date" header="Fecha de Factura" style="min-width: 150px">
+                                        <template #body="slotProps">
+                                            <span v-if="slotProps.data.invoice_date">{{
+                                                formatDate(slotProps.data.invoice_date) }}</span>
+                                            <span v-else class="text-gray-400">N/A</span>
+                                        </template>
                                     </Column>
 
                                     <Column field="status" header="Status" style="min-width: 100px">
@@ -372,11 +364,26 @@ const showOrder = () => {
                                         <template #body="slotProps">
                                             <Button v-if="slotProps.data.status === 'Pendiente de Factura'"
                                                 icon="pi pi-plus-circle" label="Agregar" severity="help" raised
-                                                @click="visible = true" variant="outlined" />
-
+                                                @click="openDialogAndSetId(slotProps.data.external_id)"
+                                                variant="outlined" />
                                             <Button v-else-if="slotProps.data.status === 'Factura Cargada'"
                                                 icon="pi pi-check" label="Completado" severity="success" raised disabled
                                                 @click="visible = true" variant="outlined" />
+                                        </template>
+                                    </Column>
+
+                                    <Column header="Documentos" style="min-width: 16rem">
+                                        <template #body="slotProps">
+                                            <div class="flex items-center gap-4">
+                                                <Button v-if="slotProps.data.pdf_route"
+                                                    @click="showDocument(slotProps.data.pdf_route)" label="Ver PDF"
+                                                    icon="pi pi-file-pdf" class="p-button-sm p-button-outlined"
+                                                    aria-label="Ver PDF" severity="danger" />
+                                                <span v-else class="flex items-center text-gray-400">
+                                                    <i class="pi pi-file text-xl"></i>
+                                                    <span class="ml-2 hidden sm:inline">Sin PDF</span>
+                                                </span>
+                                            </div>
                                         </template>
                                     </Column>
                                 </DataTable>
@@ -426,7 +433,7 @@ const showOrder = () => {
                                 <Column header="Monto" style="min-width: 10rem">
                                     <template #body="{ data }">
                                         <span class="font-bold text-gray-800">{{ formatCurrency(data.amount)
-                                        }}</span>
+                                            }}</span>
                                     </template>
                                 </Column>
                             </DataTable>
@@ -434,9 +441,12 @@ const showOrder = () => {
                                 :style="{ width: '50rem' }" position="top">
                                 <span class="text-surface-500 dark:text-surface-400 block mb-8"></span>
                                 <div class="flex flex-col items-center gap-4 mb-4">
+                                    <Button icon="pi pi-question-circle" class="p-button-rounded p-button-secondary"
+                                        @click="mostrarPopupAyuda = true" aria-label="Ayuda" v-tooltip="{ value: 'Ayuda'}"/>
                                     <label for="receipt_number" class="font-semibold">Número de Recepción</label>
                                     <InputText id="receipt_number" v-model="form.receipt_number" class="w-80"
-                                        autocomplete="off" />
+                                        autocomplete="off" placeholder="Ingresa tu número de recepción" />
+
                                 </div>
                                 <div class="flex flex-row gap-4">
                                     <div class="card p-4 border rounded-lg shadow-sm flex-1">
@@ -469,6 +479,20 @@ const showOrder = () => {
                                         </FileUpload>
                                     </div>
                                 </div>
+                                <Dialog v-model:visible="mostrarPopupAyuda" modal
+                                    header="Ayuda: Ubica tu número de recepción" :style="{ width: '30rem' }"
+                                    :position="'top'">
+                                    <div class="p-d-flex p-flex-column p-ai-center">
+                                        <div class="image-container">
+                                            <img class="mx-auto h-350px w-350px popup-imag" :src="ayuda" alt="" />
+                                            <!-- <img src="numero_recepcion_ayuda.png" alt="Ubicación del número de recepción"
+                                                class="popup-image" /> -->
+                                        </div>
+                                        <p class="mt-3 text-center">
+                                            En esta parte está el número de recepción que se debe ingresar, sin las letras.
+                                        </p>
+                                    </div>
+                                </Dialog>
                                 <div class="flex justify-end gap-2 mt-4">
                                     <Button type="button" label="Cancelar" severity="danger" @click="visible = false"
                                         icon="pi pi-times-circle"></Button>
@@ -476,88 +500,6 @@ const showOrder = () => {
                                         :loading="loading" @click="store()"></Button>
                                 </div>
                             </Dialog>
-                            <!-- <div class="card"> -->
-                                <!-- <div class="card">
-                                    <Tabs :value="activeTab">
-                                        <TabList>
-                                            <Tab v-for="tab in tabsItems" :key="tab.label" :value="tab.label"
-                                                @click="activeTab = tab.label">
-                                                <a v-ripple class="flex items-center gap-2 text-inherit">
-                                                    <i :class="tab.icon" />
-                                                    <span>{{ tab.label }}</span>
-                                                </a>
-                                            </Tab>
-                                        </TabList>
-                                    </Tabs>
-                                </div>
-
-                                <div class="tab-content0 mt-4"> -->
-                                    <!-- <div v-if="activeTab === 'Subir Archivos'" class="flex gap-4">
-
-                                    </div>
-                                    <div v-if="activeTab === 'Subir Archivos'" class="flex flex-col gap-4">
-                                        <div class="flex gap-4">
-                                        </div>
-
-                                        <div class="flex justify-center w-full">
-                                            <div class="card p-4">
-                                                <Button label="Subir Documentos" icon="pi pi-cloud-upload"
-                                                    severity="help" :loading="loading" @click="store()" outlined
-                                                    class="w-80" />
-                                            </div>
-                                        </div>
-                                    </div> -->
-                                    <!-- <div v-if="activeTab === 'Lista de Recepciones'">
-                                        <div class="card"> -->
-                                            <!-- <DataTable :value="invoices" stripedRows paginator :rows="10"
-                                                :rowsPerPageOptions="[5, 10, 25]"
-                                                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} facturas"
-                                                :filters="filtersInvoices">
-                                                <template #header>
-                                                    <div class="flex flex-wrap gap-2 items-center justify-between">
-                                                        <h4 class="m-0">Recepciones Cargadas</h4>
-                                                        <IconField>
-                                                            <InputIcon>
-                                                                <i class="pi pi-search" />
-                                                            </InputIcon>
-                                                            <InputText v-model="filtersInvoices['global'].value"
-                                                                placeholder="Buscar..." />
-                                                        </IconField>
-                                                    </div>
-                                                </template>
-
-                                                <Column field="id" header="#Recepción" sortable
-                                                    style="min-width: 12rem">
-                                                    <template #body="slotProps">
-                                                        <span class="font-semibold">{{ slotProps.data.receipt }}</span>
-                                                    </template>
-                                                </Column>
-                                                <Column field="created_at" header="Fecha" sortable
-                                                    style="min-width: 12rem">
-                                                    <template #body="slotProps">
-                                                        {{ formatDate(slotProps.data.created_at) }}
-                                                    </template>
-                                                </Column>
-                                                <Column header="Documentos" style="min-width: 16rem">
-                                                    <template #body="slotProps">
-                                                        <div class="flex items-center gap-4">
-                                                            <Button v-if="slotProps.data.pdf_route"
-                                                                @click="showDocument(slotProps.data.pdf_route)"
-                                                                label="Ver PDF" icon="pi pi-file-pdf"
-                                                                class="p-button-sm p-button-outlined"
-                                                                aria-label="Ver PDF" severity="danger" />
-                                                            <span v-else class="flex items-center text-gray-400">
-                                                                <i class="pi pi-file text-xl"></i>
-                                                                <span class="ml-2 hidden sm:inline">Sin PDF</span>
-                                                            </span>
-                                                        </div>
-                                                    </template>
-                                                </Column>
-                                            </DataTable> -->
-                                        <!-- </div>
-                                    </div> -->
-                                <!-- </div>
-                            </div> -->
                         </div>
                     </div>
                 </div>
