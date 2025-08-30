@@ -455,7 +455,7 @@ const showOrder = () => {
                                             Subir Factura (PDF)
                                         </h4>
                                         <FileUpload name="factura" ref="facturaFileUpload" accept=".pdf" :auto="false"
-                                            @select="onFacturaUpload" @remove="onFacturaRemove" :customUpload="true">
+                                            @select="onFacturaUpload" @remove="onFacturaRemove" :customUpload="false">
                                             <template #header="{ chooseCallback }">
                                                 <Button :label="buttonLabelPdf" icon="pi pi-file-pdf"
                                                     @click="chooseCallback()" severity="danger"
@@ -485,8 +485,6 @@ const showOrder = () => {
                                     <div class="p-d-flex p-flex-column p-ai-center">
                                         <div class="image-container">
                                             <img class="mx-auto h-350px w-350px popup-imag" :src="ayuda" alt="" />
-                                            <!-- <img src="numero_recepcion_ayuda.png" alt="Ubicación del número de recepción"
-                                                class="popup-image" /> -->
                                         </div>
                                         <p class="mt-3 text-center">
                                             En esta parte está el número de recepción que se debe ingresar, sin las letras.
